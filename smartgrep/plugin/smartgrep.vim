@@ -1,8 +1,8 @@
 "
-" Filename : pgrep.vim 
+" Filename : smartgrep.vim 
 " Brief    : This file is vim plugin
-" Function : grep h/c/cpp file excluding comment 
-" Author   : pebble7777 <pebble@abelia.ocn.ne.jp> 2009-2011 Copyright
+" Function : grep source file excluding comment 
+" Author   : pebble8888@gmail.com 2009-2012 Copyright
 " History  :
 " 	Ver1.0.0.0 2009-09-13 initial revision for grep excluding comment
 "	Ver1.1.0.0 2009-09-27 add word grep function
@@ -17,10 +17,19 @@
 "	Ver1.7.1.0 2011-02-10 create pgrep.vim and fix up usage 
 "	Ver1.7.2.0 2011-02-10 fix bug in pgrep.vim
 "   Ver1.7.3.0 2011-10-15 improve help and add makefile for Unix
+"   Ver2.0.0.0 2012-10-18 rename pgrep -> smartgrep
 "
+" Cover OS
+"	Windows/Unix
+"
+" Cover File Extention                                  Cover Comment Type
+"	C++ 		: *.c *.cpp *.cxx *.tli *.inc *.rc 		/* */, // 
+"   C++ heder	: *.h *.hpp *.hxx *.tlh *.inl			/* */, //
+"	Objective-C : *.m *.mm								/* */, //
+" 
 " How To Install
-"	Put pgrep.exe or pgrep in C:\windows\system32\ or pathed directory.
-"	Put pgrep.vim in vim plugin directory
+"	Put smartgrep.exe or smartgrep in C:\windows\system32\ or pathed directory.
+"	Put smartgrep.vim in vim plugin directory
 "		example:
 "			C:\vim7\runtime\plugin\		(for windows)
 "			~/.vim/plugin/				(for Unix)
@@ -30,7 +39,7 @@
 " 			let g:base_dir="c:\\develop" (for windows)
 "			let g:base_dir="/develop/"	 (for Unix)
 "
-"	If you use MacVim, add pgrep path to .vimrc file.
+"	If you use MacVim, add smartgrep path to .vimrc file.
 "		example:
 "	        let $PATH .= ':~/bin'
 "
@@ -40,82 +49,74 @@
 " 			let g:sys_dir_w="c:\\WinDDK"			(for windows)
 " 			let g:sys_dir_l="c:\\linux\\include"	(for windows)
 "
-" Cover OS
-"	Windows/Unix
-"
-" Cover File Extention
-"	C++ 		: *.c *.cpp *.cxx *.tli *.inc *.rc 
-"   C++ heder	: *.h *.hpp *.hxx *.tlh *.inl
-"	Objective-C : *.m *.mm
-" 
 " Implementation below
 
-function! RPGrepNW(word)
-  set grepprg=pgrep\ /nw
+function! RSmartGrepNW(word)
+  set grepprg=smartgrep\ /nw
   execute "cd " . g:base_dir
   execute "lgrep " . a:word
   lopen
   set grepprg&
 endfunction
 
-function! RPGrepHW(word)
-  set grepprg=pgrep\ /hw
+function! RSmartGrepHW(word)
+  set grepprg=smartgrep\ /hw
   execute "cd " . g:base_dir
   execute "lgrep " . a:word
   lopen
   set grepprg&
 endfunction
 
-function! RPGrepW(word)
-  set grepprg=pgrep\ /bw
+function! RSmartGrepW(word)
+  set grepprg=smartgrep\ /bw
   execute "cd " . g:base_dir
   execute "lgrep " . a:word
   lopen
   set grepprg&
 endfunction
 
-function! RPGrepN(word)
-  set grepprg=pgrep\ /n
+function! RSmartGrepN(word)
+  set grepprg=smartgrep\ /n
   execute "cd " . g:base_dir
   execute "lgrep " . a:word
   lopen
   set grepprg&
 endfunction
 
-function! RPGrepH(word)
-  set grepprg=pgrep\ /h
+function! RSmartGrepH(word)
+  set grepprg=smartgrep\ /h
   execute "cd " . g:base_dir
   execute "lgrep " . a:word
   lopen
   set grepprg&
 endfunction
 
-function! RPGrep(word)
-  set grepprg=pgrep\ /b
+function! RSmartGrep(word)
+  set grepprg=smartgrep\ /b
   execute "cd " . g:base_dir
   execute "lgrep " . a:word
   lopen
   set grepprg&
 endfunction
 
-function! RPGrepWA(word)
-  set grepprg=pgrep\ /bw
+function! RSmartGrepWA(word)
+  set grepprg=smartgrep\ /bw
   execute "cd " . g:sys_dir
   execute "lgrep " . a:word
   lopen
   set grepprg&
 endfunction
 
-function! RPGrepWW(word)
-  set grepprg=pgrep\ /bw
+function! RSmartGrepWW(word)
+  set grepprg=smartgrep\ /bw
   execute "cd " . g:sys_dir_w
   execute "lgrep " . a:word
   lopen
   set grepprg&
 endfunction
 
-function! RPGrepWL(word)
-  set grepprg=pgrep\ /bw
+function! RSmartGrepWL(word)
+  set grepprg=smartgrep\ /bw
   execute "cd " . g:sys_dir_l
   execute "lgrep " . a:word
   lopen
@@ -124,8 +125,8 @@ endfunction
 
 " ,g : recursive word grep for c,h file exclude comment by mouse cursored word 
 " ,h : recursive word grep for h file exclude comment by mouse cursored word
-noremap ,g :call RPGrepW("<C-R><C-W>")<CR>
-noremap ,h :call RPGrepHW("<C-R><C-W>")<CR>
+noremap ,g :call RSmartGrepW("<C-R><C-W>")<CR>
+noremap ,h :call RSmartGrepHW("<C-R><C-W>")<CR>
 
 " :Rn  -> recursive word grep for c,h file include comment
 " :Rh  -> recursive word grep for h file exclude comment
@@ -133,15 +134,15 @@ noremap ,h :call RPGrepHW("<C-R><C-W>")<CR>
 " :Rno -> recursive grep for c,h file include comment
 " :Rho -> recursive grep for h file exclude comment
 " :Ro  -> recursive grep for c,h file exclude comment
-command! -nargs=1 -complete=file Rn call RPGrepNW("<args>")
-command! -nargs=1 -complete=file Rh call RPGrepHW("<args>")
-command! -nargs=1 -complete=file R call RPGrepW("<args>")
-command! -nargs=1 -complete=file Rno call RPGrepN("<args>")
-command! -nargs=1 -complete=file Rho call RPGrepH("<args>")
-command! -nargs=1 -complete=file Ro call RPGrep("<args>")
+command! -nargs=1 -complete=file Rn call RSmartGrepNW("<args>")
+command! -nargs=1 -complete=file Rh call RSmartGrepHW("<args>")
+command! -nargs=1 -complete=file R call RSmartGrepW("<args>")
+command! -nargs=1 -complete=file Rno call RSmartGrepN("<args>")
+command! -nargs=1 -complete=file Rho call RSmartGrepH("<args>")
+command! -nargs=1 -complete=file Ro call RSmartGrep("<args>")
 
 " :Rl  -> recursive word grep for c,h file exclude comment in sys_dir_w
 " :Rw  -> recursive word grep for c,h file exclude comment in sys_dir_l
-command! -nargs=1 -complete=file Rl call RPGrepWL("<args>")
-command! -nargs=1 -complete=file Rw call RPGrepWW("<args>")
+command! -nargs=1 -complete=file Rl call RSmartGrepWL("<args>")
+command! -nargs=1 -complete=file Rw call RSmartGrepWW("<args>")
 

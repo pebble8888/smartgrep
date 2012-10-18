@@ -1,6 +1,6 @@
 /**
- * @file	pgrep.cpp
- * @author	pebble7777
+ * @file	smartgrep.cpp
+ * @author	pebble8888@gmail.com
  */
 
 #ifdef WIN32
@@ -19,7 +19,7 @@
 #include <dirent.h>
 #endif
 
-#include "pgrep.h"
+#include "smartgrep.h"
 
 #ifdef WIN32
 #include <windows.h>
@@ -49,40 +49,40 @@ int main(int argc, char* argv[])
 	int wordtype = 0;
 	int filetype = 0;
 	if( strcmp( argv[1], "/n" ) == 0 ){
-		filetype |= PGREP_FILETYPE_SOURCE;
-		filetype |= PGREP_FILETYPE_HEADER;
-		wordtype |= PGREP_WORDTYPE_NORMAL;
-		wordtype |= PGREP_WORDTYPE_INCLUDE_COMMENT;
+		filetype |= SMARTGREP_FILETYPE_SOURCE;
+		filetype |= SMARTGREP_FILETYPE_HEADER;
+		wordtype |= SMARTGREP_WORDTYPE_NORMAL;
+		wordtype |= SMARTGREP_WORDTYPE_INCLUDE_COMMENT;
 	} else if( strcmp( argv[1], "/h" ) == 0 ){
-		filetype |= PGREP_FILETYPE_HEADER;
-		wordtype |= PGREP_WORDTYPE_NORMAL;
-		wordtype |= PGREP_WORDTYPE_EXCLUDE_COMMENT;
+		filetype |= SMARTGREP_FILETYPE_HEADER;
+		wordtype |= SMARTGREP_WORDTYPE_NORMAL;
+		wordtype |= SMARTGREP_WORDTYPE_EXCLUDE_COMMENT;
 	} else if( strcmp( argv[1], "/b" ) == 0 ){
-		filetype |= PGREP_FILETYPE_SOURCE;
-		filetype |= PGREP_FILETYPE_HEADER;
-		wordtype |= PGREP_WORDTYPE_NORMAL;
-		wordtype |= PGREP_WORDTYPE_EXCLUDE_COMMENT;
+		filetype |= SMARTGREP_FILETYPE_SOURCE;
+		filetype |= SMARTGREP_FILETYPE_HEADER;
+		wordtype |= SMARTGREP_WORDTYPE_NORMAL;
+		wordtype |= SMARTGREP_WORDTYPE_EXCLUDE_COMMENT;
 	} else if( strcmp( argv[1], "/nw" ) == 0 ){
-		filetype |= PGREP_FILETYPE_SOURCE;
-		filetype |= PGREP_FILETYPE_HEADER;
-		wordtype |= PGREP_WORDTYPE_WORD;
-		wordtype |= PGREP_WORDTYPE_INCLUDE_COMMENT;
+		filetype |= SMARTGREP_FILETYPE_SOURCE;
+		filetype |= SMARTGREP_FILETYPE_HEADER;
+		wordtype |= SMARTGREP_WORDTYPE_WORD;
+		wordtype |= SMARTGREP_WORDTYPE_INCLUDE_COMMENT;
 	} else if( strcmp( argv[1], "/hw" ) == 0 ){
-		filetype |= PGREP_FILETYPE_HEADER;
-		wordtype |= PGREP_WORDTYPE_WORD;
-		wordtype |= PGREP_WORDTYPE_EXCLUDE_COMMENT;
+		filetype |= SMARTGREP_FILETYPE_HEADER;
+		wordtype |= SMARTGREP_WORDTYPE_WORD;
+		wordtype |= SMARTGREP_WORDTYPE_EXCLUDE_COMMENT;
 	} else if( strcmp( argv[1], "/bw" ) == 0 ){
-		filetype |= PGREP_FILETYPE_SOURCE;
-		filetype |= PGREP_FILETYPE_HEADER;
-		wordtype |= PGREP_WORDTYPE_WORD;
-		wordtype |= PGREP_WORDTYPE_EXCLUDE_COMMENT;
+		filetype |= SMARTGREP_FILETYPE_SOURCE;
+		filetype |= SMARTGREP_FILETYPE_HEADER;
+		wordtype |= SMARTGREP_WORDTYPE_WORD;
+		wordtype |= SMARTGREP_WORDTYPE_EXCLUDE_COMMENT;
 	} else {
 		usage();
 		return 1;
 	}
 	char path[512];
 	memset( path, 0, sizeof(path) );
-	pgrep_getcwd( path, sizeof(path) );
+	smartgrep_getcwd( path, sizeof(path) );
 	char* word = argv[2];
 #ifdef WIN32
 	parse_directory_win( path, filetype, wordtype, word );
@@ -92,7 +92,7 @@ int main(int argc, char* argv[])
 	return 0;
 }
 
-void pgrep_getcwd( char* buf, size_t size )
+void smartgrep_getcwd( char* buf, size_t size )
 {
 #ifdef WIN32
 	GetCurrentDirectory( size, buf );
@@ -105,12 +105,12 @@ void pgrep_getcwd( char* buf, size_t size )
 void usage( void )
 {
 	printf( 
-		"Usage: pgrep /h {word}  : recursive      grep for .h                excluding comment\n"
-		"       pgrep /b {word}  : recursive      grep for .cpp .c .mm .m .h excluding comment\n"
-		"       pgrep /n {word}  : recursive      grep for .cpp .c .mm .m .h including comment\n"
-		"       pgrep /hw {word} : recursive word grep for .h                excluding comment\n"
-		"       pgrep /bw {word} : recursive word grep for .cpp .c .mm .m .h excluding comment\n"
-		"       pgrep /nw {word} : recursive word grep for .cpp .c .mm .m .h including comment\n"
+		"Usage: smartgrep /h {word}  : recursive      grep for .h                excluding comment\n"
+		"                 /b {word}  : recursive      grep for .cpp .c .mm .m .h excluding comment\n"
+		"                 /n {word}  : recursive      grep for .cpp .c .mm .m .h including comment\n"
+		"                 /hw {word} : recursive word grep for .h                excluding comment\n"
+		"                 /bw {word} : recursive word grep for .cpp .c .mm .m .h excluding comment\n"
+		"                 /nw {word} : recursive word grep for .cpp .c .mm .m .h including comment\n"
 	);
 	print_version();
 }
@@ -118,11 +118,11 @@ void usage( void )
 #ifdef WIN32
 /*
  * @param char* path
- * @param int   filetype	PGREP_FILETYPE_SOURCE: .c/.cpp/.m/.mm/etc
- * 							PGREP_FILETYPE_HEADER: .h/.hpp/etc
- * @param int   wordtype	PGREP_WORDTYPE_WORD_EXCLUDE_COMMENT: \<{word}\>
- * 							PGREP_WORDTYPE_NORMAL_EXCLUDE_COMMENT: word
- * 							PGREP_WORDTYPE_NORMAL_INCLUDE_COMMENT: word
+ * @param int   filetype	SMARTGREP_FILETYPE_SOURCE: .c/.cpp/.m/.mm/etc
+ * 							SMARTGREP_FILETYPE_HEADER: .h/.hpp/etc
+ * @param int   wordtype	SMARTGREP_WORDTYPE_WORD_EXCLUDE_COMMENT: \<{word}\>
+ * 							SMARTGREP_WORDTYPE_NORMAL_EXCLUDE_COMMENT: word
+ * 							SMARTGREP_WORDTYPE_NORMAL_INCLUDE_COMMENT: word
  * @param char* target_word
  */
 void parse_directory_win( char* path, int filetype, int wordtype, char* target_word )
@@ -152,8 +152,8 @@ void parse_directory_win( char* path, int filetype, int wordtype, char* target_w
 			strcat( path_name_r, "\\" );
 			strcat( path_name_r, find_data.cFileName );
 			parse_directory_win( path_name_r, filetype, wordtype, target_word );
-		} else if( ( (filetype & PGREP_FILETYPE_SOURCE ) && is_source_file( find_data.cFileName ) ) ||
-				   ( (filetype & PGREP_FILETYPE_HEADER ) && is_header_file( find_data.cFileName ) ) ){
+		} else if( ( (filetype & SMARTGREP_FILETYPE_SOURCE ) && is_source_file( find_data.cFileName ) ) ||
+				   ( (filetype & SMARTGREP_FILETYPE_HEADER ) && is_header_file( find_data.cFileName ) ) ){
 			char file_name_r[512];
 			strcpy( file_name_r, path );
 			strcat( file_name_r, "\\" );
@@ -174,11 +174,11 @@ void parse_directory_win( char* path, int filetype, int wordtype, char* target_w
 
 /*
  * @param char* path
- * @param int   filetype	PGREP_FILETYPE_SOURCE: .c/.cpp/.m/.mm/etc
- * 							PGREP_FILETYPE_HEADER: .h/.hpp/etc
- * @param int   wordtype	PGREP_WORDTYPE_WORD_EXCLUDE_COMMENT: \<{word}\>
- * 							PGREP_WORDTYPE_NORMAL_EXCLUDE_COMMENT: word
- * 							PGREP_WORDTYPE_NORMAL_INCLUDE_COMMENT: word
+ * @param int   filetype	SMARTGREP_FILETYPE_SOURCE: .c/.cpp/.m/.mm/etc
+ * 							SMARTGREP_FILETYPE_HEADER: .h/.hpp/etc
+ * @param int   wordtype	SMARTGREP_WORDTYPE_WORD_EXCLUDE_COMMENT: \<{word}\>
+ * 							SMARTGREP_WORDTYPE_NORMAL_EXCLUDE_COMMENT: word
+ * 							SMARTGREP_WORDTYPE_NORMAL_INCLUDE_COMMENT: word
  * @param char* target_word
  */
 void parse_directory_mac( char* path, int filetype, int wordtype, char* target_word )
@@ -207,8 +207,8 @@ void parse_directory_mac( char* path, int filetype, int wordtype, char* target_w
 			strcat( path_name_r, "/" );
 			strcat( path_name_r, p_dirent->d_name );
 			parse_directory_mac( path_name_r, filetype, wordtype, target_word );
-		} else if( ( (filetype & PGREP_FILETYPE_SOURCE ) && is_source_file( p_dirent->d_name ) ) ||
-				  ( (filetype & PGREP_FILETYPE_HEADER ) && is_header_file( p_dirent->d_name ) ) ){
+		} else if( ( (filetype & SMARTGREP_FILETYPE_SOURCE ) && is_source_file( p_dirent->d_name ) ) ||
+				  ( (filetype & SMARTGREP_FILETYPE_HEADER ) && is_header_file( p_dirent->d_name ) ) ){
 			char file_name_r[512];
 			strcpy( file_name_r, path );
 			strcat( file_name_r, "/" );
@@ -287,9 +287,9 @@ void parse_file( char* file_name, int wordtype, char* target_word )
 			break;
 
 		bool found;
-		if( wordtype & PGREP_WORDTYPE_EXCLUDE_COMMENT ){
+		if( wordtype & SMARTGREP_WORDTYPE_EXCLUDE_COMMENT ){
 			found = process_line_exclude_comment( &c_comment, p_data, wordtype, target_word );
-		} else if( wordtype & PGREP_WORDTYPE_INCLUDE_COMMENT ){
+		} else if( wordtype & SMARTGREP_WORDTYPE_INCLUDE_COMMENT ){
 			found = process_line_include_comment( p_data, wordtype, target_word );
 		} else {
 			assert( false );
@@ -373,10 +373,10 @@ WHILEOUT:
  */
 bool findword_in_line( char* valid_str, int wordtype, char* target_word )
 {
-	if( wordtype & PGREP_WORDTYPE_NORMAL ){
+	if( wordtype & SMARTGREP_WORDTYPE_NORMAL ){
 		// normal search
 		return ( strstr( valid_str, target_word ) != NULL );
-	} else if( wordtype & PGREP_WORDTYPE_WORD ){
+	} else if( wordtype & SMARTGREP_WORDTYPE_WORD ){
 		// word search
 		int   target_word_len = strlen(target_word);
 		char* remain_ptr = valid_str;

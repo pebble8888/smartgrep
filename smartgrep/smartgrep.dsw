@@ -3,7 +3,7 @@ Microsoft Developer Studio Workspace File, Format Version 6.00
 
 ###############################################################################
 
-Project: "pgrep"=.\pgrep.dsp - Package Owner=<4>
+Project: "smartgrep"=.\smartgrep.dsp - Package Owner=<4>
 
 Package=<5>
 {{{

@@ -1,20 +1,18 @@
-
-
 /**
- *	@file 	pgrep.h
- *	@author	pebble7777
+ *	@file 	smartgrep.h
+ *	@author	pebble8888@gmail.com
  */
 
-#ifndef PGREP_H
-#define PGREP_H
+#ifndef SMARTGREP_H
+#define SMARTGREP_H
 
-#define PGREP_WORDTYPE_WORD				0x01
-#define PGREP_WORDTYPE_NORMAL			0x02
-#define PGREP_WORDTYPE_INCLUDE_COMMENT	0x04
-#define PGREP_WORDTYPE_EXCLUDE_COMMENT	0x08
+#define SMARTGREP_WORDTYPE_WORD				0x01
+#define SMARTGREP_WORDTYPE_NORMAL			0x02
+#define SMARTGREP_WORDTYPE_INCLUDE_COMMENT	0x04
+#define SMARTGREP_WORDTYPE_EXCLUDE_COMMENT	0x08
 
-#define PGREP_FILETYPE_HEADER	0x01	// .h/.hpp/etc 
-#define PGREP_FILETYPE_SOURCE	0x02	// .c/.cpp/.m/.mm/etc
+#define SMARTGREP_FILETYPE_HEADER	0x01	// .h/.hpp/etc 
+#define SMARTGREP_FILETYPE_SOURCE	0x02	// .c/.cpp/.m/.mm/etc
 
 void usage( void );
 void parse_file( char* file_name, int wordtype, char* target_word );
@@ -32,10 +30,10 @@ bool findword_in_line( char* valid_str, int wordtype, char* target_word );
 bool is_alnum_or_underscore( int val );
 void print_version( void );
 
-void pgrep_getcwd( char* buf, size_t size );
+void smartgrep_getcwd( char* buf, size_t size );
 
 void test_is_alnum_or_underscore( void );
 void test( void );
 
-#endif
+#endif /* SMARTGREP_H */
 
