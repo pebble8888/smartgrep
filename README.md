@@ -12,8 +12,8 @@ C, C++, Objective-C	/* */, //
 
 Usage
 =======
-$ cd {directory-you-want-to-grep}
-$ smartgrep
+$ cd {directory-you-want-to-grep}  
+$ smartgrep  
 Usage: smartgrep /h {word}  : recursive      grep for .h                excluding comment  
                  /b {word}  : recursive      grep for .cpp .c .mm .m .h excluding comment  
                  /n {word}  : recursive      grep for .cpp .c .mm .m .h including comment  
