@@ -14,15 +14,15 @@ Usage
 =======
 $ cd {directory-you-want-to-grep}
 $ smartgrep
-Usage: smartgrep /h {word}  : recursive      grep for .h                excluding comment
-                 /b {word}  : recursive      grep for .cpp .c .mm .m .h excluding comment
-                 /n {word}  : recursive      grep for .cpp .c .mm .m .h including comment
-                 /hw {word} : recursive word grep for .h                excluding comment
-                 /bw {word} : recursive word grep for .cpp .c .mm .m .h excluding comment
-                 /nw {word} : recursive word grep for .cpp .c .mm .m .h including comment
+Usage: smartgrep /h {word}  : recursive      grep for .h                excluding comment  
+                 /b {word}  : recursive      grep for .cpp .c .mm .m .h excluding comment  
+                 /n {word}  : recursive      grep for .cpp .c .mm .m .h including comment  
+                 /hw {word} : recursive word grep for .h                excluding comment  
+                 /bw {word} : recursive word grep for .cpp .c .mm .m .h excluding comment  
+                 /nw {word} : recursive word grep for .cpp .c .mm .m .h including comment  
 
 INSTALL
 =======
-If you are Windows or Mac OS X user, read ./plugin/smartgrep.vim file. 
-If you are Unix user, type 'make + [enter]' and read ./plugin/smartgrep.vim file.
+If you are Windows or Mac OS X user, read ./plugin/smartgrep.vim file.  
+If you are Unix user, type 'make + [enter]' and read ./plugin/smartgrep.vim file.  
 
