@@ -105,12 +105,12 @@ void smartgrep_getcwd( char* buf, size_t size )
 void usage( void )
 {
 	printf( 
-		"Usage: smartgrep /h {word}  : recursive      grep for .h                excluding comment\n"
-		"                 /b {word}  : recursive      grep for .cpp .c .mm .m .h excluding comment\n"
-		"                 /n {word}  : recursive      grep for .cpp .c .mm .m .h including comment\n"
-		"                 /hw {word} : recursive word grep for .h                excluding comment\n"
-		"                 /bw {word} : recursive word grep for .cpp .c .mm .m .h excluding comment\n"
-		"                 /nw {word} : recursive word grep for .cpp .c .mm .m .h including comment\n"
+		"Usage: smartgrep /h {word}  : recursive      grep for .h                        excluding comment\n"
+		"                 /b {word}  : recursive      grep for .cpp .c .mm .m .h .cs .js excluding comment\n"
+		"                 /n {word}  : recursive      grep for .cpp .c .mm .m .h .cs .js including comment\n"
+		"                 /hw {word} : recursive word grep for .h                        excluding comment\n"
+		"                 /bw {word} : recursive word grep for .cpp .c .mm .m .h .cs .js excluding comment\n"
+		"                 /nw {word} : recursive word grep for .cpp .c .mm .m .h .cs .js including comment\n"
 	);
 	print_version();
 }
@@ -174,7 +174,7 @@ void parse_directory_win( char* path, int filetype, int wordtype, char* target_w
 
 /*
  * @param char* path
- * @param int   filetype	SMARTGREP_FILETYPE_SOURCE: .c/.cpp/.m/.mm/etc
+ * @param int   filetype	SMARTGREP_FILETYPE_SOURCE: .c/.cpp/.m/.mm/.cs/.js etc
  * 							SMARTGREP_FILETYPE_HEADER: .h/.hpp/etc
  * @param int   wordtype	SMARTGREP_WORDTYPE_WORD_EXCLUDE_COMMENT: \<{word}\>
  * 							SMARTGREP_WORDTYPE_NORMAL_EXCLUDE_COMMENT: word
@@ -228,7 +228,9 @@ bool is_source_file( char* file_name ){
 		is_ext( file_name, "inc" ) ||
 		is_ext( file_name, "rc" ) ||
 		is_ext( file_name, "m" ) ||
-		is_ext( file_name, "mm" ) ) {
+		is_ext( file_name, "mm" ) ||
+		is_ext( file_name, "cs" ) || 
+		is_ext( file_name, "js" ) ) {
 		return true;
 	} else {
 		return false;
@@ -248,7 +250,7 @@ bool is_header_file( char* file_name ){
 }
 
 /*
- * @param char: ext_name "c", "cpp", "h"
+ * @param char: ext_name "c", "cpp", "h", etc
  */
 bool is_ext( char* file_name, const char* ext_name ){
 	char* period = strrchr( file_name, '.' );

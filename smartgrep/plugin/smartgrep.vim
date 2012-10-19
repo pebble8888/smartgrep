@@ -18,6 +18,7 @@
 "	Ver1.7.2.0 2011-02-10 fix bug in pgrep.vim
 "   Ver1.7.3.0 2011-10-15 improve help and add makefile for Unix
 "   Ver2.0.0.0 2012-10-18 rename pgrep -> smartgrep
+"   Ver2.1.0.0 2012-10-19 cover .cs (CSharp), .js (Java Script)
 "
 " Cover OS
 "	Windows/Unix
@@ -26,6 +27,8 @@
 "	C++ 		: *.c *.cpp *.cxx *.tli *.inc *.rc 		/* */, // 
 "   C++ heder	: *.h *.hpp *.hxx *.tlh *.inl			/* */, //
 "	Objective-C : *.m *.mm								/* */, //
+"   CSharp      : *.cs									/* */, //
+"	JavaScript  : *.js									/* */, //
 " 
 " How To Install
 "	Put smartgrep.exe or smartgrep in C:\windows\system32\ or pathed directory.

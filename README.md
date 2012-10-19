@@ -8,18 +8,18 @@ Unix, MacOS X, Windows
 
 Cover Language and Comment Type
 =======
-C, C++, Objective-C	/* */, //
+C, C++, Objective-C, C#(CSharp), Java Script   /* */, //
 
 Usage
 =======
 $ cd {directory-you-want-to-grep}  
 $ smartgrep  
-Usage: smartgrep /h {word}  : recursive      grep for .h                excluding comment  
-                 /b {word}  : recursive      grep for .cpp .c .mm .m .h excluding comment  
-                 /n {word}  : recursive      grep for .cpp .c .mm .m .h including comment  
-                 /hw {word} : recursive word grep for .h                excluding comment  
-                 /bw {word} : recursive word grep for .cpp .c .mm .m .h excluding comment  
-                 /nw {word} : recursive word grep for .cpp .c .mm .m .h including comment  
+Usage: smartgrep /h {word}  : recursive      grep for .h                        excluding comment  
+                 /b {word}  : recursive      grep for .cpp .c .mm .m .cs .js .h excluding comment  
+                 /n {word}  : recursive      grep for .cpp .c .mm .m .cs .js .h including comment  
+                 /hw {word} : recursive word grep for .h                        excluding comment  
+                 /bw {word} : recursive word grep for .cpp .c .mm .m .cs .js .h excluding comment  
+                 /nw {word} : recursive word grep for .cpp .c .mm .m .cs .js .h including comment  
 
 INSTALL
 =======

@@ -12,7 +12,7 @@
 #define SMARTGREP_WORDTYPE_EXCLUDE_COMMENT	0x08
 
 #define SMARTGREP_FILETYPE_HEADER	0x01	// .h/.hpp/etc 
-#define SMARTGREP_FILETYPE_SOURCE	0x02	// .c/.cpp/.m/.mm/etc
+#define SMARTGREP_FILETYPE_SOURCE	0x02	// .c/.cpp/.m/.mm/.cs/.js etc
 
 void usage( void );
 void parse_file( char* file_name, int wordtype, char* target_word );
