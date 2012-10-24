@@ -10,7 +10,24 @@ Cover Language and Comment Type
 =======
 C, C++, Objective-C, C#(CSharp), Java Script   /* */, //
 
-Usage
+Usage (smartgrep.vim command)
+=======
+Define g:base_dir in your .vimrc file.  
+	example:  
+		let g:base_dir="/develop/"  
+  
+,g   -> recursive word grep for c,h file exclude comment by mouse cursored word  
+,h   -> recursive word grep for h file exclude comment by mouse cursored word  
+:Rn  -> recursive word grep for c,h file include comment  
+:Rh  -> recursive word grep for h file exclude comment  
+:R   -> recursive word grep for c,h file exclude comment  
+:Rno -> recursive grep for c,h file include comment  
+:Rho -> recursive grep for h file exclude comment  
+:Ro  -> recursive grep for c,h file exclude comment  
+:Rl  -> recursive word grep for c,h file exclude comment in sys_dir_w  
+:Rw  -> recursive word grep for c,h file exclude comment in sys_dir_l  
+
+Usage (smartgrep binary)
 =======
 $ cd {directory-you-want-to-grep}  
 $ smartgrep  
