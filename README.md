@@ -2,11 +2,11 @@ smartgrep
 =======
 Grep word in source file excluding comment for vim plugin.
 
-Cover OS
+Support OS
 =======
 Unix, MacOS X, Windows
 
-Cover Language and Comment Type
+Suport Language and Comment Type
 =======
 C, C++, Objective-C, C#(CSharp), Java Script   /* */, //
 
