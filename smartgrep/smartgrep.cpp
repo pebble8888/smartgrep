@@ -28,7 +28,7 @@
 #include <string.h>
 #include <assert.h>
 
-const static int DATASIZE = 64 * 1024;
+const static int DATASIZE = 64 * 1024; // process unit size
 
 void test( void )
 {
@@ -48,34 +48,34 @@ int main(int argc, char* argv[])
 
 	int wordtype = 0;
 	int filetype = 0;
-	if( strcmp( argv[1], "/n" ) == 0 ){
-		filetype |= SMARTGREP_FILETYPE_SOURCE;
-		filetype |= SMARTGREP_FILETYPE_HEADER;
-		wordtype |= SMARTGREP_WORDTYPE_NORMAL;
-		wordtype |= SMARTGREP_WORDTYPE_INCLUDE_COMMENT;
-	} else if( strcmp( argv[1], "/h" ) == 0 ){
-		filetype |= SMARTGREP_FILETYPE_HEADER;
-		wordtype |= SMARTGREP_WORDTYPE_NORMAL;
-		wordtype |= SMARTGREP_WORDTYPE_EXCLUDE_COMMENT;
-	} else if( strcmp( argv[1], "/b" ) == 0 ){
-		filetype |= SMARTGREP_FILETYPE_SOURCE;
-		filetype |= SMARTGREP_FILETYPE_HEADER;
-		wordtype |= SMARTGREP_WORDTYPE_NORMAL;
-		wordtype |= SMARTGREP_WORDTYPE_EXCLUDE_COMMENT;
-	} else if( strcmp( argv[1], "/nw" ) == 0 ){
-		filetype |= SMARTGREP_FILETYPE_SOURCE;
-		filetype |= SMARTGREP_FILETYPE_HEADER;
-		wordtype |= SMARTGREP_WORDTYPE_WORD;
-		wordtype |= SMARTGREP_WORDTYPE_INCLUDE_COMMENT;
-	} else if( strcmp( argv[1], "/hw" ) == 0 ){
-		filetype |= SMARTGREP_FILETYPE_HEADER;
-		wordtype |= SMARTGREP_WORDTYPE_WORD;
-		wordtype |= SMARTGREP_WORDTYPE_EXCLUDE_COMMENT;
-	} else if( strcmp( argv[1], "/bw" ) == 0 ){
-		filetype |= SMARTGREP_FILETYPE_SOURCE;
-		filetype |= SMARTGREP_FILETYPE_HEADER;
-		wordtype |= SMARTGREP_WORDTYPE_WORD;
-		wordtype |= SMARTGREP_WORDTYPE_EXCLUDE_COMMENT;
+	if( strcmp( argv[1], "-n" ) == 0 ){
+		filetype |= SG_FILETYPE_SOURCE;
+		filetype |= SG_FILETYPE_HEADER;
+		wordtype |= SG_WORDTYPE_NORMAL;
+		wordtype |= SG_WORDTYPE_INCLUDE_COMMENT;
+	} else if( strcmp( argv[1], "-h" ) == 0 ){
+		filetype |= SG_FILETYPE_HEADER;
+		wordtype |= SG_WORDTYPE_NORMAL;
+		wordtype |= SG_WORDTYPE_EXCLUDE_COMMENT;
+	} else if( strcmp( argv[1], "-b" ) == 0 ){
+		filetype |= SG_FILETYPE_SOURCE;
+		filetype |= SG_FILETYPE_HEADER;
+		wordtype |= SG_WORDTYPE_NORMAL;
+		wordtype |= SG_WORDTYPE_EXCLUDE_COMMENT;
+	} else if( strcmp( argv[1], "-nw" ) == 0 ){
+		filetype |= SG_FILETYPE_SOURCE;
+		filetype |= SG_FILETYPE_HEADER;
+		wordtype |= SG_WORDTYPE_WORD;
+		wordtype |= SG_WORDTYPE_INCLUDE_COMMENT;
+	} else if( strcmp( argv[1], "-hw" ) == 0 ){
+		filetype |= SG_FILETYPE_HEADER;
+		wordtype |= SG_WORDTYPE_WORD;
+		wordtype |= SG_WORDTYPE_EXCLUDE_COMMENT;
+	} else if( strcmp( argv[1], "-bw" ) == 0 ){
+		filetype |= SG_FILETYPE_SOURCE;
+		filetype |= SG_FILETYPE_HEADER;
+		wordtype |= SG_WORDTYPE_WORD;
+		wordtype |= SG_WORDTYPE_EXCLUDE_COMMENT;
 	} else {
 		usage();
 		return 1;
@@ -105,12 +105,12 @@ void smartgrep_getcwd( char* buf, size_t size )
 void usage( void )
 {
 	printf( 
-		"Usage: smartgrep /h {word}  : recursive      grep for .h                        excluding comment\n"
-		"                 /b {word}  : recursive      grep for .cpp .c .mm .m .h .cs .js excluding comment\n"
-		"                 /n {word}  : recursive      grep for .cpp .c .mm .m .h .cs .js including comment\n"
-		"                 /hw {word} : recursive word grep for .h                        excluding comment\n"
-		"                 /bw {word} : recursive word grep for .cpp .c .mm .m .h .cs .js excluding comment\n"
-		"                 /nw {word} : recursive word grep for .cpp .c .mm .m .h .cs .js including comment\n"
+		"Usage: smartgrep -h {word}  : recursive      grep for .h                        excluding comment\n"
+		"                 -b {word}  : recursive      grep for .cpp .c .mm .m .h .cs .js excluding comment\n"
+		"                 -n {word}  : recursive      grep for .cpp .c .mm .m .h .cs .js including comment\n"
+		"                 -hw {word} : recursive word grep for .h                        excluding comment\n"
+		"                 -bw {word} : recursive word grep for .cpp .c .mm .m .h .cs .js excluding comment\n"
+		"                 -nw {word} : recursive word grep for .cpp .c .mm .m .h .cs .js including comment\n"
 	);
 	print_version();
 }
@@ -118,11 +118,9 @@ void usage( void )
 #ifdef WIN32
 /*
  * @param char* path
- * @param int   filetype	SMARTGREP_FILETYPE_SOURCE: .c/.cpp/.m/.mm/etc
- * 							SMARTGREP_FILETYPE_HEADER: .h/.hpp/etc
- * @param int   wordtype	SMARTGREP_WORDTYPE_WORD_EXCLUDE_COMMENT: \<{word}\>
- * 							SMARTGREP_WORDTYPE_NORMAL_EXCLUDE_COMMENT: word
- * 							SMARTGREP_WORDTYPE_NORMAL_INCLUDE_COMMENT: word
+ * @param int   filetype	SG_FILETYPE_SOURCE: .c/.cpp/.m/.mm/etc
+ * 							SG_FILETYPE_HEADER: .h/.hpp/etc
+ * @param int   wordtype	
  * @param char* target_word
  */
 void parse_directory_win( char* path, int filetype, int wordtype, char* target_word )
@@ -152,8 +150,8 @@ void parse_directory_win( char* path, int filetype, int wordtype, char* target_w
 			strcat( path_name_r, "\\" );
 			strcat( path_name_r, find_data.cFileName );
 			parse_directory_win( path_name_r, filetype, wordtype, target_word );
-		} else if( ( (filetype & SMARTGREP_FILETYPE_SOURCE ) && is_source_file( find_data.cFileName ) ) ||
-				   ( (filetype & SMARTGREP_FILETYPE_HEADER ) && is_header_file( find_data.cFileName ) ) ){
+		} else if( ( (filetype & SG_FILETYPE_SOURCE ) && is_source_file( find_data.cFileName ) ) ||
+				   ( (filetype & SG_FILETYPE_HEADER ) && is_header_file( find_data.cFileName ) ) ){
 			char file_name_r[512];
 			strcpy( file_name_r, path );
 			strcat( file_name_r, "\\" );
@@ -174,11 +172,9 @@ void parse_directory_win( char* path, int filetype, int wordtype, char* target_w
 
 /*
  * @param char* path
- * @param int   filetype	SMARTGREP_FILETYPE_SOURCE: .c/.cpp/.m/.mm/.cs/.js etc
- * 							SMARTGREP_FILETYPE_HEADER: .h/.hpp/etc
- * @param int   wordtype	SMARTGREP_WORDTYPE_WORD_EXCLUDE_COMMENT: \<{word}\>
- * 							SMARTGREP_WORDTYPE_NORMAL_EXCLUDE_COMMENT: word
- * 							SMARTGREP_WORDTYPE_NORMAL_INCLUDE_COMMENT: word
+ * @param int   filetype	SG_FILETYPE_SOURCE: .c/.cpp/.m/.mm/.cs/.js etc
+ * 							SG_FILETYPE_HEADER: .h/.hpp/etc
+ * @param int   wordtype
  * @param char* target_word
  */
 void parse_directory_mac( char* path, int filetype, int wordtype, char* target_word )
@@ -207,8 +203,8 @@ void parse_directory_mac( char* path, int filetype, int wordtype, char* target_w
 			strcat( path_name_r, "/" );
 			strcat( path_name_r, p_dirent->d_name );
 			parse_directory_mac( path_name_r, filetype, wordtype, target_word );
-		} else if( ( (filetype & SMARTGREP_FILETYPE_SOURCE ) && is_source_file( p_dirent->d_name ) ) ||
-				  ( (filetype & SMARTGREP_FILETYPE_HEADER ) && is_header_file( p_dirent->d_name ) ) ){
+		} else if( ( (filetype & SG_FILETYPE_SOURCE ) && is_source_file( p_dirent->d_name ) ) ||
+				  ( (filetype & SG_FILETYPE_HEADER ) && is_header_file( p_dirent->d_name ) ) ){
 			char file_name_r[512];
 			strcpy( file_name_r, path );
 			strcat( file_name_r, "/" );
@@ -280,7 +276,9 @@ void parse_file( char* file_name, int wordtype, char* target_word )
 	if( fp == NULL )
 		return;
 
-	bool c_comment = false;
+	bool isin_c_comment = false;
+	PREP prep;
+
 	int lineno;
 	for( lineno = 1; ; ++lineno ){
 		memset( p_data, 0, sizeof(DATASIZE) );
@@ -289,9 +287,10 @@ void parse_file( char* file_name, int wordtype, char* target_word )
 			break;
 
 		bool found;
-		if( wordtype & SMARTGREP_WORDTYPE_EXCLUDE_COMMENT ){
-			found = process_line_exclude_comment( &c_comment, p_data, wordtype, target_word );
-		} else if( wordtype & SMARTGREP_WORDTYPE_INCLUDE_COMMENT ){
+		if( wordtype & SG_WORDTYPE_EXCLUDE_COMMENT ){
+			found = process_line_exclude_comment( 	&isin_c_comment, &prep,
+													p_data, DATASIZE, wordtype, target_word );
+		} else if( wordtype & SG_WORDTYPE_INCLUDE_COMMENT ){
 			found = process_line_include_comment( p_data, wordtype, target_word );
 		} else {
 			assert( false );
@@ -313,48 +312,95 @@ void parse_file( char* file_name, int wordtype, char* target_word )
  * @retval 	true : found
  * @retval	false: not found
  *
- * @param	[in/out] 	bool* 	pc_comment 		whether in C comment
+ * @param	[in/out] 	bool* 	p_isin_c_comment 		whether in C comment
+ * @param   [in/out]    PREP* 	p_prep
  * @param	[in]		char* 	buf
+ * @param	[in]		size_t	bufsize
  * @param	[in]		int 	wordtype
  * @param	[in]		char* 	target_word
  */
-bool process_line_exclude_comment( bool* pc_comment, char* buf, int wordtype, char* target_word )
+bool process_line_exclude_comment( 	bool* p_isin_c_comment, PREP* p_prep,
+									char* buf, size_t bufsize, int wordtype, char* target_word )
 {
 	char valid_str[DATASIZE];
 	memset( valid_str, 0, sizeof(valid_str) );
 
-	int literal = 0;
+	bool isin_literal = false; // "xxx", 'xxx'
 	size_t i;
 	char* ptr = valid_str;
 	for( i = 0; i < DATASIZE; ++i ){
 		if( buf[i] == '\n' || buf[i] == '\0' ) break; 
-		if( !literal && !(*pc_comment) && buf[i] == '/' && buf[i+1] == '/' ){
+		if( !isin_literal && !(*p_isin_c_comment) && !(p_prep->is_commented())
+			&& buf[i] == '/' && buf[i+1] == '/' ){
 			// C++ comment
 			break;
-		} else if( !literal && !(*pc_comment) && buf[i] == '/' && buf[i+1] == '*' ){
-			// C comment in
+		} else if( !isin_literal && !(*p_isin_c_comment) && !(p_prep->is_commented())
+					&& buf[i] == '/' && buf[i+1] == '*' ){
+			// the begining of C comment
 			i += 2;
-			*pc_comment = true;
+			*p_isin_c_comment = true;
 			continue;
-		} else if( !literal && *pc_comment && buf[i] == '*' && buf[i+1] == '/' ){
-			i += 2;
-			*pc_comment = false;
-		} else if( !literal && *pc_comment && !( buf[i] == '*' && buf[i+1] == '/' ) ){
+		} else if( !isin_literal && *p_isin_c_comment && !(p_prep->is_commented()) ){
+			// in c comment
 			while( true ){
 				if( buf[i] == '\n' ) goto WHILEOUT;
-				if( buf[i] == '*' && buf[i+1] == '/' )
+				if( buf[i] == '*' && buf[i+1] == '/' ){
 					break;
+				}
 				++i;
 			}
 			i += 2;
-			*pc_comment = false;
-		} else if( !*pc_comment && ( buf[i] == '\"' || buf[i] == '\'' ) && ( buf[i-1] != '\\' ) ) {
-			// reverse literal
-			literal = !literal;
+			// the end of c comment
+			*p_isin_c_comment = false;
+		} else if( !(*p_isin_c_comment) && !(p_prep->is_commented())
+					&& ( buf[i] == '\"' || buf[i] == '\'' ) && ( i == 0 || buf[i-1] != '\\' ) ) {
+			// reverse isin_literal
+			isin_literal = !isin_literal;
+		} else if( !isin_literal && !(*p_isin_c_comment) && buf[i] == '#' ){
+			if( memcmp( &buf[i], SG_PREP_IF, strlen(SG_PREP_IF) ) == 0 ){
+				// #if
+				// count up
+				++p_prep->current_depth;
+				//
+				if( p_prep->comment_status() != SG_ST_IFZERO &&
+				 	memcmp( &buf[i], SG_PREP_IFZERO, strlen(SG_PREP_IFZERO) ) == 0 )
+				{
+					p_prep->push();
+					i += strlen(SG_PREP_IFZERO);
+				} else {
+					i += strlen(SG_PREP_IF);
+				}
+				continue;
+			} else if( memcmp( &buf[i], SG_PREP_ENDIF, strlen(SG_PREP_ENDIF) ) == 0 ){
+				// #endif
+				p_prep->pop();
+				// count down	
+				--p_prep->current_depth;
+				//
+				i += strlen(SG_PREP_IF);
+				continue;
+			} else if( p_prep->can_change_to_else()
+						&& ( memcmp( &buf[i], SG_PREP_ELIF, strlen(SG_PREP_ELIF) ) == 0 ||
+							 memcmp( &buf[i], SG_PREP_ELSE, strlen(SG_PREP_ELSE) ) == 0 ) ){
+				p_prep->change_to_else();
+
+				if( memcmp( &buf[i], SG_PREP_ELIF, strlen(SG_PREP_ELIF) ) == 0 ){
+					i += strlen(SG_PREP_ELIF);
+				} else if( memcmp( &buf[i], SG_PREP_ELSE, strlen(SG_PREP_ELSE) ) == 0 ){
+					i += strlen(SG_PREP_ELSE);
+				} else {
+					assert( false );
+				}
+				continue;
+			}
+		} else if( !isin_literal && !(*p_isin_c_comment) 
+				&& p_prep->is_commented() ){
+			continue;
 		}
 		if( buf[i] == '\r' ) break;
 		if( buf[i] == '\n' || buf[i] == '\0' ) break;
 		
+		// valid data
 		*ptr = buf[i];
 		++ptr;
 	}
@@ -375,10 +421,10 @@ WHILEOUT:
  */
 bool findword_in_line( char* valid_str, int wordtype, char* target_word )
 {
-	if( wordtype & SMARTGREP_WORDTYPE_NORMAL ){
+	if( wordtype & SG_WORDTYPE_NORMAL ){
 		// normal search
 		return ( strstr( valid_str, target_word ) != NULL );
-	} else if( wordtype & SMARTGREP_WORDTYPE_WORD ){
+	} else if( wordtype & SG_WORDTYPE_WORD ){
 		// word search
 		int   target_word_len = strlen(target_word);
 		char* remain_ptr = valid_str;
@@ -416,6 +462,9 @@ bool findword_in_line( char* valid_str, int wordtype, char* target_word )
 /**
  * @retval	true: found
  * @retval	false:not found
+ * @param [in] char* buf
+ * @param [in] int worktype
+ * @param [in] char* target_word
  */
 bool process_line_include_comment( char* buf, int wordtype, char* target_word )
 {

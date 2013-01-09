@@ -2,7 +2,7 @@
 " Filename : smartgrep.vim 
 " Brief    : This file is vim plugin
 " Function : grep source file excluding comment 
-" Author   : pebble8888@gmail.com 2009-2012 Copyright
+" Author   : pebble8888@gmail.com 2009-2013 Copyright
 " History  :
 " 	Ver1.0.0.0 2009-09-13 initial revision for grep excluding comment
 "	Ver1.1.0.0 2009-09-27 add word grep function
@@ -18,17 +18,19 @@
 "	Ver1.7.2.0 2011-02-10 fix bug in pgrep.vim
 "   Ver1.7.3.0 2011-10-15 improve help and add makefile for Unix
 "   Ver2.0.0.0 2012-10-18 rename pgrep -> smartgrep
-"   Ver2.1.0.0 2012-10-19 cover .cs (CSharp), .js (Java Script)
+"   Ver2.1.0.0 2012-10-19 support .cs (CSharp), .js (Java Script)
+"	Ver2.2.0.0 2013-01-09 support #if 0 comment.
+"						  mofify option identifier '/' to '-'.
 "
 " Cover OS
 "	Windows/Unix
 "
 " Cover File Extention                                  Cover Comment Type
-"	C++ 		: *.c *.cpp *.cxx *.tli *.inc *.rc 		/* */, // 
-"   C++ heder	: *.h *.hpp *.hxx *.tlh *.inl			/* */, //
-"	Objective-C : *.m *.mm								/* */, //
-"   CSharp      : *.cs									/* */, //
-"	JavaScript  : *.js									/* */, //
+"	C++ 		: *.c *.cpp *.cxx *.tli *.inc *.rc 		/* */, //, #if 0 
+"   C++ heder	: *.h *.hpp *.hxx *.tlh *.inl			/* */, //, #if 0
+"	Objective-C : *.m *.mm								/* */, //, #if 0
+"   CSharp      : *.cs									/* */, //, #if 0
+"	JavaScript  : *.js									/* */, //, #if 0
 " 
 " How To Install
 "	Put smartgrep.exe or smartgrep in C:\windows\system32\ or pathed directory.
@@ -55,7 +57,7 @@
 " Implementation below
 
 function! RSmartGrepNW(word)
-  set grepprg=smartgrep\ /nw
+  set grepprg=smartgrep\ -nw
   execute "cd " . g:base_dir
   execute "lgrep " . a:word
   lopen
@@ -63,7 +65,7 @@ function! RSmartGrepNW(word)
 endfunction
 
 function! RSmartGrepHW(word)
-  set grepprg=smartgrep\ /hw
+  set grepprg=smartgrep\ -hw
   execute "cd " . g:base_dir
   execute "lgrep " . a:word
   lopen
@@ -71,7 +73,7 @@ function! RSmartGrepHW(word)
 endfunction
 
 function! RSmartGrepW(word)
-  set grepprg=smartgrep\ /bw
+  set grepprg=smartgrep\ -bw
   execute "cd " . g:base_dir
   execute "lgrep " . a:word
   lopen
@@ -79,7 +81,7 @@ function! RSmartGrepW(word)
 endfunction
 
 function! RSmartGrepN(word)
-  set grepprg=smartgrep\ /n
+  set grepprg=smartgrep\ -n
   execute "cd " . g:base_dir
   execute "lgrep " . a:word
   lopen
@@ -87,7 +89,7 @@ function! RSmartGrepN(word)
 endfunction
 
 function! RSmartGrepH(word)
-  set grepprg=smartgrep\ /h
+  set grepprg=smartgrep\ -h
   execute "cd " . g:base_dir
   execute "lgrep " . a:word
   lopen
@@ -95,7 +97,7 @@ function! RSmartGrepH(word)
 endfunction
 
 function! RSmartGrep(word)
-  set grepprg=smartgrep\ /b
+  set grepprg=smartgrep\ -b
   execute "cd " . g:base_dir
   execute "lgrep " . a:word
   lopen
@@ -103,7 +105,7 @@ function! RSmartGrep(word)
 endfunction
 
 function! RSmartGrepWA(word)
-  set grepprg=smartgrep\ /bw
+  set grepprg=smartgrep\ -bw
   execute "cd " . g:sys_dir
   execute "lgrep " . a:word
   lopen
@@ -111,7 +113,7 @@ function! RSmartGrepWA(word)
 endfunction
 
 function! RSmartGrepWW(word)
-  set grepprg=smartgrep\ /bw
+  set grepprg=smartgrep\ -bw
   execute "cd " . g:sys_dir_w
   execute "lgrep " . a:word
   lopen
@@ -119,7 +121,7 @@ function! RSmartGrepWW(word)
 endfunction
 
 function! RSmartGrepWL(word)
-  set grepprg=smartgrep\ /bw
+  set grepprg=smartgrep\ -bw
   execute "cd " . g:sys_dir_l
   execute "lgrep " . a:word
   lopen
