@@ -20,7 +20,7 @@ Define g:base_dir in your .vimrc file.
 ,h   -> recursive word grep for h file exclude comment by mouse cursored word  
 :Rn  -> recursive word grep for c,h file include comment  
 :Rh  -> recursive word grep for h file exclude comment  
-:R   -> recursive word grep for c,h file exclude comment
+:R   -> recursive word grep for c,h file exclude comment  
 :Rno -> recursive grep for c,h file include comment  
 :Rho -> recursive grep for h file exclude comment  
 :Ro  -> recursive grep for c,h file exclude comment  
