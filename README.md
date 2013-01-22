@@ -40,6 +40,6 @@ Usage: smartgrep -h {word}  : recursive      grep for .h                        
 
 INSTALL
 =======
-If you are Windows or Mac OS X user, read ./plugin/smartgrep.vim file.  
-If you are Unix user, type 'make + [enter]' and read ./plugin/smartgrep.vim file.  
+If you are Windows user, read ./plugin/smartgrep.vim file.  
+If you are Mac or Unix user, type 'make + [enter]' and read ./plugin/smartgrep.vim file.  
 
