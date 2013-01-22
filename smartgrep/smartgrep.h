@@ -17,7 +17,7 @@
 
 /* preprocessor comment */
 #define SG_PREP_IFZERO	"#if 0"
-#define SG_PREP_IF		"#if"
+#define SG_PREP_IF		"#if " // don't hit #ifdef or #ifndef
 #define SG_PREP_ELIF	"#elif"
 #define SG_PREP_ELSE 	"#else"
 #define SG_PREP_ENDIF	"#endif"
