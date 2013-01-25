@@ -22,10 +22,10 @@
 "	Ver2.2.0.0 2013-01-09 support #if 0 comment.
 "						  mofify option identifier '/' to '-'.
 "
-" Cover OS
+" Support OS
 "	Windows/Unix
 "
-" Cover File Extention                                  Cover Comment Type
+" Support File Extention                                  Support Comment Type
 "	C++ 		: *.c *.cpp *.cxx *.tli *.inc *.rc 		/* */, //, #if 0 
 "   C++ heder	: *.h *.hpp *.hxx *.tlh *.inl			/* */, //, #if 0
 "	Objective-C : *.m *.mm								/* */, //, #if 0
@@ -39,17 +39,20 @@
 "			C:\vim7\runtime\plugin\		(for windows)
 "			~/.vim/plugin/				(for Unix)
 "
-" 	Define get(g:, 'smartgrep_basedir', '.') in your .vimrc file.
+"   If g:smartgrep_basedir isn't defined,
+"   the current directory is used for grep base directory.
+"	If you would like to usually use a fixed grep base directory,
+"   define 'g:smartgrep_basedir' in your .vimrc file.
 " 	    example:
-" 			let get(g:, 'smartgrep_basedir', '.')="c:\\develop" (for windows)
-"			let get(g:, 'smartgrep_basedir', '.')="/develop/"	 (for Unix)
+" 			let g:smartgrep_basedir="c:\\develop" (for windows)
+"			let g:smartgrep_basedir="/develop/"	 (for Unix)
 "
 "	If you use MacVim, add smartgrep path to .vimrc file.
 "		example:
 "	        let $PATH .= ':~/bin'
 "
 "	Optional 
-"	Define s:sys_dir_w and s:sys_dir_l in your .vimrc file.
+"	Define g:sys_dir_w and g:sys_dir_l in your .vimrc file.
 "		example:
 " 			let g:sys_dir_w="c:\\WinDDK"			(for windows)
 " 			let g:sys_dir_l="c:\\linux\\include"	(for windows)
