@@ -128,26 +128,29 @@ function! RSmartGrepWL(word)
   set grepprg&
 endfunction
 
-" ,g : recursive word grep for c,h file exclude comment by mouse cursored word 
-" ,h : recursive word grep for h file exclude comment by mouse cursored word
-noremap ,g :call RSmartGrepW("<C-R><C-W>")<CR>
-noremap ,h :call RSmartGrepHW("<C-R><C-W>")<CR>
+if !exists('g:smartgrep_no_default_key_mappings')
+  " ,g : recursive word grep for c,h file exclude comment by mouse cursored word 
+  " ,h : recursive word grep for h file exclude comment by mouse cursored word
+  noremap ,g :call RSmartGrepW("<C-R><C-W>")<CR>
+  noremap ,h :call RSmartGrepHW("<C-R><C-W>")<CR>
+endif
 
-" :Rn  -> recursive word grep for c,h file include comment
-" :Rh  -> recursive word grep for h file exclude comment
-" :R   -> recursive word grep for c,h file exclude comment
-" :Rno -> recursive grep for c,h file include comment
-" :Rho -> recursive grep for h file exclude comment
-" :Ro  -> recursive grep for c,h file exclude comment
-command! -nargs=1 -complete=file Rn call RSmartGrepNW("<args>")
-command! -nargs=1 -complete=file Rh call RSmartGrepHW("<args>")
-command! -nargs=1 -complete=file R call RSmartGrepW("<args>")
-command! -nargs=1 -complete=file Rno call RSmartGrepN("<args>")
-command! -nargs=1 -complete=file Rho call RSmartGrepH("<args>")
-command! -nargs=1 -complete=file Ro call RSmartGrep("<args>")
+if !exists('g:smartgrep_no_default_key_mappings')
+  " :Rn  -> recursive word grep for c,h file include comment
+  " :Rh  -> recursive word grep for h file exclude comment
+  " :R   -> recursive word grep for c,h file exclude comment
+  " :Rno -> recursive grep for c,h file include comment
+  " :Rho -> recursive grep for h file exclude comment
+  " :Ro  -> recursive grep for c,h file exclude comment
+  command! -nargs=1 -complete=file Rn call RSmartGrepNW("<args>")
+  command! -nargs=1 -complete=file Rh call RSmartGrepHW("<args>")
+  command! -nargs=1 -complete=file R call RSmartGrepW("<args>")
+  command! -nargs=1 -complete=file Rno call RSmartGrepN("<args>")
+  command! -nargs=1 -complete=file Rho call RSmartGrepH("<args>")
+  command! -nargs=1 -complete=file Ro call RSmartGrep("<args>")
 
-" :Rl  -> recursive word grep for c,h file exclude comment in sys_dir_w
-" :Rw  -> recursive word grep for c,h file exclude comment in sys_dir_l
-command! -nargs=1 -complete=file Rl call RSmartGrepWL("<args>")
-command! -nargs=1 -complete=file Rw call RSmartGrepWW("<args>")
-
+  " :Rl  -> recursive word grep for c,h file exclude comment in sys_dir_w
+  " :Rw  -> recursive word grep for c,h file exclude comment in sys_dir_l
+  command! -nargs=1 -complete=file Rl call RSmartGrepWL("<args>")
+  command! -nargs=1 -complete=file Rw call RSmartGrepWW("<args>")
+endif
