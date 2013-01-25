@@ -12,9 +12,9 @@ C, C++, Objective-C, C#(CSharp), Java Script   /* */, //, #if 0
 
 Usage (smartgrep.vim command)
 =======
-Define g:base_dir in your .vimrc file.  
+Define g:smartgrep_basedir in your .vimrc file.  
 	example:  
-		let g:base_dir="/develop/"  
+		let g:smartgrep_basedir="/develop/"  
   
 ,g   -> recursive word grep for c,h file exclude comment by mouse cursored word  
 ,h   -> recursive word grep for h file exclude comment by mouse cursored word  

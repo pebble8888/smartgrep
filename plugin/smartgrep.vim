@@ -39,10 +39,10 @@
 "			C:\vim7\runtime\plugin\		(for windows)
 "			~/.vim/plugin/				(for Unix)
 "
-" 	Define g:base_dir in your .vimrc file.
+" 	Define get(g:, 'smartgrep_basedir', '.') in your .vimrc file.
 " 	    example:
-" 			let g:base_dir="c:\\develop" (for windows)
-"			let g:base_dir="/develop/"	 (for Unix)
+" 			let get(g:, 'smartgrep_basedir', '.')="c:\\develop" (for windows)
+"			let get(g:, 'smartgrep_basedir', '.')="/develop/"	 (for Unix)
 "
 "	If you use MacVim, add smartgrep path to .vimrc file.
 "		example:
@@ -58,73 +58,73 @@
 
 function! RSmartGrepNW(word)
   set grepprg=smartgrep\ -nw
-  execute "cd " . g:base_dir
-  execute "lgrep " . a:word
-  lopen
+  execute "cd " . get(g:, 'smartgrep_basedir', '.')
+  silent! execute "lgrep " . a:word
+  silent! lopen
   set grepprg&
 endfunction
 
 function! RSmartGrepHW(word)
   set grepprg=smartgrep\ -hw
-  execute "cd " . g:base_dir
-  execute "lgrep " . a:word
-  lopen
+  execute "cd " . get(g:, 'smartgrep_basedir', '.')
+  silent! execute "lgrep " . a:word
+  silent! lopen
   set grepprg&
 endfunction
 
 function! RSmartGrepW(word)
   set grepprg=smartgrep\ -bw
-  execute "cd " . g:base_dir
-  execute "lgrep " . a:word
-  lopen
+  execute "cd " . get(g:, 'smartgrep_basedir', '.')
+  silent! execute "lgrep " . a:word
+  silent! lopen
   set grepprg&
 endfunction
 
 function! RSmartGrepN(word)
   set grepprg=smartgrep\ -n
-  execute "cd " . g:base_dir
-  execute "lgrep " . a:word
-  lopen
+  execute "cd " . get(g:, 'smartgrep_basedir', '.')
+  silent! execute "lgrep " . a:word
+  silent! lopen
   set grepprg&
 endfunction
 
 function! RSmartGrepH(word)
   set grepprg=smartgrep\ -h
-  execute "cd " . g:base_dir
-  execute "lgrep " . a:word
-  lopen
+  execute "cd " . get(g:, 'smartgrep_basedir', '.')
+  silent! execute "lgrep " . a:word
+  silent! lopen
   set grepprg&
 endfunction
 
 function! RSmartGrep(word)
   set grepprg=smartgrep\ -b
-  execute "cd " . g:base_dir
-  execute "lgrep " . a:word
-  lopen
+  execute "cd " . get(g:, 'smartgrep_basedir', '.')
+  silent! execute "lgrep " . a:word
+  silent! lopen
   set grepprg&
 endfunction
 
 function! RSmartGrepWA(word)
   set grepprg=smartgrep\ -bw
   execute "cd " . g:sys_dir
-  execute "lgrep " . a:word
-  lopen
+  silent! execute "lgrep " . a:word
+  silent! lopen
   set grepprg&
 endfunction
 
 function! RSmartGrepWW(word)
   set grepprg=smartgrep\ -bw
   execute "cd " . g:sys_dir_w
-  execute "lgrep " . a:word
-  lopen
+  silent! execute "lgrep " . a:word
+  silent! lopen
   set grepprg&
 endfunction
 
 function! RSmartGrepWL(word)
   set grepprg=smartgrep\ -bw
   execute "cd " . g:sys_dir_l
-  execute "lgrep " . a:word
-  lopen
+  silent! execute "lgrep " . a:word
+  silent! lopen
   set grepprg&
 endfunction
 
