@@ -15,6 +15,7 @@ Usage (smartgrep.vim command)
 Define g:smartgrep_basedir in your .vimrc file.  
 	example:  
 		let g:smartgrep_basedir="/develop/"  
+If g:smartgrep_basedir isn't defined, the current directory is used.  
   
 ,g   -> recursive word grep for c,h file exclude comment by mouse cursored word  
 ,h   -> recursive word grep for h file exclude comment by mouse cursored word  
