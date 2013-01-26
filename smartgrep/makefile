@@ -1,8 +1,8 @@
 #
-# makefile for Unix / Linux / MacOS
-# Copyright (C) 2011-2012 pebble8888@gmail.com
+# makefile for Unix / Linux / MacOS / Windows with MinGW
+# Copyright (C) 2011-2013 pebble8888@gmail.com
 #
-CC=gcc
+CC=g++
 TARGET=smartgrep
 LIBS=
 

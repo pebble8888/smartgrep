@@ -41,6 +41,8 @@ Usage: smartgrep -h {word}  : recursive      grep for .h                        
 
 INSTALL
 =======
-If you are Windows user, read ./plugin/smartgrep.vim file.  
-If you are Mac or Unix user, type 'make + [enter]' and read ./plugin/smartgrep.vim file.  
+If you are Windows user, build 'smartgrep.exe' from source with MinGW or Visual Studio 6  
+and read ./plugin/smartgrep.vim file.  
+If you are Mac or Unix user, build 'smartgrep' from source to type 'make + [enter]'  
+and read ./plugin/smartgrep.vim file.  
 
