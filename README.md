@@ -8,8 +8,10 @@ Unix, MacOS X, Windows
 
 Suport Language and Comment Type
 =======
-C, C++, Objective-C, C#(CSharp), Java Script   /* */, //, #if 0
-
+C, C++, Objective-C, C#(CSharp), Java Script   /* */, //, #if 0  
+  
+If you would like to use it for another language, please request me or try this plugin [coolgrep.vim](https://github.com/tyru/coolgrep.vim).  
+  
 Usage (smartgrep.vim command)
 =======
 Define g:smartgrep_basedir in your .vimrc file.  

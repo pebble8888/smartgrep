@@ -357,27 +357,26 @@ bool process_line_exclude_comment( 	bool* p_isin_c_comment, PREP* p_prep,
 			// reverse isin_literal
 			isin_literal = !isin_literal;
 		} else if( !isin_literal && !(*p_isin_c_comment) && buf[i] == '#' ){
-			if( memcmp( &buf[i], SG_PREP_IF, strlen(SG_PREP_IF) ) == 0 ){
-				// #if
-				// count up
-				++p_prep->current_depth;
-				//
-				if( p_prep->comment_status() != SG_ST_IFZERO &&
-				 	memcmp( &buf[i], SG_PREP_IFZERO, strlen(SG_PREP_IFZERO) ) == 0 )
-				{
-					p_prep->push();
+			if( memcmp( &buf[i], SG_PREP_IF, strlen(SG_PREP_IF) ) == 0 ||
+				memcmp( &buf[i], SG_PREP_IFDEF, strlen(SG_PREP_IFDEF) ) == 0 ||
+				memcmp( &buf[i], SG_PREP_IFNDEF, strlen(SG_PREP_IFNDEF) ) == 0 ){
+				// #if or #ifdef or #ifndef
+				if( memcmp( &buf[i], SG_PREP_IFZERO, strlen(SG_PREP_IFZERO) ) == 0 ) {
+					// #if 0
+					p_prep->push( true );
 					i += strlen(SG_PREP_IFZERO);
 				} else {
-					i += strlen(SG_PREP_IF);
+					p_prep->push( false );
+					if( memcmp( &buf[i], SG_PREP_IF, strlen(SG_PREP_IF) ) == 0 ){
+						i += strlen(SG_PREP_IF);
+					} else if( memcmp( &buf[i], SG_PREP_IFDEF, strlen(SG_PREP_IFDEF) ) == 0 ){
+						i += strlen(SG_PREP_IFDEF);
+					} else if( memcmp( &buf[i], SG_PREP_IFNDEF, strlen(SG_PREP_IFNDEF) ) == 0 ){
+						i += strlen(SG_PREP_IFNDEF);
+					} else {
+						assert( false );
+					}
 				}
-				continue;
-			} else if( memcmp( &buf[i], SG_PREP_ENDIF, strlen(SG_PREP_ENDIF) ) == 0 ){
-				// #endif
-				p_prep->pop();
-				// count down	
-				--p_prep->current_depth;
-				//
-				i += strlen(SG_PREP_IF);
 				continue;
 			} else if( p_prep->can_change_to_else()
 						&& ( memcmp( &buf[i], SG_PREP_ELIF, strlen(SG_PREP_ELIF) ) == 0 ||
@@ -392,9 +391,13 @@ bool process_line_exclude_comment( 	bool* p_isin_c_comment, PREP* p_prep,
 					assert( false );
 				}
 				continue;
+			} else if( memcmp( &buf[i], SG_PREP_ENDIF, strlen(SG_PREP_ENDIF) ) == 0 ){
+				// #endif
+				p_prep->pop();
+				i += strlen(SG_PREP_ENDIF);
+				continue;
 			}
-		} else if( !isin_literal && !(*p_isin_c_comment) 
-				&& p_prep->is_commented() ){
+		} else if( !isin_literal && !(*p_isin_c_comment) && p_prep->is_commented() ){
 			continue;
 		}
 		if( buf[i] == '\r' ) break;

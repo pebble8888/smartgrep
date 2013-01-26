@@ -9,61 +9,56 @@
 
 #define STACK_COUNT	(256) 
 
+enum {
+	SG_ST_IFONE,	/* #if 1 or #ifdef or #ifndef */
+	SG_ST_IFZERO,	/* in #if 0 */
+	SG_ST_ELSE,		/* in #elif or #else */
+};
+
 typedef struct {
 	int status;
-	int depth;
 } COMMENT_PREP;
 
 /**
  * @brief PREP class
  */
-struct PREP {
-	int current_depth;
-	int comment_index;
-	COMMENT_PREP comment[STACK_COUNT];
-	PREP(){
-		current_depth = 0;
-		comment_index = 0;
-		for( int i = 0; i < STACK_COUNT; ++i ){
-			comment[i].status = SG_ST_NOTIN;
-			comment[i].depth = 0;
+class PREP {
+	public:
+		PREP(){
+			_current_depth = 0;
+			for( int i = 0; i < STACK_COUNT; ++i ){
+				_comment[i].status = SG_ST_IFONE;
+			}
 		}
-	}
-	bool is_commented( void ){
-		return comment_status() == SG_ST_IFZERO;
-	}
-	int comment_status( void ){
-		return comment[comment_index].status;
-	}
-	int comment_depth( void ){
-		return comment[comment_index].depth;
-	}
-	void push( void ){
-		if( comment_status() == SG_ST_NOTIN ){
-			comment[comment_index].status = SG_ST_IFZERO;
-			comment[comment_index].depth = current_depth;
-		} else if( comment_status() == SG_ST_ELSE ){
-			++comment_index;
-			comment[comment_index].status = SG_ST_IFZERO;
-			comment[comment_index].depth = current_depth;
-		} else if( comment_status() == SG_ST_IFZERO ){
-			assert( false );
+		bool is_commented( void ){
+			return comment_status() == SG_ST_IFZERO;
 		}
-	}
-	bool can_change_to_else( void ){
-		return comment_status() == SG_ST_IFZERO
-				&& comment_depth() == current_depth;
-	}
-	void change_to_else( void ){
-		comment[comment_index].status = SG_ST_ELSE;
-	}
-	void pop( void ){
-		if( comment_depth() == current_depth ){
-			comment[comment_index].status = SG_ST_NOTIN;
-			comment[comment_index].depth = 0;
-			--comment_index;
+		int comment_status( void ){
+			return _comment[_current_depth].status;
 		}
-	}
+		void push( bool ifzero ){
+			++_current_depth;
+			if( ifzero ){
+				_comment[_current_depth].status = SG_ST_IFZERO;
+			} else {	
+				_comment[_current_depth].status = SG_ST_IFONE;
+			}
+		}
+		// not already in SG_ST_ELSE
+		bool can_change_to_else( void ){
+			return comment_status() == SG_ST_IFZERO ||
+				   comment_status() == SG_ST_IFONE;
+		}
+		void change_to_else( void ){
+			_comment[_current_depth].status = SG_ST_ELSE;
+		}
+		void pop( void ){
+			_comment[_current_depth].status = SG_ST_IFONE;
+			--_current_depth;
+		}
+	private:
+		int 		 _current_depth;
+		COMMENT_PREP _comment[STACK_COUNT];
 };
 
 #endif /* PREP_H */

@@ -18,15 +18,11 @@
 /* preprocessor comment */
 #define SG_PREP_IFZERO	"#if 0"
 #define SG_PREP_IF		"#if " // don't hit #ifdef or #ifndef
+#define SG_PREP_IFDEF	"#ifdef"
+#define SG_PREP_IFNDEF	"#ifndef"
 #define SG_PREP_ELIF	"#elif"
 #define SG_PREP_ELSE 	"#else"
 #define SG_PREP_ENDIF	"#endif"
-
-enum {
-	SG_ST_NOTIN,	/* not in #if 0 */
-	SG_ST_IFZERO,	/* in #if 0 */
-	SG_ST_ELSE,		/* in #elif or #else */
-};
 
 #include "prep.h"
 
