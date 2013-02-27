@@ -21,6 +21,10 @@
 "   Ver2.1.0.0 2012-10-19 support .cs (CSharp), .js (Java Script)
 "	Ver2.2.0.0 2013-01-09 support #if 0 comment.
 "						  mofify option identifier '/' to '-'.
+"   Ver2.3.0.0 2013-01-26 modify viriable name g:base_dir to g:smartgrep_basedir.
+"						  modify makefile for linux environment.
+"						  fix bug in case of #ifdef and #ifndef.
+"   Ver2.4.0.0 2013-02-27 add command with newtab.
 "
 " Support OS
 "	Windows/Unix
@@ -131,11 +135,25 @@ function! RSmartGrepWL(word)
   set grepprg&
 endfunction
 
+function! RSmartGrepW_TabNew(word)
+  execute "tabnew"
+  call RSmartGrepW(a:word)
+endfunction
+
+function! RSmartGrepHW_TabNew(word)
+  execute "tabnew"
+  call RSmartGrepHW(a:word)
+endfunction
+
 if !exists('g:smartgrep_no_default_key_mappings')
-  " ,g : recursive word grep for c,h file exclude comment by mouse cursored word 
-  " ,h : recursive word grep for h file exclude comment by mouse cursored word
+  " ,g  : recursive word grep for c,h file exclude comment by mouse cursored word 
+  " ,h  : recursive word grep for h file exclude comment by mouse cursored word
+  " ,gt : tabnew version for ,g
+  " ,ht : tabnew version for ,h
   noremap ,g :call RSmartGrepW("<C-R><C-W>")<CR>
   noremap ,h :call RSmartGrepHW("<C-R><C-W>")<CR>
+  noremap ,gt :call RSmartGrepW_TabNew("<C-R><C-W>")<CR>
+  noremap ,ht :call RSmartGrepHW_TabNew("<C-R><C-W>")<CR>
 endif
 
 if !exists('g:smartgrep_no_default_key_mappings')
