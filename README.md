@@ -48,3 +48,6 @@ and read ./plugin/smartgrep.vim file.
 If you are Mac or Unix user, build 'smartgrep' from source to type 'make + [enter]'  
 and read ./plugin/smartgrep.vim file.  
 
+SCREEN SHOT
+=======
+![screen shot](https:github.com/pebble8888/smartgrep/smartgrep_screenshot.jpg)
