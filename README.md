@@ -50,4 +50,4 @@ and read ./plugin/smartgrep.vim file.
 
 SCREEN SHOT
 =======
-![screen shot](https:github.com/pebble8888/smartgrep/smartgrep_screenshot.jpg)
+![screen shot](https:github.com/pebble8888/smartgrep/smartgrep_screenshot.png)
