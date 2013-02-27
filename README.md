@@ -21,6 +21,8 @@ If g:smartgrep_basedir isn't defined, the current directory is used.
   
 ,g   -> recursive word grep for c,h file exclude comment by mouse cursored word  
 ,h   -> recursive word grep for h file exclude comment by mouse cursored word  
+,gt  -> tabnew version for ,g  
+,ht  -> tabnew version for ,h  
 :Rn  -> recursive word grep for c,h file include comment  
 :Rh  -> recursive word grep for h file exclude comment  
 :R   -> recursive word grep for c,h file exclude comment  
