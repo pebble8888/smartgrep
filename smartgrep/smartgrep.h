@@ -41,6 +41,7 @@ void parse_directory_mac( char* path, int filetype, int wordtype, char* target_w
 #endif
 bool is_header_file( char* file_name );
 bool is_source_file( char* file_name );
+bool is_ruby_file( char* file_name );
 bool is_ext( char* file_name, const char* ext_name );
 bool findword_in_line( char* valid_str, int wordtype, char* target_word );
 bool is_alnum_or_underscore( int val );

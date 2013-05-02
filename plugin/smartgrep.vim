@@ -25,6 +25,7 @@
 "						  modify makefile for linux environment.
 "						  fix bug in case of #ifdef and #ifndef.
 "   Ver2.4.0.0 2013-02-27 add command with newtab.
+"	Ver2.5.0.0 2013-05-02 support .rb(ruby), comment is not supported yet.
 "
 " Support OS
 "	Windows/Unix
@@ -35,6 +36,7 @@
 "	Objective-C : *.m *.mm								/* */, //, #if 0
 "   CSharp      : *.cs									/* */, //, #if 0
 "	JavaScript  : *.js									/* */, //, #if 0
+"   Ruby        : *.rb                                  Not supported
 " 
 " How To Install
 "	Put smartgrep.exe or smartgrep in C:\windows\system32\ or pathed directory.

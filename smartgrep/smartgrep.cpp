@@ -105,12 +105,14 @@ void smartgrep_getcwd( char* buf, size_t size )
 void usage( void )
 {
 	printf( 
-		"Usage: smartgrep -h {word}  : recursive      grep for .h                        excluding comment\n"
-		"                 -b {word}  : recursive      grep for .cpp .c .mm .m .h .cs .js excluding comment\n"
-		"                 -n {word}  : recursive      grep for .cpp .c .mm .m .h .cs .js including comment\n"
-		"                 -hw {word} : recursive word grep for .h                        excluding comment\n"
-		"                 -bw {word} : recursive word grep for .cpp .c .mm .m .h .cs .js excluding comment\n"
-		"                 -nw {word} : recursive word grep for .cpp .c .mm .m .h .cs .js including comment\n"
+		"Usage: smartgrep\n"
+		"  -h {word}  : recursive      grep for .h                            excluding comment\n"
+		"  -b {word}  : recursive      grep for .cpp .c .mm .m .h .cs .js .rb excluding comment\n"
+		"  -n {word}  : recursive      grep for .cpp .c .mm .m .h .cs .js .rb including comment\n"
+		"  -hw {word} : recursive word grep for .h                            excluding comment\n"
+		"  -bw {word} : recursive word grep for .cpp .c .mm .m .h .cs .js .rb excluding comment\n"
+		"  -nw {word} : recursive word grep for .cpp .c .mm .m .h .cs .js .rb including comment\n"
+		" NOTICE: don't support .rb comment\n"
 	);
 	print_version();
 }
@@ -156,6 +158,11 @@ void parse_directory_win( char* path, int filetype, int wordtype, char* target_w
 			strcpy( file_name_r, path );
 			strcat( file_name_r, "\\" );
 			strcat( file_name_r, find_data.cFileName );
+			if( is_ruby_file( find_data.cFileName ) ){
+				// ruby comment isn't supported yet.
+				wordtype &= ~SG_WORDTYPE_EXCLUDE_COMMENT;
+				wordtype |= SG_WORDTYPE_INCLUDE_COMMENT;
+			}
 			parse_file( file_name_r, wordtype, target_word ); 
 		}
 		BOOL ret = FindNextFile( h_find, &find_data );
@@ -209,6 +216,11 @@ void parse_directory_mac( char* path, int filetype, int wordtype, char* target_w
 			strcpy( file_name_r, path );
 			strcat( file_name_r, "/" );
 			strcat( file_name_r, p_dirent->d_name );
+			if( is_ruby_file( p_dirent->d_name ) ){
+				// ruby comment isn't supported yet.
+				wordtype &= ~SG_WORDTYPE_EXCLUDE_COMMENT;
+				wordtype |= SG_WORDTYPE_INCLUDE_COMMENT;
+			}
 			parse_file( file_name_r, wordtype, target_word ); 
 		}
 	}
@@ -228,9 +240,15 @@ bool is_source_file( char* file_name ){
 		is_ext( file_name, "cs" ) || 
 		is_ext( file_name, "js" ) ) {
 		return true;
+	} else if( is_ruby_file( file_name ) ){
+		return true;
 	} else {
 		return false;
 	}
+}
+
+bool is_ruby_file( char* file_name ){
+	return is_ext( file_name, "rb" );
 }
 
 bool is_header_file( char* file_name ){
