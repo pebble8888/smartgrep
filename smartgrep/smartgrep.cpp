@@ -112,7 +112,6 @@ void usage( void )
 		"  -hw {word} : recursive word grep for .h                            excluding comment\n"
 		"  -bw {word} : recursive word grep for .cpp .c .mm .m .h .cs .js .rb excluding comment\n"
 		"  -nw {word} : recursive word grep for .cpp .c .mm .m .h .cs .js .rb including comment\n"
-		" NOTICE: don't support .rb comment\n"
 	);
 	print_version();
 }
@@ -158,12 +157,13 @@ void parse_directory_win( char* path, int filetype, int wordtype, char* target_w
 			strcpy( file_name_r, path );
 			strcat( file_name_r, "\\" );
 			strcat( file_name_r, find_data.cFileName );
+			int file_extension;
 			if( is_ruby_file( find_data.cFileName ) ){
-				// ruby comment isn't supported yet.
-				wordtype &= ~SG_WORDTYPE_EXCLUDE_COMMENT;
-				wordtype |= SG_WORDTYPE_INCLUDE_COMMENT;
+				file_extension = kFileExtensionRuby; 
+			} else {
+				file_extension = kFileExtensionC; 
 			}
-			parse_file( file_name_r, wordtype, target_word ); 
+			parse_file( file_name_r, file_extension, wordtype, target_word ); 
 		}
 		BOOL ret = FindNextFile( h_find, &find_data );
 		if( !ret ){
@@ -216,12 +216,13 @@ void parse_directory_mac( char* path, int filetype, int wordtype, char* target_w
 			strcpy( file_name_r, path );
 			strcat( file_name_r, "/" );
 			strcat( file_name_r, p_dirent->d_name );
+			int file_extension;
 			if( is_ruby_file( p_dirent->d_name ) ){
-				// ruby comment isn't supported yet.
-				wordtype &= ~SG_WORDTYPE_EXCLUDE_COMMENT;
-				wordtype |= SG_WORDTYPE_INCLUDE_COMMENT;
+				file_extension = kFileExtensionRuby;
+			} else {
+				file_extension = kFileExtensionC; 
 			}
-			parse_file( file_name_r, wordtype, target_word ); 
+			parse_file( file_name_r, file_extension, wordtype, target_word ); 
 		}
 	}
 	closedir( p_dir );	
@@ -284,12 +285,13 @@ bool is_ext( char* file_name, const char* ext_name ){
 /*
  * @brief	parse one file
  * 			output to standard out
+ * @param [in] char* file_name
+ * @param [in] int file_extension
+ * @param [in] int wordtype
+ * @param [in] char* target_word
  */
-void parse_file( char* file_name, int wordtype, char* target_word )
+void parse_file( char* file_name, int file_extension, int wordtype, char* target_word )
 {
-	// it is presumed that the one line byte size in file don't exceed 64k
-	char p_data[DATASIZE]; 
-
 	FILE* fp = fopen( file_name, "rb" );
 	if( fp == NULL )
 		return;
@@ -297,6 +299,8 @@ void parse_file( char* file_name, int wordtype, char* target_word )
 	bool isin_c_comment = false;
 	PREP prep;
 
+	// it is presumed that the one line byte size in file don't exceed 64k
+	char p_data[DATASIZE]; 
 	int lineno;
 	for( lineno = 1; ; ++lineno ){
 		memset( p_data, 0, sizeof(DATASIZE) );
@@ -306,8 +310,14 @@ void parse_file( char* file_name, int wordtype, char* target_word )
 
 		bool found;
 		if( wordtype & SG_WORDTYPE_EXCLUDE_COMMENT ){
-			found = process_line_exclude_comment( 	&isin_c_comment, &prep,
-													p_data, DATASIZE, wordtype, target_word );
+			if( file_extension == kFileExtensionC ){
+				found = process_line_exclude_comment_c( &isin_c_comment, &prep,
+														p_data, DATASIZE, wordtype, target_word );
+			} else if( file_extension == kFileExtensionRuby ){
+				found = process_line_exclude_comment_ruby( p_data, DATASIZE, wordtype, target_word );
+			} else {
+				assert( false );
+			}
 		} else if( wordtype & SG_WORDTYPE_INCLUDE_COMMENT ){
 			found = process_line_include_comment( p_data, wordtype, target_word );
 		} else {
@@ -337,7 +347,7 @@ void parse_file( char* file_name, int wordtype, char* target_word )
  * @param	[in]		int 	wordtype
  * @param	[in]		char* 	target_word
  */
-bool process_line_exclude_comment( 	bool* p_isin_c_comment, PREP* p_prep,
+bool process_line_exclude_comment_c( bool* p_isin_c_comment, PREP* p_prep,
 									char* buf, size_t bufsize, int wordtype, char* target_word )
 {
 	char valid_str[DATASIZE];
@@ -417,6 +427,44 @@ bool process_line_exclude_comment( 	bool* p_isin_c_comment, PREP* p_prep,
 			}
 		} else if( !isin_literal && !(*p_isin_c_comment) && p_prep->is_commented() ){
 			continue;
+		}
+		if( buf[i] == '\r' ) break;
+		if( buf[i] == '\n' || buf[i] == '\0' ) break;
+		
+		// valid data
+		*ptr = buf[i];
+		++ptr;
+	}
+WHILEOUT:
+	return findword_in_line( valid_str, wordtype, target_word );
+}
+
+bool process_line_exclude_comment_ruby( char* buf, size_t bufsize, int wordtype, char* target_word )
+{
+	char valid_str[DATASIZE];
+	memset( valid_str, 0, sizeof(valid_str) );
+
+	bool isin_dq = false; // "xxx"
+	bool isin_sq = false; // 'xxx'
+	bool isin_var = false; // "#{}"
+	size_t i;
+	char* ptr = valid_str;
+	for( i = 0; i < DATASIZE; ++i ){
+		if( buf[i] == '\n' || buf[i] == '\0' ) break; 
+
+		if( !isin_sq && !isin_dq && buf[i] == '#' ){
+			// # comment
+			break;
+		} else if( !isin_sq && buf[i] == '\"' && ( i == 0 || buf[i-1] != '\\' ) ){
+			// reverse isin_dq
+			isin_dq = !isin_dq;
+		} else if( !isin_dq && buf[i] == '\'' && ( i == 0 || buf[i-1] != '\\' ) ){
+			// reverse isin_sq
+			isin_sq = !isin_sq;
+		} else if( isin_dq && !isin_var && buf[i] == '#' && buf[i+1] == '{' ){
+			isin_var = true;
+		} else if( isin_dq && isin_var && buf[i] == '}' ){
+			isin_var = false;
 		}
 		if( buf[i] == '\r' ) break;
 		if( buf[i] == '\n' || buf[i] == '\0' ) break;

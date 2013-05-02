@@ -24,15 +24,21 @@
 #define SG_PREP_ELSE 	"#else"
 #define SG_PREP_ENDIF	"#endif"
 
+/* file extension */
+enum {
+	kFileExtensionC,
+	kFileExtensionRuby,
+};
+
 #include "prep.h"
 
 /**
  * @brief	function prototype
  */
 void usage( void );
-void parse_file( char* file_name, int wordtype, char* target_word );
-bool process_line_exclude_comment( 	bool* p_isin_c_comment, PREP* p_prep,
-									char* buf, size_t bufsize, int wordtype, char* target_word );
+void parse_file( char* file_name, int file_extension, int wordtype, char* target_word );
+bool process_line_exclude_comment_c( bool* p_isin_c_comment, PREP* p_prep, char* buf, size_t bufsize, int wordtype, char* target_word );
+bool process_line_exclude_comment_ruby( char* buf, size_t bufsize, int wordtype, char* target_word );
 bool process_line_include_comment( char* buf, int wordtype, char* target_word );
 #ifdef WIN32
 void parse_directory_win( char* path, int filetype, int wordtype, char* target_word );
