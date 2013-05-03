@@ -106,12 +106,13 @@ void usage( void )
 {
 	printf( 
 		"Usage: smartgrep\n"
-		"  -h {word}  : recursive      grep for .h                            excluding comment\n"
-		"  -b {word}  : recursive      grep for .cpp .c .mm .m .h .cs .js .rb excluding comment\n"
-		"  -n {word}  : recursive      grep for .cpp .c .mm .m .h .cs .js .rb including comment\n"
-		"  -hw {word} : recursive word grep for .h                            excluding comment\n"
-		"  -bw {word} : recursive word grep for .cpp .c .mm .m .h .cs .js .rb excluding comment\n"
-		"  -nw {word} : recursive word grep for .cpp .c .mm .m .h .cs .js .rb including comment\n"
+		"  -h {word}  : recursive      grep for .h                                excluding comment\n"
+		"  -b {word}  : recursive      grep for .cpp .c .mm .m .h .cs .js .rb .py excluding comment\n"
+		"  -n {word}  : recursive      grep for .cpp .c .mm .m .h .cs .js .rb .py including comment\n"
+		"  -hw {word} : recursive word grep for .h                                excluding comment\n"
+		"  -bw {word} : recursive word grep for .cpp .c .mm .m .h .cs .js .rb .py excluding comment\n"
+		"  -nw {word} : recursive word grep for .cpp .c .mm .m .h .cs .js .rb .py including comment\n"
+		" NOTICE: py comment is not supported.\n"
 	);
 	print_version();
 }
@@ -157,13 +158,7 @@ void parse_directory_win( char* path, int filetype, int wordtype, char* target_w
 			strcpy( file_name_r, path );
 			strcat( file_name_r, "\\" );
 			strcat( file_name_r, find_data.cFileName );
-			int file_extension;
-			if( is_ruby_file( find_data.cFileName ) ){
-				file_extension = kFileExtensionRuby; 
-			} else {
-				file_extension = kFileExtensionC; 
-			}
-			parse_file( file_name_r, file_extension, wordtype, target_word ); 
+			parse_file( file_name_r, wordtype, target_word ); 
 		}
 		BOOL ret = FindNextFile( h_find, &find_data );
 		if( !ret ){
@@ -216,13 +211,7 @@ void parse_directory_mac( char* path, int filetype, int wordtype, char* target_w
 			strcpy( file_name_r, path );
 			strcat( file_name_r, "/" );
 			strcat( file_name_r, p_dirent->d_name );
-			int file_extension;
-			if( is_ruby_file( p_dirent->d_name ) ){
-				file_extension = kFileExtensionRuby;
-			} else {
-				file_extension = kFileExtensionC; 
-			}
-			parse_file( file_name_r, file_extension, wordtype, target_word ); 
+			parse_file( file_name_r, wordtype, target_word ); 
 		}
 	}
 	closedir( p_dir );	
@@ -243,6 +232,8 @@ bool is_source_file( char* file_name ){
 		return true;
 	} else if( is_ruby_file( file_name ) ){
 		return true;
+	} else if( is_python_file( file_name ) ){
+		return true;
 	} else {
 		return false;
 	}
@@ -250,6 +241,10 @@ bool is_source_file( char* file_name ){
 
 bool is_ruby_file( char* file_name ){
 	return is_ext( file_name, "rb" );
+}
+
+bool is_python_file( char* file_name ){
+	return is_ext( file_name, "py" );
 }
 
 bool is_header_file( char* file_name ){
@@ -286,12 +281,24 @@ bool is_ext( char* file_name, const char* ext_name ){
  * @brief	parse one file
  * 			output to standard out
  * @param [in] char* file_name
- * @param [in] int file_extension
  * @param [in] int wordtype
  * @param [in] char* target_word
  */
-void parse_file( char* file_name, int file_extension, int wordtype, char* target_word )
+void parse_file( char* file_name, int wordtype, char* target_word )
 {
+	// file extension
+	int file_extension;
+	if( is_ruby_file( file_name ) ){
+		file_extension = kFileExtensionRuby; 
+	} else if( is_python_file( file_name ) ){
+		file_extension = kFileExtensionPython;
+		// python comment is not supported yet.
+		wordtype &= ~SG_WORDTYPE_EXCLUDE_COMMENT;
+		wordtype |= SG_WORDTYPE_INCLUDE_COMMENT;
+	} else {
+		file_extension = kFileExtensionC; 
+	}
+
 	FILE* fp = fopen( file_name, "rb" );
 	if( fp == NULL )
 		return;

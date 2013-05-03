@@ -26,6 +26,7 @@
 "						  fix bug in case of #ifdef and #ifndef.
 "   Ver2.4.0.0 2013-02-27 add command with newtab.
 "	Ver2.5.0.0 2013-05-02 support .rb(ruby) and one line comment.
+"   Ver2.6.0.0 2013-05-03 support .py(python), python comment is not supported.
 "
 " Support OS
 "	Windows/Unix
@@ -37,6 +38,7 @@
 "   CSharp      : *.cs									/* */, //, #if 0
 "	JavaScript  : *.js									/* */, //, #if 0
 "   Ruby        : *.rb                                  #
+"	Python		: *.py									none
 " 
 " How To Install
 "	Put smartgrep.exe or smartgrep in C:\windows\system32\ or pathed directory.

@@ -28,6 +28,7 @@
 enum {
 	kFileExtensionC,
 	kFileExtensionRuby,
+	kFileExtensionPython,
 };
 
 #include "prep.h"
@@ -36,7 +37,7 @@ enum {
  * @brief	function prototype
  */
 void usage( void );
-void parse_file( char* file_name, int file_extension, int wordtype, char* target_word );
+void parse_file( char* file_name, int wordtype, char* target_word );
 bool process_line_exclude_comment_c( bool* p_isin_c_comment, PREP* p_prep, char* buf, size_t bufsize, int wordtype, char* target_word );
 bool process_line_exclude_comment_ruby( char* buf, size_t bufsize, int wordtype, char* target_word );
 bool process_line_include_comment( char* buf, int wordtype, char* target_word );
@@ -48,6 +49,7 @@ void parse_directory_mac( char* path, int filetype, int wordtype, char* target_w
 bool is_header_file( char* file_name );
 bool is_source_file( char* file_name );
 bool is_ruby_file( char* file_name );
+bool is_python_file( char* file_name );
 bool is_ext( char* file_name, const char* ext_name );
 bool findword_in_line( char* valid_str, int wordtype, char* target_word );
 bool is_alnum_or_underscore( int val );
