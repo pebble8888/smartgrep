@@ -38,7 +38,8 @@ enum {
  */
 void usage( void );
 void parse_file( char* file_name, int wordtype, char* target_word );
-bool process_line_exclude_comment_c( bool* p_isin_c_comment, PREP* p_prep, char* buf, size_t bufsize, int wordtype, char* target_word );
+bool process_line_exclude_comment_c( bool* p_isin_multiline_comment, PREP* p_prep, char* buf, size_t bufsize, int wordtype, char* target_word );
+bool process_line_exclude_comment_python( bool* p_isin_multiline_comment, char* buf, size_t bufsize, int wordtype, char* target_word );
 bool process_line_exclude_comment_ruby( char* buf, size_t bufsize, int wordtype, char* target_word );
 bool process_line_include_comment( char* buf, int wordtype, char* target_word );
 #ifdef WIN32

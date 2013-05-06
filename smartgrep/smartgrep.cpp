@@ -112,7 +112,6 @@ void usage( void )
 		"  -hw {word} : recursive word grep for .h                                excluding comment\n"
 		"  -bw {word} : recursive word grep for .cpp .c .mm .m .h .cs .js .rb .py excluding comment\n"
 		"  -nw {word} : recursive word grep for .cpp .c .mm .m .h .cs .js .rb .py including comment\n"
-		" NOTICE: py comment is not supported.\n"
 	);
 	print_version();
 }
@@ -292,9 +291,6 @@ void parse_file( char* file_name, int wordtype, char* target_word )
 		file_extension = kFileExtensionRuby; 
 	} else if( is_python_file( file_name ) ){
 		file_extension = kFileExtensionPython;
-		// python comment is not supported yet.
-		wordtype &= ~SG_WORDTYPE_EXCLUDE_COMMENT;
-		wordtype |= SG_WORDTYPE_INCLUDE_COMMENT;
 	} else {
 		file_extension = kFileExtensionC; 
 	}
@@ -303,7 +299,7 @@ void parse_file( char* file_name, int wordtype, char* target_word )
 	if( fp == NULL )
 		return;
 
-	bool isin_c_comment = false;
+	bool isin_multiline_comment = false;
 	PREP prep;
 
 	// it is presumed that the one line byte size in file don't exceed 64k
@@ -318,7 +314,10 @@ void parse_file( char* file_name, int wordtype, char* target_word )
 		bool found;
 		if( wordtype & SG_WORDTYPE_EXCLUDE_COMMENT ){
 			if( file_extension == kFileExtensionC ){
-				found = process_line_exclude_comment_c( &isin_c_comment, &prep,
+				found = process_line_exclude_comment_c( &isin_multiline_comment, &prep,
+														p_data, DATASIZE, wordtype, target_word );
+			} else if( file_extension == kFileExtensionPython ){
+				found = process_line_exclude_comment_python( &isin_multiline_comment,
 														p_data, DATASIZE, wordtype, target_word );
 			} else if( file_extension == kFileExtensionRuby ){
 				found = process_line_exclude_comment_ruby( p_data, DATASIZE, wordtype, target_word );
@@ -347,14 +346,14 @@ void parse_file( char* file_name, int wordtype, char* target_word )
  * @retval 	true : found
  * @retval	false: not found
  *
- * @param	[in/out] 	bool* 	p_isin_c_comment 		whether in C comment
+ * @param	[in/out] 	bool* 	p_isin_multiline_comment 		whether in C comment
  * @param   [in/out]    PREP* 	p_prep
  * @param	[in]		char* 	buf
  * @param	[in]		size_t	bufsize
  * @param	[in]		int 	wordtype
  * @param	[in]		char* 	target_word
  */
-bool process_line_exclude_comment_c( bool* p_isin_c_comment, PREP* p_prep,
+bool process_line_exclude_comment_c( bool* p_isin_multiline_comment, PREP* p_prep,
 									char* buf, size_t bufsize, int wordtype, char* target_word )
 {
 	char valid_str[DATASIZE];
@@ -365,17 +364,17 @@ bool process_line_exclude_comment_c( bool* p_isin_c_comment, PREP* p_prep,
 	char* ptr = valid_str;
 	for( i = 0; i < DATASIZE; ++i ){
 		if( buf[i] == '\n' || buf[i] == '\0' ) break; 
-		if( !isin_literal && !(*p_isin_c_comment) && !(p_prep->is_commented())
+		if( !isin_literal && !(*p_isin_multiline_comment) && !(p_prep->is_commented())
 			&& buf[i] == '/' && buf[i+1] == '/' ){
 			// C++ comment
 			break;
-		} else if( !isin_literal && !(*p_isin_c_comment) && !(p_prep->is_commented())
+		} else if( !isin_literal && !(*p_isin_multiline_comment) && !(p_prep->is_commented())
 					&& buf[i] == '/' && buf[i+1] == '*' ){
 			// the begining of C comment
 			i += 2;
-			*p_isin_c_comment = true;
+			*p_isin_multiline_comment = true;
 			continue;
-		} else if( !isin_literal && *p_isin_c_comment && !(p_prep->is_commented()) ){
+		} else if( !isin_literal && *p_isin_multiline_comment && !(p_prep->is_commented()) ){
 			// in c comment
 			while( true ){
 				if( buf[i] == '\n' ) goto WHILEOUT;
@@ -386,12 +385,12 @@ bool process_line_exclude_comment_c( bool* p_isin_c_comment, PREP* p_prep,
 			}
 			i += 2;
 			// the end of c comment
-			*p_isin_c_comment = false;
-		} else if( !(*p_isin_c_comment) && !(p_prep->is_commented())
+			*p_isin_multiline_comment = false;
+		} else if( !(*p_isin_multiline_comment) && !(p_prep->is_commented())
 					&& ( buf[i] == '\"' || buf[i] == '\'' ) && ( i == 0 || buf[i-1] != '\\' ) ) {
 			// reverse isin_literal
 			isin_literal = !isin_literal;
-		} else if( !isin_literal && !(*p_isin_c_comment) && buf[i] == '#' ){
+		} else if( !isin_literal && !(*p_isin_multiline_comment) && buf[i] == '#' ){
 			if( memcmp( &buf[i], SG_PREP_IF, strlen(SG_PREP_IF) ) == 0 ||
 				memcmp( &buf[i], SG_PREP_IFDEF, strlen(SG_PREP_IFDEF) ) == 0 ||
 				memcmp( &buf[i], SG_PREP_IFNDEF, strlen(SG_PREP_IFNDEF) ) == 0 ){
@@ -432,7 +431,7 @@ bool process_line_exclude_comment_c( bool* p_isin_c_comment, PREP* p_prep,
 				i += strlen(SG_PREP_ENDIF);
 				continue;
 			}
-		} else if( !isin_literal && !(*p_isin_c_comment) && p_prep->is_commented() ){
+		} else if( !isin_literal && !(*p_isin_multiline_comment) && p_prep->is_commented() ){
 			continue;
 		}
 		if( buf[i] == '\r' ) break;
@@ -446,6 +445,66 @@ WHILEOUT:
 	return findword_in_line( valid_str, wordtype, target_word );
 }
 
+/**
+ *
+ */
+bool process_line_exclude_comment_python( bool* p_isin_multiline_comment,
+									char* buf, size_t bufsize, int wordtype, char* target_word )
+{
+	char valid_str[DATASIZE];
+	memset( valid_str, 0, sizeof(valid_str) );
+
+	bool isin_dq = false; // "xxx"
+	bool isin_sq = false; // 'xxx'
+	size_t i;
+	char* ptr = valid_str;
+	for( i = 0; i < DATASIZE; ++i ){
+		if( buf[i] == '\n' || buf[i] == '\0' ) break; 
+		if( !isin_dq && !isin_sq && !(*p_isin_multiline_comment)
+			&& buf[i] == '#' ){
+			// single-line comment
+			break;
+		} else if( !isin_dq && !isin_sq && !(*p_isin_multiline_comment)
+					&& buf[i] == '\"' && buf[i+1] == '\"' && buf[i+2] == '\"' ){
+			// the begining of multi-line comment
+			i += 3;
+			*p_isin_multiline_comment = true;
+			continue;
+		} else if( !isin_dq && !isin_sq && *p_isin_multiline_comment ){
+			// in multi-line comment
+			while( true ){
+				if( buf[i] == '\n' ) goto WHILEOUT;
+				if( buf[i] == '\"' && buf[i+1] == '\"' && buf[i+2] == '\"' ){
+					break;
+				}
+				++i;
+			}
+			i += 3;
+			// the end of multi-line comment
+			*p_isin_multiline_comment = false;
+		} else if( !(*p_isin_multiline_comment)
+					&& !isin_sq && buf[i] == '\"' && ( i == 0 || buf[i-1] != '\\' ) ) {
+			// reverse isin_dq
+			isin_dq = !isin_dq;
+		} else if( !(*p_isin_multiline_comment)
+					&& !isin_dq && buf[i] == '\'' && ( i == 0 || buf[i-1] != '\\' ) ){
+			// reverse isin_sq
+			isin_sq = !isin_sq;
+		}
+		if( buf[i] == '\r' ) break;
+		if( buf[i] == '\n' || buf[i] == '\0' ) break;
+		
+		// valid data
+		*ptr = buf[i];
+		++ptr;
+	}
+WHILEOUT:
+	return findword_in_line( valid_str, wordtype, target_word );
+}
+
+/**
+ *
+ */
 bool process_line_exclude_comment_ruby( char* buf, size_t bufsize, int wordtype, char* target_word )
 {
 	char valid_str[DATASIZE];

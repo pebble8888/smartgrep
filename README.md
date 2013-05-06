@@ -11,7 +11,7 @@ Suport Language and Comment Type
 =======
 C, C++, Objective-C, C#(CSharp), Java Script   /* */, //, #if 0  
 Ruby 	#  
-Python  None (Python comment is not supported yet.)  
+Python  #, """  
   
 If you would like to use it for another language, please request me or try this plugin [coolgrep.vim](https://github.com/tyru/coolgrep.vim).  
   
