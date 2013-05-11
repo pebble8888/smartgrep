@@ -1,0 +1,5 @@
+# @see http://about.travis-ci.org/docs/user/getting-started/
+language: cpp
+compiler:
+  - gcc
+script: cd smartgrep && make
