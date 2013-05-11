@@ -12,6 +12,7 @@ endif
 
 all:$(TARGET)
 
+
 OBJS=smartgrep.o
 
 $(TARGET): $(OBJS)
@@ -24,3 +25,6 @@ $(TARGET): $(OBJS)
 clean:
 	rm -f $(OBJS) $(TARGET)
 
+test:
+	smartgrep -bw c_gamma1 > test.out
+	cat test.out
