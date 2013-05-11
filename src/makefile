@@ -26,5 +26,5 @@ clean:
 	rm -f $(OBJS) $(TARGET)
 
 test:
-	smartgrep -bw c_gamma1 > test.out
+	./smartgrep -bw c_gamma1 > test.out
 	cat test.out
