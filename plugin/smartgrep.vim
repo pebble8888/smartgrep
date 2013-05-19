@@ -28,6 +28,7 @@
 "	Ver2.5.0.0 2013-05-02 support .rb(ruby) and one line comment.
 "   Ver2.6.0.0 2013-05-03 support .py(python), python comment is not supported.
 "   Ver2.7.0.0 2013-05-06 support python multi-line comment
+"   Ver2.8.0.0 2013-05-19 support .java and .go
 "
 " Support OS
 "	Windows/Unix
@@ -36,8 +37,10 @@
 "	C++ 		: *.c *.cpp *.cxx *.tli *.inc *.rc 		/* */, //, #if 0 
 "   C++ heder	: *.h *.hpp *.hxx *.tlh *.inl			/* */, //, #if 0
 "	Objective-C : *.m *.mm								/* */, //, #if 0
-"   CSharp      : *.cs									/* */, //, #if 0
-"	JavaScript  : *.js									/* */, //, #if 0
+"   CSharp      : *.cs									/* */, //
+"	JavaScript  : *.js									/* */, //
+"   Java        : *.java                                /* */, //
+"   Go          : *.go                                  /* */, //
 "   Ruby        : *.rb                                  #
 "	Python		: *.py									#, three double quotation
 " 

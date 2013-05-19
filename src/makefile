@@ -27,4 +27,6 @@ clean:
 
 test:
 	./smartgrep -bw c_gamma1 > test.out
+	./smartgrep -bw good > test_java.out
+	./smartgrep -bw Hello > test_go.out
 	cat test.out

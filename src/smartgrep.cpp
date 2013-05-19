@@ -106,12 +106,13 @@ void usage( void )
 {
 	printf( 
 		"Usage: smartgrep\n"
-		"  -h {word}  : recursive      grep for .h                                excluding comment\n"
-		"  -b {word}  : recursive      grep for .cpp .c .mm .m .h .cs .js .rb .py excluding comment\n"
-		"  -n {word}  : recursive      grep for .cpp .c .mm .m .h .cs .js .rb .py including comment\n"
-		"  -hw {word} : recursive word grep for .h                                excluding comment\n"
-		"  -bw {word} : recursive word grep for .cpp .c .mm .m .h .cs .js .rb .py excluding comment\n"
-		"  -nw {word} : recursive word grep for .cpp .c .mm .m .h .cs .js .rb .py including comment\n"
+		"  -h {word}  : recursive      grep for .h                      excluding comment\n"
+		"  -b {word}  : recursive      grep for support file extensions excluding comment\n"
+		"  -n {word}  : recursive      grep for support file extensions including comment\n"
+		"  -hw {word} : recursive word grep for .h                      excluding comment\n"
+		"  -bw {word} : recursive word grep for support file extensions excluding comment\n"
+		"  -nw {word} : recursive word grep for support file extensions including comment\n"
+		" support file extensions : .cpp/.c/.mm/.m/.h/.cs/.js/.rb/.py/.java/.go\n"
 	);
 	print_version();
 }
@@ -227,7 +228,9 @@ bool is_source_file( char* file_name ){
 		is_ext( file_name, "m" ) ||
 		is_ext( file_name, "mm" ) ||
 		is_ext( file_name, "cs" ) || 
-		is_ext( file_name, "js" ) ) {
+		is_ext( file_name, "js" ) ||
+		is_ext( file_name, "java" ) ||
+		is_ext( file_name, "go" ) ) {
 		return true;
 	} else if( is_ruby_file( file_name ) ){
 		return true;
