@@ -5,13 +5,13 @@ import "exp/eval"
 func main() {
 world := eval.NewWorld();
 	   code, err := world.Compile(`
-			   print("Hello\n");
+			   print("go_hello\n");
 			   `); // does not supoort package
 
 	   if err != nil {
 		   panic(err.String(), "\n");
 	   } else {
-		   /* Hello */
+		   /* go_hello */
 		   if value, err := code.Run(); err != nil {
 			   panicln(err.String());
 		   } else println(value);

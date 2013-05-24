@@ -12,6 +12,7 @@ Suport Language and Comment Type
 C, C++, Objective-C, C#(CSharp), Java Script, Java, Go   /* */, //, #if 0  
 Ruby 	#  
 Python  #, """  
+Coffee  #, ###
   
 If you would like to use it for another language, please request me or try this plugin [coolgrep.vim](https://github.com/tyru/coolgrep.vim).  
   
@@ -39,12 +40,13 @@ Usage (smartgrep binary)
 =======
 $ cd {directory-you-want-to-grep}  
 $ smartgrep  
-Usage: smartgrep -h {word}  : recursive      grep for .h                                excluding comment  
-                 -b {word}  : recursive      grep for .cpp .c .mm .m .cs .js .h .rb .py excluding comment  
-                 -n {word}  : recursive      grep for .cpp .c .mm .m .cs .js .h .rb .py including comment  
-                 -hw {word} : recursive word grep for .h                                excluding comment  
-                 -bw {word} : recursive word grep for .cpp .c .mm .m .cs .js .h .rb .py excluding comment  
-                 -nw {word} : recursive word grep for .cpp .c .mm .m .cs .js .h .rb .py including comment  
+Usage: smartgrep  
+  -h {word}  : recursive      grep for .h                      excluding comment  
+  -b {word}  : recursive      grep for support file extensions excluding comment  
+  -n {word}  : recursive      grep for support file extensions including comment  
+  -hw {word} : recursive word grep for .h                      excluding comment  
+  -bw {word} : recursive word grep for support file extensions excluding comment  
+  -nw {word} : recursive word grep for support file extensions including comment  
 
 INSTALL
 =======

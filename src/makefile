@@ -26,7 +26,18 @@ clean:
 	rm -f $(OBJS) $(TARGET)
 
 test:
-	./smartgrep -bw c_gamma1 > test.out
-	./smartgrep -bw good > test_java.out
-	./smartgrep -bw Hello > test_go.out
-	cat test.out
+	sh ./unittest.sh c_gamma1 1
+	sh ./unittest.sh java_good 1
+	sh ./unittest.sh go_hello 1 
+	sh ./unittest.sh py_alpha1 0 
+	sh ./unittest.sh py_gamma1 0 
+	sh ./unittest.sh py_alpha2 0 
+	sh ./unittest.sh py_alpha3 1 
+	sh ./unittest.sh py_B 1 
+	sh ./unittest.sh py_C 0 
+	sh ./unittest.sh rb_alpha1 1
+	sh ./unittest.sh rb_gamma2 0
+	sh ./unittest.sh rb_hoge1 1
+	sh ./unittest.sh rb_gamma1 1
+	sh ./unittest.sh rb_delta2 0
+	sh ./unittest.sh coffee_hello 1

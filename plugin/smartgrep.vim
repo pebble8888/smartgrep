@@ -29,6 +29,7 @@
 "   Ver2.6.0.0 2013-05-03 support .py(python), python comment is not supported.
 "   Ver2.7.0.0 2013-05-06 support python multi-line comment
 "   Ver2.8.0.0 2013-05-19 support .java and .go
+"   Ver2.9.0.0 2013-05-24 support .coffee
 "
 " Support OS
 "	Windows/Unix
@@ -42,6 +43,7 @@
 "   Java        : *.java                                /* */, //
 "   Go          : *.go                                  /* */, //
 "   Ruby        : *.rb                                  #
+"   Coffee      : *.coffee                              #, ###
 "	Python		: *.py									#, three double quotation
 " 
 " How To Install
