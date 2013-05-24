@@ -9,7 +9,7 @@ Unix, MacOS X, Windows
 
 Suport Language and Comment Type
 =======
-C, C++, Objective-C, C#(CSharp), Java Script, Java, Go   /* */, //, #if 0  
+C, C++, Objective-C, C#(CSharp), Java Script, Java, Scala, Go   /* */, //, #if 0  
 Ruby 	#  
 Python  #, """  
 Coffee  #, ###

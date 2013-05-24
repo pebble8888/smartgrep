@@ -28,6 +28,7 @@ clean:
 test:
 	sh ./unittest.sh c_gamma1 1
 	sh ./unittest.sh java_good 1
+	sh ./unittest.sh scala_good 1
 	sh ./unittest.sh go_hello 1 
 	sh ./unittest.sh py_alpha1 0 
 	sh ./unittest.sh py_gamma1 0 

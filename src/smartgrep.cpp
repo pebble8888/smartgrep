@@ -112,7 +112,7 @@ void usage( void )
 		"  -hw {word} : recursive word grep for .h                      excluding comment\n"
 		"  -bw {word} : recursive word grep for support file extensions excluding comment\n"
 		"  -nw {word} : recursive word grep for support file extensions including comment\n"
-		" support file extensions : .cpp/.c/.mm/.m/.h/.cs/.js/.coffee/.rb/.py/.java/.go\n"
+		" support file extensions : .cpp/.c/.mm/.m/.h/.cs/.js/.coffee/.rb/.py/.java/.scala/.go\n"
 	);
 	print_version();
 }
@@ -230,6 +230,7 @@ bool is_source_file( char* file_name ){
 		is_ext( file_name, "cs" ) || 
 		is_ext( file_name, "js" ) ||
 		is_ext( file_name, "java" ) ||
+        is_ext( file_name, "scala" ) ||
 		is_ext( file_name, "go" ) ) {
 		return true;
 	} else if( is_ruby_file( file_name ) ){
