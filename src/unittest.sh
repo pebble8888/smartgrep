@@ -5,7 +5,7 @@ WORD=${1}
 OUTFILENAME=./testout/${WORD}.out
 LINECOUNT=${2}
 
-./smartgrep -bw ${WORD} > ${OUTFILENAME}
+./smartgrep -ew ${WORD} > ${OUTFILENAME}
 
 if [ `grep ${WORD} ${OUTFILENAME}|wc -l` -eq ${LINECOUNT} ]; then
    exit 0

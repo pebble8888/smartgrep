@@ -59,7 +59,7 @@ bool is_alnum_or_underscore( int val );
 void print_version( void );
 
 void smartgrep_getcwd( char* buf, size_t size );
-
+void smartgrep_getrepo( char* buf, size_t size );
 void test_is_alnum_or_underscore( void );
 void test( void );
 

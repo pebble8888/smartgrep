@@ -41,14 +41,15 @@ int main(int argc, char* argv[])
 	test();
 #endif
 
-	if( argc - 1 != 2 ){
+	if( (argc-1 != 2) && (argc-1 != 3) ){
 		usage();
 		return 1;
 	}
 
+    bool use_repo = false;
 	int wordtype = 0;
 	int filetype = 0;
-	if( strcmp( argv[1], "-n" ) == 0 ){
+	if( strcmp( argv[1], "-i" ) == 0 ){
 		filetype |= SG_FILETYPE_SOURCE;
 		filetype |= SG_FILETYPE_HEADER;
 		wordtype |= SG_WORDTYPE_NORMAL;
@@ -57,12 +58,12 @@ int main(int argc, char* argv[])
 		filetype |= SG_FILETYPE_HEADER;
 		wordtype |= SG_WORDTYPE_NORMAL;
 		wordtype |= SG_WORDTYPE_EXCLUDE_COMMENT;
-	} else if( strcmp( argv[1], "-b" ) == 0 ){
+	} else if( strcmp( argv[1], "-e" ) == 0 ){
 		filetype |= SG_FILETYPE_SOURCE;
 		filetype |= SG_FILETYPE_HEADER;
 		wordtype |= SG_WORDTYPE_NORMAL;
 		wordtype |= SG_WORDTYPE_EXCLUDE_COMMENT;
-	} else if( strcmp( argv[1], "-nw" ) == 0 ){
+	} else if( strcmp( argv[1], "-iw" ) == 0 ){
 		filetype |= SG_FILETYPE_SOURCE;
 		filetype |= SG_FILETYPE_HEADER;
 		wordtype |= SG_WORDTYPE_WORD;
@@ -71,7 +72,7 @@ int main(int argc, char* argv[])
 		filetype |= SG_FILETYPE_HEADER;
 		wordtype |= SG_WORDTYPE_WORD;
 		wordtype |= SG_WORDTYPE_EXCLUDE_COMMENT;
-	} else if( strcmp( argv[1], "-bw" ) == 0 ){
+	} else if( strcmp( argv[1], "-ew" ) == 0 ){
 		filetype |= SG_FILETYPE_SOURCE;
 		filetype |= SG_FILETYPE_HEADER;
 		wordtype |= SG_WORDTYPE_WORD;
@@ -80,10 +81,19 @@ int main(int argc, char* argv[])
 		usage();
 		return 1;
 	}
+    if( argc-1 == 3 ){
+        if( strcmp( argv[2], "-g" ) == 0 ){
+            use_repo = true;
+        }
+    }
 	char path[512];
 	memset( path, 0, sizeof(path) );
-	smartgrep_getcwd( path, sizeof(path) );
-	char* word = argv[2];
+    if( use_repo ){
+        smartgrep_getrepo( path, sizeof(path) );
+    } else {
+        smartgrep_getcwd( path, sizeof(path) );
+    }
+	char* word = argv[argc-1];
 #ifdef WIN32
 	parse_directory_win( path, filetype, wordtype, word );
 #else
@@ -101,18 +111,83 @@ void smartgrep_getcwd( char* buf, size_t size )
 #endif
 }
 
+void smartgrep_getrepo( char* buf, size_t size )
+{
+    char curpath[512];
+    memset( curpath, 0, sizeof(curpath) );
+    smartgrep_getcwd( curpath, sizeof(curpath) );
+    size_t idx = strlen(curpath);
+    char path[512]; 
+#ifdef WIN32
+	assert( strlen(curpath) < size );
+	strcpy( buf, curpath );
+	while( idx > 3 ){
+		for( int i = 0; i < 2; ++i ){
+			strcpy( path, curpath );
+			path[idx] = '\0';
+			if( i == 0 ) strcat( path, "\\.git" );
+			else if( i == 1 ) strcat( path, "\\.hg" );
+			// check
+			HANDLE h_find;
+			WIN32_FIND_DATA find_data;
+			h_find = FindFirstFile( path, &find_data );
+			if( h_find != INVALID_HANDLE_VALUE ){
+				// can access
+				FindClose( h_find );
+				path[idx] = '\0';
+				size_t len = strlen(path);
+				assert( len < size );
+				strcpy( buf, path );
+				return;
+			}
+		}
+		path[idx] = '\0';
+		char* r = strrchr( path, '\\' );
+		if( r == NULL ){
+			strcpy( buf, curpath );
+			return;
+		}
+		idx = (size_t)(r - path);
+	}
+#else
+    while( true ){
+        for( int i = 0; i < 2; ++i ){
+            strcpy( path, curpath );
+            path[idx] = '\0'; 
+            if( i == 0 ) strcat( path, "/.git" );
+            else if( i == 1 ) strcat( path, "/.hg" );
+            // check
+            DIR* p_dir = opendir( path );
+            if( p_dir != NULL ){
+                // can access
+                closedir( p_dir );
+                path[idx] = '\0';
+                size_t len = strlen(path);
+                assert( len < size );
+                strcpy( buf, path );
+                return;
+            }
+        }
+        path[idx] = '\0';
+        char* r = strrchr( path, '/' );
+        if( r == NULL ){
+            strcpy( buf, curpath );
+            return;
+        }
+        idx = (size_t)(r - path); 
+    }
+#endif
+}
 
 void usage( void )
 {
 	printf( 
-		"Usage: smartgrep\n"
-		"  -h {word}  : recursive      grep for .h                      excluding comment\n"
-		"  -b {word}  : recursive      grep for support file extensions excluding comment\n"
-		"  -n {word}  : recursive      grep for support file extensions including comment\n"
-		"  -hw {word} : recursive word grep for .h                      excluding comment\n"
-		"  -bw {word} : recursive word grep for support file extensions excluding comment\n"
-		"  -nw {word} : recursive word grep for support file extensions including comment\n"
-		" support file extensions : .cpp/.c/.mm/.m/.h/.cs/.js/.coffee/.rb/.py/.java/.scala/.go\n"
+		"Usage: smartgrep {-e[w]|-i[w]|-h[w]} [-g] word_you_grep\n"
+		"  -e[w] : recursive [word] grep for supported file extensions excluding comment\n"
+		"  -i[w] : recursive [word] grep for supported file extensions including comment\n"
+		"  -h[w] : recursive [word] grep for .h excluding comment\n"
+        "  -g : use auto detect git or mercurial repository with the current directory.\n"
+		"  support file extensions : .cpp/.c/.mm/.m/.h/.cs/.js/.coffee/.rb/.py/.java/.scala/.go\n"
 	);
 	print_version();
 }

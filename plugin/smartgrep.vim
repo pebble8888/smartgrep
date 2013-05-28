@@ -30,6 +30,7 @@
 "   Ver2.7.0.0 2013-05-06 support python multi-line comment
 "   Ver2.8.0.0 2013-05-19 support .java and .go
 "   Ver2.9.0.0 2013-05-24 support .coffee and .scala( not support nest )
+"   Ver3.0.0.0 2013-05-28 auto project detect feature using .git and .hg folder.
 "
 " Support OS
 "	Windows/Unix
@@ -48,10 +49,10 @@
 "	Python		: *.py									#, three double quotation
 " 
 " How To Install
-"	Put smartgrep.exe or smartgrep in C:\windows\system32\ or pathed directory.
+"	Put smartgrep.exe or smartgrep in C:\windows\system\ or pathed directory.
 "	Put smartgrep.vim in vim plugin directory
 "		example:
-"			C:\vim7\runtime\plugin\		(for windows)
+"			C:\vim\runtime\plugin\		(for windows)
 "			~/.vim/plugin/				(for Unix)
 "
 "   If g:smartgrep_basedir isn't defined,
@@ -74,115 +75,77 @@
 "
 " Implementation below
 
-function! RSmartGrepNW(word)
-  set grepprg=smartgrep\ -nw
+function! RSmartGrepHWG(word)
+  set grepprg=smartgrep\ -hw\ -g
   execute "cd " . get(g:, 'smartgrep_basedir', '.')
   silent! execute "lgrep " . a:word
   silent! lopen
   set grepprg&
 endfunction
 
-function! RSmartGrepHW(word)
-  set grepprg=smartgrep\ -hw
+function! RSmartGrepEWG(word)
+  set grepprg=smartgrep\ -ew\ -g
   execute "cd " . get(g:, 'smartgrep_basedir', '.')
   silent! execute "lgrep " . a:word
   silent! lopen
   set grepprg&
 endfunction
 
-function! RSmartGrepW(word)
-  set grepprg=smartgrep\ -bw
+function! RSmartGrepIG(word)
+  set grepprg=smartgrep\ -i\ -g
   execute "cd " . get(g:, 'smartgrep_basedir', '.')
   silent! execute "lgrep " . a:word
   silent! lopen
   set grepprg&
 endfunction
 
-function! RSmartGrepN(word)
-  set grepprg=smartgrep\ -n
-  execute "cd " . get(g:, 'smartgrep_basedir', '.')
-  silent! execute "lgrep " . a:word
-  silent! lopen
-  set grepprg&
-endfunction
-
-function! RSmartGrepH(word)
-  set grepprg=smartgrep\ -h
-  execute "cd " . get(g:, 'smartgrep_basedir', '.')
-  silent! execute "lgrep " . a:word
-  silent! lopen
-  set grepprg&
-endfunction
-
-function! RSmartGrep(word)
-  set grepprg=smartgrep\ -b
-  execute "cd " . get(g:, 'smartgrep_basedir', '.')
-  silent! execute "lgrep " . a:word
-  silent! lopen
-  set grepprg&
-endfunction
-
-function! RSmartGrepWA(word)
-  set grepprg=smartgrep\ -bw
-  execute "cd " . g:sys_dir
-  silent! execute "lgrep " . a:word
-  silent! lopen
-  set grepprg&
-endfunction
-
-function! RSmartGrepWW(word)
-  set grepprg=smartgrep\ -bw
+function! RSmartGrepEWW(word)
+  set grepprg=smartgrep\ -ew
   execute "cd " . g:sys_dir_w
   silent! execute "lgrep " . a:word
   silent! lopen
   set grepprg&
 endfunction
 
-function! RSmartGrepWL(word)
-  set grepprg=smartgrep\ -bw
+function! RSmartGrepEWL(word)
+  set grepprg=smartgrep\ -ew
   execute "cd " . g:sys_dir_l
   silent! execute "lgrep " . a:word
   silent! lopen
   set grepprg&
 endfunction
 
-function! RSmartGrepW_TabNew(word)
+function! RSmartGrepEWG_TabNew(word)
   execute "tabnew"
-  call RSmartGrepW(a:word)
+  call RSmartGrepEWG(a:word)
 endfunction
 
-function! RSmartGrepHW_TabNew(word)
+function! RSmartGrepHWG_TabNew(word)
   execute "tabnew"
-  call RSmartGrepHW(a:word)
+  call RSmartGrepHWG(a:word)
 endfunction
 
 if !exists('g:smartgrep_no_default_key_mappings')
-  " ,g  : recursive word grep for c,h file exclude comment by mouse cursored word 
+  " ,g  : recursive word grep for support file exclude comment by mouse cursored word 
   " ,h  : recursive word grep for h file exclude comment by mouse cursored word
   " ,gt : tabnew version for ,g
   " ,ht : tabnew version for ,h
-  noremap ,g :call RSmartGrepW("<C-R><C-W>")<CR>
-  noremap ,h :call RSmartGrepHW("<C-R><C-W>")<CR>
-  noremap ,gt :call RSmartGrepW_TabNew("<C-R><C-W>")<CR>
-  noremap ,ht :call RSmartGrepHW_TabNew("<C-R><C-W>")<CR>
+  noremap ,g :call RSmartGrepEWG("<C-R><C-W>")<CR>
+  noremap ,h :call RSmartGrepHWG("<C-R><C-W>")<CR>
+  noremap ,gt :call RSmartGrepEWG_TabNew("<C-R><C-W>")<CR>
+  noremap ,ht :call RSmartGrepHWG_TabNew("<C-R><C-W>")<CR>
 endif
 
 if !exists('g:smartgrep_no_default_key_mappings')
-  " :Rn  -> recursive word grep for c,h file include comment
-  " :Rh  -> recursive word grep for h file exclude comment
-  " :R   -> recursive word grep for c,h file exclude comment
-  " :Rno -> recursive grep for c,h file include comment
-  " :Rho -> recursive grep for h file exclude comment
-  " :Ro  -> recursive grep for c,h file exclude comment
-  command! -nargs=1 -complete=file Rn call RSmartGrepNW("<args>")
-  command! -nargs=1 -complete=file Rh call RSmartGrepHW("<args>")
-  command! -nargs=1 -complete=file R call RSmartGrepW("<args>")
-  command! -nargs=1 -complete=file Rno call RSmartGrepN("<args>")
-  command! -nargs=1 -complete=file Rho call RSmartGrepH("<args>")
-  command! -nargs=1 -complete=file Ro call RSmartGrep("<args>")
+  " :R  -> recursive word grep for support file exclude comment
+  " :Rh -> recursive word grep for h file exclude comment
+  " :Ri -> recursive grep for c,h file include comment
+  command! -nargs=1 -complete=file R call RSmartGrepEWG("<args>")
+  command! -nargs=1 -complete=file Rh call RSmartGrepHWG("<args>")
+  command! -nargs=1 -complete=file Ri call RSmartGrepIG("<args>")
 
-  " :Rl  -> recursive word grep for c,h file exclude comment in sys_dir_w
-  " :Rw  -> recursive word grep for c,h file exclude comment in sys_dir_l
-  command! -nargs=1 -complete=file Rl call RSmartGrepWL("<args>")
-  command! -nargs=1 -complete=file Rw call RSmartGrepWW("<args>")
+  " :Rl  -> recursive word grep for support file exclude comment in sys_dir_w
+  " :Rw  -> recursive word grep for support file exclude comment in sys_dir_l
+  command! -nargs=1 -complete=file Rl call RSmartGrepEWL("<args>")
+  command! -nargs=1 -complete=file Rw call RSmartGrepEWW("<args>")
 endif
