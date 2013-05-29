@@ -52,10 +52,10 @@ Usage: smartgrep {-e[w]|-i[w]|-h[w]} [-g] word_you_grep
 
 INSTALL
 =======
-If you are Windows user, build 'smartgrep.exe' from source with MinGW or Visual Studio 6  
-and read ./plugin/smartgrep.vim file.  
-If you are Mac or Unix user, build 'smartgrep' from source to type 'make + [enter]'  
-and read ./plugin/smartgrep.vim file.  
+If you use Bundle, add 'pebble8888/smartgrep.git' to ~/.vimrc and :BundleInstall.  
+Windows : build 'smartgrep.exe' from source file in smartgrep/src with MinGW or Visual Studio 6.  
+MacOSX/Linux : build 'smartgrep' from source file in smartgrep/src with g++ to type 'make + [enter]'.  
+So copy smartgrep binary to pathed directory.  
 
 SCREEN SHOT
 =======
