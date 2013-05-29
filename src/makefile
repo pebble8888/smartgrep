@@ -24,6 +24,7 @@ $(TARGET): $(OBJS)
 
 clean:
 	rm -f $(OBJS) $(TARGET)
+	rm -f ./testout/*.out
 
 test:
 	sh ./unittest.sh c_gamma1 1
@@ -36,9 +37,26 @@ test:
 	sh ./unittest.sh py_alpha3 1 
 	sh ./unittest.sh py_B 1 
 	sh ./unittest.sh py_C 0 
+	sh ./unittest.sh py_D 0
+	sh ./unittest.sh py_E 0
 	sh ./unittest.sh rb_alpha1 1
 	sh ./unittest.sh rb_gamma2 0
 	sh ./unittest.sh rb_hoge1 1
 	sh ./unittest.sh rb_gamma1 1
 	sh ./unittest.sh rb_delta2 0
+	sh ./unittest.sh rb_delta3 0
+	sh ./unittest.sh rb_delta4 1
 	sh ./unittest.sh coffee_hello 1
+	sh ./unittest.sh perl_1 1
+	sh ./unittest.sh perl_2 0
+	sh ./unittest.sh perl_4 1
+	sh ./unittest.sh perl_7 0
+	sh ./unittest.sh csharp_1 0
+	sh ./unittest.sh csharp_2 0
+	sh ./unittest.sh csharp_3 1
+	sh ./unittest.sh vbdotnet_1 4
+	sh ./unittest.sh vbdotnet_2 0
+	sh ./unittest.sh vbdotnet_3 0
+	sh ./unittest.sh vbdotnet_4 0
+	sh ./unittest.sh vbdotnet_6 4
+

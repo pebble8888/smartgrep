@@ -1,6 +1,6 @@
 smartgrep
 =======
-Grep word in source file excluding comment for vim plugin.  
+Grep word in source files excluding comment for vim plugin.  
 Grep is very fast because C compiled binary is used.  
 Auto project detection using .git or .hg folder.  
 
@@ -10,11 +10,14 @@ Unix, MacOS X, Windows
 
 Suport Language and Comment Type
 =======
-C, C++, Objective-C, C#(CSharp), Java Script, Java, Scala, Go   /* */, //, #if 0  
-Ruby 	#  
-Python  #, """  
-Coffee  #, ###  
-  
+C, C++, Objective-C, C#, Java Script, Java, Scala, Go   /* */, //, #if 0  
+Perl        #, =pod, =cut  
+Ruby 	    #, =begin, =end  
+Python      #, """, '''  
+Coffee      #, ###  
+Shell       #  
+VB.Net,VB6  '  
+   
 If you would like to use it for another language, please request me or try this plugin [coolgrep.vim](https://github.com/tyru/coolgrep.vim).  
   
 Usage (smartgrep.vim command)
@@ -35,9 +38,6 @@ If g:smartgrep_basedir isn't defined, the current directory is used.
 :Rh  -> recursive word grep for h file exclude comment  
 :Ri  -> recursive grep for supported file extensions include comment  
   
-:Rl  -> recursive word grep for supported file extensions exclude comment in sys_dir_w  
-:Rw  -> recursive word grep for supported file extensions exclude comment in sys_dir_l  
-
 Usage (smartgrep binary)
 =======
 $ cd {directory-you-want-to-grep}  
@@ -47,8 +47,8 @@ Usage: smartgrep {-e[w]|-i[w]|-h[w]} [-g] word_you_grep
   -i[w] : recursive [word] grep for supported file extensions including comment  
   -h[w] : recursive [word] grep for .h excluding comment  
   -g : use auto detect git or mercurial repository with the current directory.  
-  support file extensions : .cpp/.c/.mm/.m/.h/.cs/.js/.coffee/.rb/.py/.java/.scala/.go  
-
+  support file extensions : .cpp/.c/.mm/.m/.h/.js/.coffee/.pl/.rb/.py/.java/.scala/.go  
+                            .cs/.vb/.bas/.frm/.cls  
 
 INSTALL
 =======

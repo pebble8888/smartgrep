@@ -31,22 +31,26 @@
 "   Ver2.8.0.0 2013-05-19 support .java and .go
 "   Ver2.9.0.0 2013-05-24 support .coffee and .scala( not support nest )
 "   Ver3.0.0.0 2013-05-28 auto project detect feature using .git and .hg folder.
+"   Ver3.1.0.0 2013-05-29 support ruby multi-line comment, perl, visual basic.
 "
 " Support OS
 "	Windows/Unix
 "
-" Support File Extention                                  Support Comment Type
-"	C++ 		: *.c *.cpp *.cxx *.tli *.inc *.rc 		/* */, //, #if 0 
-"   C++ heder	: *.h *.hpp *.hxx *.tlh *.inl			/* */, //, #if 0
-"	Objective-C : *.m *.mm								/* */, //, #if 0
-"   CSharp      : *.cs									/* */, //
-"	JavaScript  : *.js									/* */, //
-"   Java        : *.java                                /* */, //
-"   Scala       : *.scala                               /* */(can't nest), //
-"   Go          : *.go                                  /* */, //
-"   Ruby        : *.rb                                  #
-"   Coffee      : *.coffee                              #, ###
-"	Python		: *.py									#, three double quotation
+" Support File Extention                            Support Comment Type
+"	C++ 		: .c .cpp .cxx .tli .inc .rc 		/* */, //, #if 0 
+"   C++ heder	: .h .hpp .hxx .tlh .inl			/* */, //, #if 0
+"	Objective-C : .m .mm							/* */, //, #if 0
+"   CSharp      : .cs								/* */, //
+"	JavaScript  : .js								/* */, //
+"   Java        : .java                             /* */, //
+"   Scala       : .scala                            /* */(can't nest), //
+"   Go          : .go                               /* */, //
+"   Ruby        : .rb                               #, =begin, =end
+"   Perl        : .pl                               #, =pod, =cut
+"	Python		: .py								#, three double(single) quotation
+"   Coffee      : .coffee                           #, ###
+"   VBNet       : .vb                               '
+"   VB6         : .bas .frm .cls                    '
 " 
 " How To Install
 "	Put smartgrep.exe or smartgrep in C:\windows\system\ or pathed directory.

@@ -8,4 +8,10 @@ print "py_B"
 """
 print "py_C"
 """
+'''
+print "py_D"
+'''
+    """
+    print "py_E"
+    """
 print "" # py_gamma6

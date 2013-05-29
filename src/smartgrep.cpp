@@ -187,7 +187,8 @@ void usage( void )
 		"  -i[w] : recursive [word] grep for supported file extensions including comment\n"
 		"  -h[w] : recursive [word] grep for .h excluding comment\n"
         "  -g : use auto detect git or mercurial repository with the current directory.\n"
-		"  support file extensions : .cpp/.c/.mm/.m/.h/.cs/.js/.coffee/.rb/.py/.java/.scala/.go\n"
+		"  support file extensions : .cpp/.c/.mm/.m/.h/.js/.coffee/.rb/.py/.pl/.java/\n"
+        "                            .scala/.go/.cs/.vb/.bas/.frm/.cls\n"
 	);
 	print_version();
 }
@@ -308,27 +309,30 @@ bool is_source_file( char* file_name ){
         is_ext( file_name, "scala" ) ||
 		is_ext( file_name, "go" ) ) {
 		return true;
-	} else if( is_ruby_file( file_name ) ){
-		return true;
-    } else if( is_coffee_file( file_name ) ){
-        return true;
-	} else if( is_python_file( file_name ) ){
+	} else if( is_ruby_file( file_name ) ||
+               is_coffee_file( file_name ) ||
+	           is_python_file( file_name ) ||
+               is_perl_file( file_name ) ||
+               is_vb_file( file_name ) ){
 		return true;
 	} else {
 		return false;
 	}
 }
 
-bool is_ruby_file( char* file_name ){
-	return is_ext( file_name, "rb" );
-}
-
-bool is_coffee_file( char* file_name ){
-    return is_ext( file_name, "coffee" );
-}
-
-bool is_python_file( char* file_name ){
-	return is_ext( file_name, "py" );
+bool is_ruby_file( char* file_name ){ return is_ext( file_name, "rb" ); }
+bool is_coffee_file( char* file_name ){ return is_ext( file_name, "coffee" ); }
+bool is_python_file( char* file_name ){ return is_ext( file_name, "py" ); }
+bool is_perl_file( char* file_name ){ return is_ext( file_name, "pl" ); }
+bool is_vb_file( char* file_name ){
+    if( is_ext( file_name, "vb" ) ||
+        is_ext( file_name, "frm" ) ||
+        is_ext( file_name, "bas" ) ||
+        is_ext( file_name, "cls" ) ){
+        return true;
+    } else {
+        return false;
+    }
 }
 
 bool is_header_file( char* file_name ){
@@ -373,13 +377,17 @@ void parse_file( char* file_name, int wordtype, char* target_word )
 	// file extension
 	int file_extension;
 	if( is_ruby_file( file_name ) ){
-		file_extension = kFileExtensionRuby; 
+		file_extension = kRuby; 
     } else if( is_coffee_file( file_name ) ){
-        file_extension = kFileExtensionCoffee;
+        file_extension = kCoffee;
 	} else if( is_python_file( file_name ) ){
-		file_extension = kFileExtensionPython;
+		file_extension = kPython;
+    } else if( is_perl_file( file_name ) ){
+        file_extension = kPerl;
+    } else if( is_vb_file( file_name ) ){
+        file_extension = kVB;
 	} else {
-		file_extension = kFileExtensionC; 
+		file_extension = kC; 
 	}
 
 	FILE* fp = fopen( file_name, "rb" );
@@ -400,17 +408,18 @@ void parse_file( char* file_name, int wordtype, char* target_word )
 
 		bool found;
 		if( wordtype & SG_WORDTYPE_EXCLUDE_COMMENT ){
-			if( file_extension == kFileExtensionC ){
+			if( file_extension == kC ){
 				found = process_line_exclude_comment_c( &isin_multiline_comment, &prep,
 														p_data, DATASIZE, wordtype, target_word );
-			} else if( file_extension == kFileExtensionPython ){
-				found = process_line_exclude_comment_python( &isin_multiline_comment,
-														p_data, DATASIZE, wordtype, target_word );
-			} else if( file_extension == kFileExtensionRuby ||
-                       file_extension == kFileExtensionCoffee ){
+			} else if( file_extension == kRuby ||
+                       file_extension == kCoffee ||
+                       file_extension == kPython ||
+                       file_extension == kPerl ){
 				found = process_line_exclude_comment_ruby( &isin_multiline_comment,
                                                         p_data, DATASIZE, wordtype, target_word,
-                                                        (file_extension == kFileExtensionRuby) );
+                                                        file_extension );
+            } else if( file_extension == kVB ){
+                found = process_line_exclude_comment_vb( p_data, DATASIZE, wordtype, target_word );
 			} else {
 				assert( false );
 			}
@@ -536,70 +545,11 @@ WHILEOUT:
 }
 
 /**
- * python
- */
-bool process_line_exclude_comment_python( bool* p_isin_multiline_comment,
-									char* buf, size_t bufsize, int wordtype, char* target_word )
-{
-	char valid_str[DATASIZE];
-	memset( valid_str, 0, sizeof(valid_str) );
-
-	bool isin_dq = false; // "xxx"
-	bool isin_sq = false; // 'xxx'
-	size_t i;
-	char* ptr = valid_str;
-	for( i = 0; i < DATASIZE; ++i ){
-		if( buf[i] == '\n' || buf[i] == '\0' ) break; 
-
-		if( !(*p_isin_multiline_comment)
-            && !isin_dq && !isin_sq && buf[i] == '#' ){
-			// single-line comment
-			break;
-		} else if( !(*p_isin_multiline_comment)
-                   && !isin_dq && !isin_sq 
-				   && buf[i] == '\"' && buf[i+1] == '\"' && buf[i+2] == '\"' ){
-			// the begining of multi-line comment
-			i += 3;
-			*p_isin_multiline_comment = true;
-			continue;
-		} else if( !isin_dq && !isin_sq && *p_isin_multiline_comment ){
-			// in multi-line comment
-			while( true ){
-				if( buf[i] == '\n' ) goto WHILEOUT;
-				if( buf[i] == '\"' && buf[i+1] == '\"' && buf[i+2] == '\"' ){
-					break;
-				}
-				++i;
-			}
-			i += 3;
-			// the end of multi-line comment
-			*p_isin_multiline_comment = false;
-		} else if( !(*p_isin_multiline_comment)
-					&& !isin_sq && buf[i] == '\"' && ( i == 0 || buf[i-1] != '\\' ) ) {
-			// reverse isin_dq
-			isin_dq = !isin_dq;
-		} else if( !(*p_isin_multiline_comment)
-					&& !isin_dq && buf[i] == '\'' && ( i == 0 || buf[i-1] != '\\' ) ){
-			// reverse isin_sq
-			isin_sq = !isin_sq;
-		}
-		if( buf[i] == '\r' ) break;
-		if( buf[i] == '\n' || buf[i] == '\0' ) break;
-		
-		// valid data
-		*ptr = buf[i];
-		++ptr;
-	}
-WHILEOUT:
-	return findword_in_line( valid_str, wordtype, target_word );
-}
-
-/**
- * ruby (#begin #end is not implemented) or coffee
+ * dynamic languages
  */
 bool process_line_exclude_comment_ruby( bool* p_isin_multiline_comment,
                                 char* buf, size_t bufsize, int wordtype, char* target_word,
-                                bool ruby_or_coffee )
+                                int file_extension )
 {
 	char valid_str[DATASIZE];
 	memset( valid_str, 0, sizeof(valid_str) );
@@ -613,23 +563,36 @@ bool process_line_exclude_comment_ruby( bool* p_isin_multiline_comment,
 		if( buf[i] == '\n' || buf[i] == '\0' ) break; 
 
         if( !(*p_isin_multiline_comment)
-                   && !isin_dq && !isin_sq
-                   && !ruby_or_coffee
-                   && buf[i] == '#' && buf[i+1] == '#' && buf[i+2] == '#' ){
+            && !isin_dq && !isin_sq
+            && ((file_extension == kRuby && i == 0 && memcmp(&buf[i], "=begin", 5) == 0) ||
+                (file_extension == kPerl && i == 0 && memcmp(&buf[i], "=pod", 4) == 0 ) ||
+                (file_extension == kCoffee && memcmp(&buf[i], "###", 3) == 0) ||
+                (file_extension == kPython &&
+                  ( memcmp(&buf[i], "\"\"\"", 3) == 0 || memcmp(&buf[i], "'''", 3) == 0 ) ) ) )
+        {
             // the begining of multi-line comment
-            i += 3;
+            if( file_extension == kRuby ){ i += 5; }
+            else if( file_extension == kPerl ){ i += 4; }
+            else if( file_extension == kCoffee ){ i += 3; }
+            else if( file_extension == kPython ){ i += 3; }
             *p_isin_multiline_comment = true;
             continue;
         } else if( !isin_dq && !isin_sq && *p_isin_multiline_comment ){
             // in multi-line comment
             while( true ){
                 if( buf[i] == '\n' ) goto WHILEOUT;
-                if( buf[i] == '#' && buf[i+1] == '#' && buf[i+2] == '#' ){
-                    break;
+                if( file_extension == kRuby && i == 0 && memcmp(&buf[i], "=end", 4) == 0 ){
+                    i += 4; break;
+                } else if( file_extension == kPerl && i == 0 && memcmp(&buf[i], "=cut", 4) == 0 ){
+                    i += 4; break;
+                } else if( file_extension == kCoffee && memcmp(&buf[i], "###", 3) == 0 ){
+                    i += 3; break;
+                } else if( file_extension == kPython && 
+                           ( memcmp(&buf[i], "\"\"\"",3) == 0 || memcmp(&buf[i], "'''",3) == 0 ) ){
+                    i += 3; break;
                 }
                 ++i;
             }
-            i += 3;
             // the end of multi-line comment
             *p_isin_multiline_comment = false;
         } else if( !(*p_isin_multiline_comment)
@@ -648,8 +611,40 @@ bool process_line_exclude_comment_ruby( bool* p_isin_multiline_comment,
                    && isin_dq && !isin_var && buf[i] == '#' && buf[i+1] == '{' ){
 			isin_var = true;
 		} else if( !(*p_isin_multiline_comment)
-                   && isin_dq && isin_var && buf[i] == '}' ){
+                   && isin_dq && file_extension == kRuby && isin_var && buf[i] == '}' ){
 			isin_var = false;
+		}
+		if( buf[i] == '\r' ) break;
+		if( buf[i] == '\n' || buf[i] == '\0' ) break;
+		
+		// valid data
+		*ptr = buf[i];
+		++ptr;
+	}
+WHILEOUT:
+	return findword_in_line( valid_str, wordtype, target_word );
+}
+
+/**
+ * visual basic 6 and visual basic dot net
+ */
+bool process_line_exclude_comment_vb( char* buf, size_t bufsize, int wordtype, char* target_word )
+{
+	char valid_str[DATASIZE];
+	memset( valid_str, 0, sizeof(valid_str) );
+
+	bool isin_dq = false; // "xxx"
+	size_t i;
+	char* ptr = valid_str;
+	for( i = 0; i < DATASIZE; ++i ){
+		if( buf[i] == '\n' || buf[i] == '\0' ) break; 
+
+        if( !isin_dq && buf[i] == '\'' ){
+			// single-line comment
+			break;
+		} else if( buf[i] == '\"' && ( i == 0 || buf[i-1] != '\\' ) ){
+			// reverse isin_dq
+			isin_dq = !isin_dq;
 		}
 		if( buf[i] == '\r' ) break;
 		if( buf[i] == '\n' || buf[i] == '\0' ) break;
