@@ -8,7 +8,7 @@ Example
 =======
 If C source file func.c looks like  
 
-void savelife( int he, int she ){  
+void glare_at( int he, int she ){  
     /* BUGFIX  
     petrify( he );  
      */  
