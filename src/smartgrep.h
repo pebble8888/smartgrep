@@ -27,6 +27,7 @@
 /* file extension */
 enum {
 	kC,
+    kShell,
 	kRuby,
     kCoffee,
 	kPython,
@@ -52,6 +53,7 @@ void parse_directory_mac( char* path, int filetype, int wordtype, char* target_w
 #endif
 bool is_header_file( char* file_name );
 bool is_source_file( char* file_name );
+bool is_shell_file( char* file_name );
 bool is_ruby_file( char* file_name );
 bool is_coffee_file( char* file_name );
 bool is_python_file( char* file_name );

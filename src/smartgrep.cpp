@@ -187,8 +187,8 @@ void usage( void )
 		"  -i[w] : recursive [word] grep for supported file extensions including comment\n"
 		"  -h[w] : recursive [word] grep for .h excluding comment\n"
         "  -g : use auto detect git or mercurial repository with the current directory.\n"
-		"  support file extensions : .cpp/.c/.mm/.m/.h/.js/.coffee/.rb/.py/.pl/.java/\n"
-        "                            .scala/.go/.cs/.vb/.bas/.frm/.cls\n"
+		"  support file extensions : .cpp/.c/.mm/.m/.h/.js/.coffee/.rb/.py/.pl/.sh/\n"
+        "                            .java/.scala/.go/.cs/.vb/.bas/.frm/.cls\n"
 	);
 	print_version();
 }
@@ -309,7 +309,8 @@ bool is_source_file( char* file_name ){
         is_ext( file_name, "scala" ) ||
 		is_ext( file_name, "go" ) ) {
 		return true;
-	} else if( is_ruby_file( file_name ) ||
+	} else if( is_shell_file( file_name ) ||
+               is_ruby_file( file_name ) ||
                is_coffee_file( file_name ) ||
 	           is_python_file( file_name ) ||
                is_perl_file( file_name ) ||
@@ -320,6 +321,7 @@ bool is_source_file( char* file_name ){
 	}
 }
 
+bool is_shell_file( char* file_name ){ return is_ext( file_name, "sh" ); }
 bool is_ruby_file( char* file_name ){ return is_ext( file_name, "rb" ); }
 bool is_coffee_file( char* file_name ){ return is_ext( file_name, "coffee" ); }
 bool is_python_file( char* file_name ){ return is_ext( file_name, "py" ); }
@@ -376,7 +378,9 @@ void parse_file( char* file_name, int wordtype, char* target_word )
 {
 	// file extension
 	int file_extension;
-	if( is_ruby_file( file_name ) ){
+    if( is_shell_file( file_name ) ){
+        file_extension = kShell;
+    } else if( is_ruby_file( file_name ) ){
 		file_extension = kRuby; 
     } else if( is_coffee_file( file_name ) ){
         file_extension = kCoffee;
@@ -411,7 +415,8 @@ void parse_file( char* file_name, int wordtype, char* target_word )
 			if( file_extension == kC ){
 				found = process_line_exclude_comment_c( &isin_multiline_comment, &prep,
 														p_data, DATASIZE, wordtype, target_word );
-			} else if( file_extension == kRuby ||
+			} else if( file_extension == kShell ||
+                       file_extension == kRuby ||
                        file_extension == kCoffee ||
                        file_extension == kPython ||
                        file_extension == kPerl ){

@@ -59,4 +59,6 @@ test:
 	sh ./unittest.sh vbdotnet_3 0
 	sh ./unittest.sh vbdotnet_4 0
 	sh ./unittest.sh vbdotnet_6 4
-
+	sh ./unittest.sh shell_alpha1 0 
+	sh ./unittest.sh shell_beta1 0 
+	sh ./unittest.sh shell_gamma1 1 
