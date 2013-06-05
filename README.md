@@ -4,6 +4,23 @@ Grep word in source files excluding comment for vim plugin.
 Grep is very fast because C compiled binary is used.  
 Auto project detection using .git or .hg folder.  
 
+Example
+=======
+If C source file func.c looks like  
+
+void savelife( int he, int she ){  
+    /* BUGFIX  
+    petrify( he );  
+     */  
+    petrify( she );  
+}  
+  
+$ smartgrep -ew petrify  
+  
+This command puts  
+  
+/Users/pebble/func.c:5:    petrify( she );  
+
 Support OS
 =======
 Unix, MacOS X, Windows
