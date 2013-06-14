@@ -74,8 +74,8 @@
 "	Optional 
 "	Define g:sys_dir_w and g:sys_dir_l in your .vimrc file.
 "		example:
-" 			let g:sys_dir_w="c:\\WinDDK"			(for windows)
-" 			let g:sys_dir_l="c:\\linux\\include"	(for windows)
+" 			let g:smartgrep_sys_w="c:\\WinDDK"			(for windows)
+" 			let g:smartgrep_sys_l="c:\\linux\\include"	(for windows)
 "
 " Implementation below
 
@@ -105,7 +105,7 @@ endfunction
 
 function! RSmartGrepEWW(word)
   set grepprg=smartgrep\ -ew
-  execute "cd " . g:sys_dir_w
+  execute "cd " . g:smartgrep_sys_w
   silent! execute "lgrep " . a:word
   silent! lopen
   set grepprg&
@@ -113,7 +113,7 @@ endfunction
 
 function! RSmartGrepEWL(word)
   set grepprg=smartgrep\ -ew
-  execute "cd " . g:sys_dir_l
+  execute "cd " . g:smartgrep_sys_l
   silent! execute "lgrep " . a:word
   silent! lopen
   set grepprg&
