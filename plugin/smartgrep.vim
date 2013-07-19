@@ -32,6 +32,7 @@
 "   Ver2.9.0.0 2013-05-24 support .coffee and .scala( not support nest )
 "   Ver3.0.0.0 2013-05-28 auto project detect feature using .git and .hg folder.
 "   Ver3.1.0.0 2013-05-29 support ruby multi-line comment, perl, visual basic.
+"   Ver3.2.0.0 2013-07-19 bug fix in case of using .git repogitory.
 "
 " Support OS
 "	Windows/Unix
@@ -80,7 +81,7 @@
 " Implementation below
 
 function! RSmartGrepHWG(word)
-  set grepprg=smartgrep\ -hw\ -g
+  set grepprg=smartgrep\ -hw
   execute "cd " . get(g:, 'smartgrep_basedir', '.')
   silent! execute "lgrep " . a:word
   silent! lopen
@@ -88,7 +89,7 @@ function! RSmartGrepHWG(word)
 endfunction
 
 function! RSmartGrepEWG(word)
-  set grepprg=smartgrep\ -ew\ -g
+  set grepprg=smartgrep\ -ew
   execute "cd " . get(g:, 'smartgrep_basedir', '.')
   silent! execute "lgrep " . a:word
   silent! lopen
@@ -96,7 +97,7 @@ function! RSmartGrepEWG(word)
 endfunction
 
 function! RSmartGrepIG(word)
-  set grepprg=smartgrep\ -i\ -g
+  set grepprg=smartgrep\ -i
   execute "cd " . get(g:, 'smartgrep_basedir', '.')
   silent! execute "lgrep " . a:word
   silent! lopen
