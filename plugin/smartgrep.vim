@@ -33,6 +33,8 @@
 "   Ver3.0.0.0 2013-05-28 auto project detect feature using .git and .hg folder.
 "   Ver3.1.0.0 2013-05-29 support ruby multi-line comment, perl, visual basic.
 "   Ver3.2.0.0 2013-07-19 bug fix in case of using .git repogitory.
+"   Ver3.3.0.0 2013-08-29 add auto repogitory detect feature.
+"                         delete optional feature.
 "
 " Support OS
 "	Windows/Unix
@@ -60,7 +62,8 @@
 "			C:\vim\runtime\plugin\		(for windows)
 "			~/.vim/plugin/				(for Unix)
 "
-"   If g:smartgrep_basedir isn't defined,
+"   If g:smartgrep_detectrepo isn't defined and
+"   g:smartgrep_basedir isn't defined 
 "   the current directory is used for grep base directory.
 "	If you would like to usually use a fixed grep base directory,
 "   define 'g:smartgrep_basedir' in your .vimrc file.
@@ -68,20 +71,25 @@
 " 			let g:smartgrep_basedir="c:\\develop" (for windows)
 "			let g:smartgrep_basedir="/develop/"	 (for Unix)
 "
+"   If g:smartgrep_detectrepo is defined
+"   the git or mercurial repogitory detected by the current directory is used.
+"   If repogitory is not detected, it is the same of the case
+"   g:smartgrep_detectrepo isn't defined. 
+"		example:
+"		    let g:smartgrep_detectrepo=1 (use git or mercurial auto repo detect.)
+"
 "	If you use MacVim, add smartgrep path to .vimrc file.
 "		example:
 "	        let $PATH .= ':~/bin'
 "
-"	Optional 
-"	Define g:sys_dir_w and g:sys_dir_l in your .vimrc file.
-"		example:
-" 			let g:smartgrep_sys_w="c:\\WinDDK"			(for windows)
-" 			let g:smartgrep_sys_l="c:\\linux\\include"	(for windows)
-"
 " Implementation below
 
 function! RSmartGrepHWG(word)
-  set grepprg=smartgrep\ -hw
+  if exists("g:smartgrep_detectrepo") 
+    set grepprg=smartgrep\ -hw\ -g
+  else
+    set grepprg=smartgrep\ -hw
+  endif
   execute "cd " . get(g:, 'smartgrep_basedir', '.')
   silent! execute "lgrep " . a:word
   silent! lopen
@@ -89,7 +97,11 @@ function! RSmartGrepHWG(word)
 endfunction
 
 function! RSmartGrepEWG(word)
-  set grepprg=smartgrep\ -ew
+  if exists("g:smartgrep_detectrepo")
+    set grepprg=smartgrep\ -ew\ -g
+  else
+    set grepprg=smartgrep\ -ew
+  endif
   execute "cd " . get(g:, 'smartgrep_basedir', '.')
   silent! execute "lgrep " . a:word
   silent! lopen
@@ -97,37 +109,15 @@ function! RSmartGrepEWG(word)
 endfunction
 
 function! RSmartGrepIG(word)
-  set grepprg=smartgrep\ -i
+  if exists("g:smartgrep_detectrepo")
+    set grepprg=smartgrep\ -i\ -g
+  else
+    set grepprg=smartgrep\ -i
+  endif
   execute "cd " . get(g:, 'smartgrep_basedir', '.')
   silent! execute "lgrep " . a:word
   silent! lopen
   set grepprg&
-endfunction
-
-function! RSmartGrepEWW(word)
-  set grepprg=smartgrep\ -ew
-  execute "cd " . g:smartgrep_sys_w
-  silent! execute "lgrep " . a:word
-  silent! lopen
-  set grepprg&
-endfunction
-
-function! RSmartGrepEWL(word)
-  set grepprg=smartgrep\ -ew
-  execute "cd " . g:smartgrep_sys_l
-  silent! execute "lgrep " . a:word
-  silent! lopen
-  set grepprg&
-endfunction
-
-function! RSmartGrepEWG_TabNew(word)
-  execute "tabnew"
-  call RSmartGrepEWG(a:word)
-endfunction
-
-function! RSmartGrepHWG_TabNew(word)
-  execute "tabnew"
-  call RSmartGrepHWG(a:word)
 endfunction
 
 if !exists('g:smartgrep_no_default_key_mappings')
@@ -137,8 +127,6 @@ if !exists('g:smartgrep_no_default_key_mappings')
   " ,ht : tabnew version for ,h
   noremap ,g :call RSmartGrepEWG("<C-R><C-W>")<CR>
   noremap ,h :call RSmartGrepHWG("<C-R><C-W>")<CR>
-  noremap ,gt :call RSmartGrepEWG_TabNew("<C-R><C-W>")<CR>
-  noremap ,ht :call RSmartGrepHWG_TabNew("<C-R><C-W>")<CR>
 endif
 
 if !exists('g:smartgrep_no_default_key_mappings')
@@ -148,9 +136,4 @@ if !exists('g:smartgrep_no_default_key_mappings')
   command! -nargs=1 -complete=file R call RSmartGrepEWG("<args>")
   command! -nargs=1 -complete=file Rh call RSmartGrepHWG("<args>")
   command! -nargs=1 -complete=file Ri call RSmartGrepIG("<args>")
-
-  " :Rl  -> recursive word grep for support file exclude comment in sys_dir_w
-  " :Rw  -> recursive word grep for support file exclude comment in sys_dir_l
-  command! -nargs=1 -complete=file Rl call RSmartGrepEWL("<args>")
-  command! -nargs=1 -complete=file Rw call RSmartGrepEWW("<args>")
 endif
