@@ -35,9 +35,10 @@
 "   Ver3.2.0.0 2013-07-19 bug fix in case of using .git repogitory.
 "   Ver3.3.0.0 2013-08-29 add auto repogitory detect feature.
 "                         delete optional feature.
+"   Ver3.4.0.0 2013-11-17 set auto repogitory detect for default.
 "
 " Support OS
-"	Windows/Unix
+"	Windows/Unix/MacOSX
 "
 " Support File Extention                            Support Comment Type
 "	C++ 		: .c .cpp .cxx .tli .inc .rc 		/* */, //, #if 0 
@@ -62,8 +63,7 @@
 "			C:\vim\runtime\plugin\		(for windows)
 "			~/.vim/plugin/				(for Unix)
 "
-"   If g:smartgrep_detectrepo isn't defined and
-"   g:smartgrep_basedir isn't defined 
+"   If g:smartgrep_no_detectrepo is defined and g:smartgrep_basedir isn't defined 
 "   the current directory is used for grep base directory.
 "	If you would like to usually use a fixed grep base directory,
 "   define 'g:smartgrep_basedir' in your .vimrc file.
@@ -71,12 +71,12 @@
 " 			let g:smartgrep_basedir="c:\\develop" (for windows)
 "			let g:smartgrep_basedir="/develop/"	 (for Unix)
 "
-"   If g:smartgrep_detectrepo is defined
+"   If g:smartgrep_no_detectrepo is not defined
 "   the git or mercurial repogitory detected by the current directory is used.
 "   If repogitory is not detected, it is the same of the case
-"   g:smartgrep_detectrepo isn't defined. 
+"   g:smartgrep_no_detectrepo isn't defined. 
 "		example:
-"		    let g:smartgrep_detectrepo=1 (use git or mercurial auto repo detect.)
+"		    let g:smartgrep_no_detectrepo=1 (don't use git or mercurial auto repo detect.)
 "
 "	If you use MacVim, add smartgrep path to .vimrc file.
 "		example:
@@ -85,10 +85,10 @@
 " Implementation below
 
 function! RSmartGrepHWG(word)
-  if exists("g:smartgrep_detectrepo") 
-    set grepprg=smartgrep\ -hw\ -g
-  else
+  if exists("g:smartgrep_no_detectrepo") 
     set grepprg=smartgrep\ -hw
+  else
+    set grepprg=smartgrep\ -hw\ -g
   endif
   execute "cd " . get(g:, 'smartgrep_basedir', '.')
   silent! execute "lgrep " . a:word
@@ -97,10 +97,10 @@ function! RSmartGrepHWG(word)
 endfunction
 
 function! RSmartGrepEWG(word)
-  if exists("g:smartgrep_detectrepo")
-    set grepprg=smartgrep\ -ew\ -g
-  else
+  if exists("g:smartgrep_no_detectrepo")
     set grepprg=smartgrep\ -ew
+  else
+    set grepprg=smartgrep\ -ew\ -g
   endif
   execute "cd " . get(g:, 'smartgrep_basedir', '.')
   silent! execute "lgrep " . a:word
@@ -109,10 +109,10 @@ function! RSmartGrepEWG(word)
 endfunction
 
 function! RSmartGrepIG(word)
-  if exists("g:smartgrep_detectrepo")
-    set grepprg=smartgrep\ -i\ -g
-  else
+  if exists("g:smartgrep_no_detectrepo")
     set grepprg=smartgrep\ -i
+  else
+    set grepprg=smartgrep\ -i -g
   endif
   execute "cd " . get(g:, 'smartgrep_basedir', '.')
   silent! execute "lgrep " . a:word
