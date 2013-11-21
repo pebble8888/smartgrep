@@ -36,6 +36,7 @@
 "   Ver3.3.0.0 2013-08-29 add auto repogitory detect feature.
 "                         delete optional feature.
 "   Ver3.4.0.0 2013-11-17 set auto repogitory detect for default.
+"   Ver3.4.1.0 2013-11-21 amend wrong flag setting.
 "
 " Support OS
 "	Windows/Unix/MacOSX
@@ -112,7 +113,7 @@ function! RSmartGrepIG(word)
   if exists("g:smartgrep_no_detectrepo")
     set grepprg=smartgrep\ -i
   else
-    set grepprg=smartgrep\ -i -g
+    set grepprg=smartgrep\ -i\ -g
   endif
   execute "cd " . get(g:, 'smartgrep_basedir', '.')
   silent! execute "lgrep " . a:word
