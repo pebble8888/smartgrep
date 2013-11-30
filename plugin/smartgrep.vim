@@ -86,6 +86,12 @@
 "
 " Implementation below
 
+function! RSmartHilight(word)
+  silent! execute "ij " . a:word
+  normal*
+  redraw!
+endfunction
+
 function! RSmartGrepEWG(word)
   if exists("g:smartgrep_no_detectrepo")
     set grepprg=smartgrep\ -ew
@@ -96,6 +102,7 @@ function! RSmartGrepEWG(word)
   silent! execute "lgrep " . a:word
   silent! lopen
   set grepprg&
+  call RSmartHilight(a:word)
 endfunction
 
 function! RSmartGrepHWG(word)
@@ -108,6 +115,7 @@ function! RSmartGrepHWG(word)
   silent! execute "lgrep " . a:word
   silent! lopen
   set grepprg&
+  call RSmartHilight(a:word)
 endfunction
 
 function! RSmartGrepIG(word)
@@ -120,6 +128,7 @@ function! RSmartGrepIG(word)
   silent! execute "lgrep " . a:word
   silent! lopen
   set grepprg&
+  call RSmartHilight(a:word)
 endfunction
 
 function! RGitGrep(word)
@@ -127,26 +136,27 @@ function! RGitGrep(word)
   silent! execute "lgrep " . a:word
   silent! lopen
   set grepprg&
+  call RSmartHilight(a:word)
 endfunction
 
 if !exists('g:smartgrep_no_default_key_mappings')
   " ,g  : recursive word grep for supported files exclude comment by mouse cursored word 
   " ,h  : recursive word grep for h file exclude comment by mouse cursored word
   " ,i  : recursive grep for supported files include comment
-  " ,r  : git grep by mouse cursored word
+  " ,u  : git grep by mouse cursored word
   noremap ,g :call RSmartGrepEWG("<C-R><C-W>")<CR>
   noremap ,h :call RSmartGrepHWG("<C-R><C-W>")<CR>
   noremap ,i :call RSmartGrepIG("<C-R><C-W>")<CR>
-  noremap ,r :call RGitGrep("<C-R><C-W>")<CR>
+  noremap ,u :call RGitGrep("<C-R><C-W>")<CR>
 endif
 
 if !exists('g:smartgrep_no_default_key_mappings')
   " :R  -> recursive word grep for supported files exclude comment
   " :Rh -> recursive word grep for h file exclude comment
   " :Ri -> recursive grep for supported files include comment
-  " :Rr -> git grep
+  " :Ru -> git grep
   command! -nargs=1 -complete=file R call RSmartGrepEWG("<args>")
   command! -nargs=1 -complete=file Rh call RSmartGrepHWG("<args>")
   command! -nargs=1 -complete=file Ri call RSmartGrepIG("<args>")
-  command! -nargs=1 -complete=file Rr call RGitGrep("<args>")
+  command! -nargs=1 -complete=file Ru call RGitGrep("<args>")
 endif
