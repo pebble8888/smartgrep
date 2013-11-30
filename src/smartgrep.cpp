@@ -191,7 +191,7 @@ void usage( void )
 		"  -i[w] : recursive [word] grep for supported file extensions including comment\n"
 		"  -h[w] : recursive [word] grep for .h excluding comment\n"
         "  -g : use auto detect git or mercurial repository with the current directory\n"
-        "  -nojs : exclude .js file\n"
+        "  --nojs : exclude .js file\n"
 		"  support file extensions : .cpp/.c/.mm/.m/.h/.js/.coffee/.rb/.py/.pl/.sh/\n"
         "                            .java/.scala/.go/.cs/.vb/.bas/.frm/.cls\n"
 	);
