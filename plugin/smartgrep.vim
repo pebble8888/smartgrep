@@ -37,6 +37,7 @@
 "                         delete optional feature.
 "   Ver3.4.0.0 2013-11-17 set auto repogitory detect for default.
 "   Ver3.4.1.0 2013-11-21 amend wrong flag setting.
+"   Ver3.5.0.0 2013-11-30 add git grep wrapper.
 "
 " Support OS
 "	Windows/Unix/MacOSX
@@ -85,25 +86,25 @@
 "
 " Implementation below
 
-function! RSmartGrepHWG(word)
-  if exists("g:smartgrep_no_detectrepo") 
-    set grepprg=smartgrep\ -hw
-  else
-    set grepprg=smartgrep\ -hw\ -g
-  endif
-  execute "cd " . get(g:, 'smartgrep_basedir', '.')
-  silent! execute "lgrep " . a:word
-  silent! lopen
-  set grepprg&
-endfunction
-
 function! RSmartGrepEWG(word)
   if exists("g:smartgrep_no_detectrepo")
     set grepprg=smartgrep\ -ew
   else
     set grepprg=smartgrep\ -ew\ -g
   endif
-  execute "cd " . get(g:, 'smartgrep_basedir', '.')
+  silent! execute "cd " . get(g:, 'smartgrep_basedir', '.')
+  silent! execute "lgrep " . a:word
+  silent! lopen
+  set grepprg&
+endfunction
+
+function! RSmartGrepHWG(word)
+  if exists("g:smartgrep_no_detectrepo") 
+    set grepprg=smartgrep\ -hw
+  else
+    set grepprg=smartgrep\ -hw\ -g
+  endif
+  silent! execute "cd " . get(g:, 'smartgrep_basedir', '.')
   silent! execute "lgrep " . a:word
   silent! lopen
   set grepprg&
@@ -115,7 +116,14 @@ function! RSmartGrepIG(word)
   else
     set grepprg=smartgrep\ -i\ -g
   endif
-  execute "cd " . get(g:, 'smartgrep_basedir', '.')
+  silent! execute "cd " . get(g:, 'smartgrep_basedir', '.')
+  silent! execute "lgrep " . a:word
+  silent! lopen
+  set grepprg&
+endfunction
+
+function! RGitGrep(word)
+  set grepprg=git\ grep\ --line-number
   silent! execute "lgrep " . a:word
   silent! lopen
   set grepprg&
@@ -124,17 +132,21 @@ endfunction
 if !exists('g:smartgrep_no_default_key_mappings')
   " ,g  : recursive word grep for supported files exclude comment by mouse cursored word 
   " ,h  : recursive word grep for h file exclude comment by mouse cursored word
-  " ,gt : tabnew version for ,g
-  " ,ht : tabnew version for ,h
+  " ,i  : recursive grep for supported files include comment
+  " ,r  : git grep by mouse cursored word
   noremap ,g :call RSmartGrepEWG("<C-R><C-W>")<CR>
   noremap ,h :call RSmartGrepHWG("<C-R><C-W>")<CR>
+  noremap ,i :call RSmartGrepIG("<C-R><C-W>")<CR>
+  noremap ,r :call RGitGrep("<C-R><C-W>")<CR>
 endif
 
 if !exists('g:smartgrep_no_default_key_mappings')
   " :R  -> recursive word grep for supported files exclude comment
   " :Rh -> recursive word grep for h file exclude comment
   " :Ri -> recursive grep for supported files include comment
+  " :Rr -> git grep
   command! -nargs=1 -complete=file R call RSmartGrepEWG("<args>")
   command! -nargs=1 -complete=file Rh call RSmartGrepHWG("<args>")
   command! -nargs=1 -complete=file Ri call RSmartGrepIG("<args>")
+  command! -nargs=1 -complete=file Rr call RGitGrep("<args>")
 endif
