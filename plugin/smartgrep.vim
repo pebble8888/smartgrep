@@ -38,6 +38,7 @@
 "   Ver3.4.0.0 2013-11-17 set auto repogitory detect for default.
 "   Ver3.4.1.0 2013-11-21 amend wrong flag setting.
 "   Ver3.5.0.0 2013-11-30 add git grep wrapper.
+"   Ver3.6.0.0 2013-12-01 add ag wrapper.
 "
 " Support OS
 "	Windows/Unix/MacOSX
@@ -139,15 +140,25 @@ function! RGitGrep(word)
   call RSmartHilight(a:word)
 endfunction
 
+function! RSilverSearcherGrep(word)
+  set grepprg=ag\ --nogroup\ --nocolor\ --column
+  silent! execute "lgrep " . a:word
+  silent! lopen
+  set grepprg&
+  call RSmartHilight(a:word)
+endfunction
+
 if !exists('g:smartgrep_no_default_key_mappings')
   " ,g  : recursive word grep for supported files exclude comment by mouse cursored word 
   " ,h  : recursive word grep for h file exclude comment by mouse cursored word
   " ,i  : recursive grep for supported files include comment
   " ,u  : git grep by mouse cursored word
+  " ,s  : ag by mouse cursored word
   noremap ,g :call RSmartGrepEWG("<C-R><C-W>")<CR>
   noremap ,h :call RSmartGrepHWG("<C-R><C-W>")<CR>
   noremap ,i :call RSmartGrepIG("<C-R><C-W>")<CR>
   noremap ,u :call RGitGrep("<C-R><C-W>")<CR>
+  noremap ,s :call RSilverSearcherGrep("<C-R><C-W>")<CR>
 endif
 
 if !exists('g:smartgrep_no_default_key_mappings')
@@ -155,8 +166,10 @@ if !exists('g:smartgrep_no_default_key_mappings')
   " :Rh -> recursive word grep for h file exclude comment
   " :Ri -> recursive grep for supported files include comment
   " :Ru -> git grep
+  " :Rs -> ag
   command! -nargs=1 -complete=file R call RSmartGrepEWG("<args>")
   command! -nargs=1 -complete=file Rh call RSmartGrepHWG("<args>")
   command! -nargs=1 -complete=file Ri call RSmartGrepIG("<args>")
   command! -nargs=1 -complete=file Ru call RGitGrep("<args>")
+  command! -nargs=1 -complete=file Rs call RSilverSearcherGrep("<args>")
 endif
