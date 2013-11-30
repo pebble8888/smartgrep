@@ -6,21 +6,22 @@ Auto project detection using .git or .hg folder.
 
 Example
 =======
-If C source file func.c looks like  
-
-void glare_at( int he, int she ){  
-    /* BUGFIX  
-    petrify( he );  
-     */  
-    petrify( she );  
-}  
-  
-$ smartgrep -ew petrify  
-  
-This command puts  
-  
-/Users/pebble/func.c:5:    petrify( she );  
-
+If C source file func.c looks like
+```c
+void glare_at( int brave_boy, int pretty_girl ){
+    /* BUGFIX
+    petrify( brave_boy );
+     */
+    petrify( pretty_girl );
+}
+```
+```
+$ smartgrep -ew petrify
+```
+This command puts
+```
+/Users/pebble/func.c:5:    petrify( pretty_girl );
+```
 Support OS
 =======
 Unix, MacOS X, Windows
@@ -48,22 +49,24 @@ If g:smartgrep_basedir isn't defined, the current directory is used.
   
 ,g   -> recursive word grep for support file exclude comment by mouse cursored word  
 ,h   -> recursive word grep for h file exclude comment by mouse cursored word  
-,gt  -> tabnew version for ,g  
-,ht  -> tabnew version for ,h  
+,i   -> recursive grep for supported files include comment  
+,r   -> git grep by mouse cursored word  
 
 :R   -> recursive word grep for support file exclude comment  
 :Rh  -> recursive word grep for h file exclude comment  
 :Ri  -> recursive grep for supported file extensions include comment  
+:Rr  -> git grep  
   
 Usage (smartgrep binary)
 =======
 $ cd {directory-you-want-to-grep}  
 $ smartgrep  
-Usage: smartgrep {-e[w]|-i[w]|-h[w]} [-g] word_you_grep  
+Usage: smartgrep {-e[w]|-i[w]|-h[w]} [-g] [--nojs] word_you_grep  
   -e[w] : recursive [word] grep for supported file extensions excluding comment  
   -i[w] : recursive [word] grep for supported file extensions including comment  
   -h[w] : recursive [word] grep for .h excluding comment  
-  -g : use auto detect git or mercurial repository with the current directory.  
+  -g : use auto detect git or mercurial repository with the current directory  
+  --nojs : exclude js file  
   support file extensions : .cpp/.c/.mm/.m/.h/.js/.coffee/.pl/.rb/.py/.java/.scala/.go  
                             .cs/.vb/.bas/.frm/.cls  
 
