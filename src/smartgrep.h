@@ -35,6 +35,11 @@ enum {
     kVB,
 };
 
+typedef struct {
+    int filetype;
+    bool js;
+} FILE_TYPE_INFO;
+
 #include "prep.h"
 
 /**
@@ -47,12 +52,12 @@ bool process_line_exclude_comment_ruby( bool* p_isin_multiline_comment, char* bu
 bool process_line_exclude_comment_vb( char* buf, size_t bufsize, int wordtype, char* target_word ); 
 bool process_line_include_comment( char* buf, int wordtype, char* target_word );
 #ifdef WIN32
-void parse_directory_win( char* path, int filetype, int wordtype, char* target_word );
+void parse_directory_win( char* path, FILE_TYPE_INFO* p_info, int wordtype, char* target_word );
 #else
-void parse_directory_mac( char* path, int filetype, int wordtype, char* target_word );
+void parse_directory_mac( char* path, FILE_TYPE_INFO* p_info, int wordtype, char* target_word );
 #endif
 bool is_header_file( char* file_name );
-bool is_source_file( char* file_name );
+bool is_source_file( FILE_TYPE_INFO* p_info, char* file_name );
 bool is_shell_file( char* file_name );
 bool is_ruby_file( char* file_name );
 bool is_coffee_file( char* file_name );

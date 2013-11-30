@@ -41,49 +41,53 @@ int main(int argc, char* argv[])
 	test();
 #endif
 
-	if( (argc-1 != 2) && (argc-1 != 3) ){
+	if( argc-1 < 2 || argc-1 > 4 ){
 		usage();
 		return 1;
 	}
 
     bool use_repo = false;
 	int wordtype = 0;
-	int filetype = 0;
+    FILE_TYPE_INFO info;
+    info.filetype = 0;
+    info.js = true;
 	if( strcmp( argv[1], "-i" ) == 0 ){
-		filetype |= SG_FILETYPE_SOURCE;
-		filetype |= SG_FILETYPE_HEADER;
+		info.filetype |= SG_FILETYPE_SOURCE;
+		info.filetype |= SG_FILETYPE_HEADER;
 		wordtype |= SG_WORDTYPE_NORMAL;
 		wordtype |= SG_WORDTYPE_INCLUDE_COMMENT;
 	} else if( strcmp( argv[1], "-h" ) == 0 ){
-		filetype |= SG_FILETYPE_HEADER;
+		info.filetype |= SG_FILETYPE_HEADER;
 		wordtype |= SG_WORDTYPE_NORMAL;
 		wordtype |= SG_WORDTYPE_EXCLUDE_COMMENT;
 	} else if( strcmp( argv[1], "-e" ) == 0 ){
-		filetype |= SG_FILETYPE_SOURCE;
-		filetype |= SG_FILETYPE_HEADER;
+		info.filetype |= SG_FILETYPE_SOURCE;
+		info.filetype |= SG_FILETYPE_HEADER;
 		wordtype |= SG_WORDTYPE_NORMAL;
 		wordtype |= SG_WORDTYPE_EXCLUDE_COMMENT;
 	} else if( strcmp( argv[1], "-iw" ) == 0 ){
-		filetype |= SG_FILETYPE_SOURCE;
-		filetype |= SG_FILETYPE_HEADER;
+		info.filetype |= SG_FILETYPE_SOURCE;
+		info.filetype |= SG_FILETYPE_HEADER;
 		wordtype |= SG_WORDTYPE_WORD;
 		wordtype |= SG_WORDTYPE_INCLUDE_COMMENT;
 	} else if( strcmp( argv[1], "-hw" ) == 0 ){
-		filetype |= SG_FILETYPE_HEADER;
+		info.filetype |= SG_FILETYPE_HEADER;
 		wordtype |= SG_WORDTYPE_WORD;
 		wordtype |= SG_WORDTYPE_EXCLUDE_COMMENT;
 	} else if( strcmp( argv[1], "-ew" ) == 0 ){
-		filetype |= SG_FILETYPE_SOURCE;
-		filetype |= SG_FILETYPE_HEADER;
+		info.filetype |= SG_FILETYPE_SOURCE;
+		info.filetype |= SG_FILETYPE_HEADER;
 		wordtype |= SG_WORDTYPE_WORD;
 		wordtype |= SG_WORDTYPE_EXCLUDE_COMMENT;
 	} else {
 		usage();
 		return 1;
 	}
-    if( argc-1 == 3 ){
-        if( strcmp( argv[2], "-g" ) == 0 ){
+    for( int i = 2; i < argc; ++i ){
+        if( strcmp( argv[i], "-g" ) == 0 ){
             use_repo = true;
+        } else if( strcmp( argv[i], "--nojs" ) == 0 ){
+            info.js = false;
         }
     }
 	char path[512];
@@ -95,9 +99,9 @@ int main(int argc, char* argv[])
     }
 	char* word = argv[argc-1];
 #ifdef WIN32
-	parse_directory_win( path, filetype, wordtype, word );
+	parse_directory_win( path, &info, wordtype, word );
 #else
-	parse_directory_mac( path, filetype, wordtype, word );
+	parse_directory_mac( path, &info, wordtype, word );
 #endif
 	return 0;
 }
@@ -182,11 +186,12 @@ void smartgrep_getrepo( char* buf, size_t size )
 void usage( void )
 {
 	printf( 
-		"Usage: smartgrep {-e[w]|-i[w]|-h[w]} [-g] word_you_grep\n"
+		"Usage: smartgrep {-e[w]|-i[w]|-h[w]} [-g] [--nojs] word_you_grep\n"
 		"  -e[w] : recursive [word] grep for supported file extensions excluding comment\n"
 		"  -i[w] : recursive [word] grep for supported file extensions including comment\n"
 		"  -h[w] : recursive [word] grep for .h excluding comment\n"
-        "  -g : use auto detect git or mercurial repository with the current directory.\n"
+        "  -g : use auto detect git or mercurial repository with the current directory\n"
+        "  -nojs : exclude .js file\n"
 		"  support file extensions : .cpp/.c/.mm/.m/.h/.js/.coffee/.rb/.py/.pl/.sh/\n"
         "                            .java/.scala/.go/.cs/.vb/.bas/.frm/.cls\n"
 	);
@@ -201,7 +206,7 @@ void usage( void )
  * @param int   wordtype	
  * @param char* target_word
  */
-void parse_directory_win( char* path, int filetype, int wordtype, char* target_word )
+void parse_directory_win( char* path, FILE_TYPE_INFO* p_info, int wordtype, char* target_word )
 {
 	char path_name[512];
 	strcpy( path_name, path );
@@ -227,9 +232,9 @@ void parse_directory_win( char* path, int filetype, int wordtype, char* target_w
 			strcpy( path_name_r, path );
 			strcat( path_name_r, "\\" );
 			strcat( path_name_r, find_data.cFileName );
-			parse_directory_win( path_name_r, filetype, wordtype, target_word );
-		} else if( ( (filetype & SG_FILETYPE_SOURCE ) && is_source_file( find_data.cFileName ) ) ||
-				   ( (filetype & SG_FILETYPE_HEADER ) && is_header_file( find_data.cFileName ) ) ){
+			parse_directory_win( path_name_r, p_info, wordtype, target_word );
+		} else if( ( (p_info->filetype & SG_FILETYPE_SOURCE ) && is_source_file( p_info, find_data.cFileName ) ) ||
+				   ( (p_info->filetype & SG_FILETYPE_HEADER ) && is_header_file( find_data.cFileName ) ) ){
 			char file_name_r[512];
 			strcpy( file_name_r, path );
 			strcat( file_name_r, "\\" );
@@ -255,7 +260,7 @@ void parse_directory_win( char* path, int filetype, int wordtype, char* target_w
  * @param int   wordtype
  * @param char* target_word
  */
-void parse_directory_mac( char* path, int filetype, int wordtype, char* target_word )
+void parse_directory_mac( char* path, FILE_TYPE_INFO* p_info, int wordtype, char* target_word )
 {
 	char path_name[512];
 	strcpy( path_name, path );
@@ -280,9 +285,9 @@ void parse_directory_mac( char* path, int filetype, int wordtype, char* target_w
 			strcpy( path_name_r, path );
 			strcat( path_name_r, "/" );
 			strcat( path_name_r, p_dirent->d_name );
-			parse_directory_mac( path_name_r, filetype, wordtype, target_word );
-		} else if( ( (filetype & SG_FILETYPE_SOURCE ) && is_source_file( p_dirent->d_name ) ) ||
-				  ( (filetype & SG_FILETYPE_HEADER ) && is_header_file( p_dirent->d_name ) ) ){
+			parse_directory_mac( path_name_r, p_info, wordtype, target_word );
+		} else if( ( (p_info->filetype & SG_FILETYPE_SOURCE ) && is_source_file( p_info, p_dirent->d_name ) ) ||
+				  ( (p_info->filetype & SG_FILETYPE_HEADER ) && is_header_file( p_dirent->d_name ) ) ){
 			char file_name_r[512];
 			strcpy( file_name_r, path );
 			strcat( file_name_r, "/" );
@@ -294,7 +299,7 @@ void parse_directory_mac( char* path, int filetype, int wordtype, char* target_w
 }
 #endif
 
-bool is_source_file( char* file_name ){
+bool is_source_file( FILE_TYPE_INFO* p_info, char* file_name ){
 	if( is_ext( file_name, "c" ) ||
 		is_ext( file_name, "cpp" ) || 
 		is_ext( file_name, "cxx" ) ||
@@ -304,7 +309,7 @@ bool is_source_file( char* file_name ){
 		is_ext( file_name, "m" ) ||
 		is_ext( file_name, "mm" ) ||
 		is_ext( file_name, "cs" ) || 
-		is_ext( file_name, "js" ) ||
+		(p_info->js && is_ext( file_name, "js")) ||
 		is_ext( file_name, "java" ) ||
         is_ext( file_name, "scala" ) ||
 		is_ext( file_name, "go" ) ) {

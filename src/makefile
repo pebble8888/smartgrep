@@ -28,6 +28,8 @@ clean:
 
 test:
 	sh ./unittest.sh c_gamma1 1
+	sh ./unittest.sh js_dog 1
+	sh ./unittest.sh js_dog 0 --nojs
 	sh ./unittest.sh java_good 1
 	sh ./unittest.sh scala_good 1
 	sh ./unittest.sh go_hello 1 
