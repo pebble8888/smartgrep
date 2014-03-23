@@ -99,6 +99,7 @@ function! RSmartGrepEWG(word)
     set grepprg=smartgrep\ -ew
   else
     set grepprg=smartgrep\ -ew\ -g
+    "set grepprg=smartgrep\ -ew\ -g\ --nojs\ --ignore-dir\ Windows
   endif
   silent! execute "cd " . get(g:, 'smartgrep_basedir', '.')
   silent! execute "lgrep " . a:word
@@ -112,6 +113,7 @@ function! RSmartGrepHWG(word)
     set grepprg=smartgrep\ -hw
   else
     set grepprg=smartgrep\ -hw\ -g
+    "set grepprg=smartgrep\ -hw\ -g\ --nojs\ --ignore-dir\ Windows
   endif
   silent! execute "cd " . get(g:, 'smartgrep_basedir', '.')
   silent! execute "lgrep " . a:word
@@ -125,6 +127,7 @@ function! RSmartGrepIG(word)
     set grepprg=smartgrep\ -i
   else
     set grepprg=smartgrep\ -i\ -g
+    "set grepprg=smartgrep\ -i\ -g\ --nojs\ --ignore-dir\ Windows
   endif
   silent! execute "cd " . get(g:, 'smartgrep_basedir', '.')
   silent! execute "lgrep " . a:word
