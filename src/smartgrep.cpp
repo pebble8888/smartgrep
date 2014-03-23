@@ -41,7 +41,7 @@ int main(int argc, char* argv[])
 	test();
 #endif
 
-	if( argc-1 < 2 || argc-1 > 4 ){
+	if( argc-1 < 2 ){
 		usage();
 		return 1;
 	}
@@ -51,6 +51,7 @@ int main(int argc, char* argv[])
     FILE_TYPE_INFO info;
     info.filetype = 0;
     info.js = true;
+    info.foldername = NULL;
 	if( strcmp( argv[1], "-i" ) == 0 ){
 		info.filetype |= SG_FILETYPE_SOURCE;
 		info.filetype |= SG_FILETYPE_HEADER;
@@ -88,6 +89,11 @@ int main(int argc, char* argv[])
             use_repo = true;
         } else if( strcmp( argv[i], "--nojs" ) == 0 ){
             info.js = false;
+        } else if( strcmp( argv[i], "--ignore-dir" ) == 0 ){
+            int len = strlen(argv[i+1])+1;
+            delete [] info.foldername;
+            info.foldername = new char[len];
+            strcpy( info.foldername, argv[i+1] );
         }
     }
 	char path[512];
@@ -103,6 +109,7 @@ int main(int argc, char* argv[])
 #else
 	parse_directory_mac( path, &info, wordtype, word );
 #endif
+    delete info.foldername;
 	return 0;
 }
 
@@ -186,12 +193,13 @@ void smartgrep_getrepo( char* buf, size_t size )
 void usage( void )
 {
 	printf( 
-		"Usage: smartgrep {-e[w]|-i[w]|-h[w]} [-g] [--nojs] word_you_grep\n"
+		"Usage: smartgrep {-e[w]|-i[w]|-h[w]} [-g] [--nojs] [--ignore-dir NAME] word_you_grep\n"
 		"  -e[w] : recursive [word] grep for supported file extensions excluding comment\n"
 		"  -i[w] : recursive [word] grep for supported file extensions including comment\n"
 		"  -h[w] : recursive [word] grep for .h excluding comment\n"
         "  -g : use auto detect git or mercurial repository with the current directory\n"
         "  --nojs : exclude .js file\n"
+        "  --ignore-dir NAME : exclude NAME folder\n"
 		"  support file extensions : .cpp/.c/.mm/.m/.h/.js/.coffee/.rb/.py/.pl/.sh/\n"
         "                            .java/.scala/.go/.cs/.vb/.bas/.frm/.cls\n"
 	);
@@ -227,14 +235,20 @@ void parse_directory_win( char* path, FILE_TYPE_INFO* p_info, int wordtype, char
 		}
 		else if( (find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY ) &&
 		         find_data.cFileName[0] != '.' ){
-			// not hided directory
-			char path_name_r[512];
-			strcpy( path_name_r, path );
-			strcat( path_name_r, "\\" );
-			strcat( path_name_r, find_data.cFileName );
-			parse_directory_win( path_name_r, p_info, wordtype, target_word );
+			// not hidden directory
+            if( p_info->foldername != NULL &&
+                strcmp( p_info->foldername, find_data.cFileName ) == 0 ){
+                // ignore the folder
+            } else {
+                char path_name_r[512];
+                strcpy( path_name_r, path );
+                strcat( path_name_r, "\\" );
+                strcat( path_name_r, find_data.cFileName );
+                parse_directory_win( path_name_r, p_info, wordtype, target_word );
+            }
 		} else if( ( (p_info->filetype & SG_FILETYPE_SOURCE ) && is_source_file( p_info, find_data.cFileName ) ) ||
 				   ( (p_info->filetype & SG_FILETYPE_HEADER ) && is_header_file( find_data.cFileName ) ) ){
+            // file
 			char file_name_r[512];
 			strcpy( file_name_r, path );
 			strcat( file_name_r, "\\" );
@@ -280,12 +294,17 @@ void parse_directory_mac( char* path, FILE_TYPE_INFO* p_info, int wordtype, char
 		}
 		else if( (p_dirent->d_type == DT_DIR ) &&
 				p_dirent->d_name[0] != '.' ){
-			// not hided directory
-			char path_name_r[512];
-			strcpy( path_name_r, path );
-			strcat( path_name_r, "/" );
-			strcat( path_name_r, p_dirent->d_name );
-			parse_directory_mac( path_name_r, p_info, wordtype, target_word );
+			// not hidden directory
+            if( p_info->foldername != NULL &&
+                // ignore the folder
+                strcmp( p_info->foldername, p_dirent->d_name ) == 0 ){
+            } else {
+                char path_name_r[512];
+                strcpy( path_name_r, path );
+                strcat( path_name_r, "/" );
+                strcat( path_name_r, p_dirent->d_name );
+                parse_directory_mac( path_name_r, p_info, wordtype, target_word );
+            }
 		} else if( ( (p_info->filetype & SG_FILETYPE_SOURCE ) && is_source_file( p_info, p_dirent->d_name ) ) ||
 				  ( (p_info->filetype & SG_FILETYPE_HEADER ) && is_header_file( p_dirent->d_name ) ) ){
 			char file_name_r[512];

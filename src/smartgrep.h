@@ -38,6 +38,7 @@ enum {
 typedef struct {
     int filetype;
     bool js;
+    char* foldername;
 } FILE_TYPE_INFO;
 
 #include "prep.h"

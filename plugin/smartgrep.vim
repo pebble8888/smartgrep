@@ -39,6 +39,7 @@
 "   Ver3.4.1.0 2013-11-21 amend wrong flag setting.
 "   Ver3.5.0.0 2013-11-30 add git grep wrapper.
 "   Ver3.6.0.0 2013-12-01 add ag wrapper.
+"   Ver3.7.0.0 2014-03-23 add --ignore-dir option.
 "
 " Support OS
 "	Windows/Unix/MacOSX
