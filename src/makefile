@@ -13,7 +13,7 @@ endif
 all:$(TARGET)
 
 
-OBJS=smartgrep.o
+OBJS=smartgrep.o foldernamelist.o
 
 $(TARGET): $(OBJS)
 	$(CC) -o $@ $? $(LIBS)

@@ -51,7 +51,6 @@ int main(int argc, char* argv[])
     FILE_TYPE_INFO info;
     info.filetype = 0;
     info.js = true;
-    info.foldername = NULL;
 	if( strcmp( argv[1], "-i" ) == 0 ){
 		info.filetype |= SG_FILETYPE_SOURCE;
 		info.filetype |= SG_FILETYPE_HEADER;
@@ -90,10 +89,8 @@ int main(int argc, char* argv[])
         } else if( strcmp( argv[i], "--nojs" ) == 0 ){
             info.js = false;
         } else if( strcmp( argv[i], "--ignore-dir" ) == 0 ){
-            int len = strlen(argv[i+1])+1;
-            delete [] info.foldername;
-            info.foldername = new char[len];
-            strcpy( info.foldername, argv[i+1] );
+            info.foldernamelist.add_foldername( argv[i+1] );
+            ++i;
         }
     }
 	char path[512];
@@ -109,7 +106,6 @@ int main(int argc, char* argv[])
 #else
 	parse_directory_mac( path, &info, wordtype, word );
 #endif
-    delete info.foldername;
 	return 0;
 }
 
@@ -202,6 +198,7 @@ void usage( void )
         "  --ignore-dir NAME : exclude NAME folder\n"
 		"  support file extensions : .cpp/.c/.mm/.m/.h/.js/.coffee/.rb/.py/.pl/.sh/\n"
         "                            .java/.scala/.go/.cs/.vb/.bas/.frm/.cls\n"
+        "  Version 3.7.1.0\n"
 	);
 	print_version();
 }
@@ -236,8 +233,7 @@ void parse_directory_win( char* path, FILE_TYPE_INFO* p_info, int wordtype, char
 		else if( (find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY ) &&
 		         find_data.cFileName[0] != '.' ){
 			// not hidden directory
-            if( p_info->foldername != NULL &&
-                strcmp( p_info->foldername, find_data.cFileName ) == 0 ){
+            if( p_info->foldernamelist.has_foldername( find_data.cFileName ) ){
                 // ignore the folder
             } else {
                 char path_name_r[512];
@@ -295,9 +291,8 @@ void parse_directory_mac( char* path, FILE_TYPE_INFO* p_info, int wordtype, char
 		else if( (p_dirent->d_type == DT_DIR ) &&
 				p_dirent->d_name[0] != '.' ){
 			// not hidden directory
-            if( p_info->foldername != NULL &&
+            if( p_info->foldernamelist.has_foldername( p_dirent->d_name ) ){
                 // ignore the folder
-                strcmp( p_info->foldername, p_dirent->d_name ) == 0 ){
             } else {
                 char path_name_r[512];
                 strcpy( path_name_r, path );

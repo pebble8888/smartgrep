@@ -35,10 +35,12 @@ enum {
     kVB,
 };
 
+#include "foldernamelist.h"
+
 typedef struct {
     int filetype;
     bool js;
-    char* foldername;
+    Foldernamelist foldernamelist;
 } FILE_TYPE_INFO;
 
 #include "prep.h"
