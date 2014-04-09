@@ -41,6 +41,7 @@
 "   Ver3.6.0.0 2013-12-01 add ag wrapper.
 "   Ver3.7.0.0 2014-03-23 add --ignore-dir option.
 "   Ver3.7.1.0 2014-04-06 multiple --ignore-dir option.
+"   Ver3.7.2.0 2014-04-09 add g:smartgrep_user_option variable.
 "
 " Support OS
 "	Windows/Unix/MacOSX
@@ -83,6 +84,8 @@
 "		example:
 "		    let g:smartgrep_no_detectrepo=1 (don't use git or mercurial auto repo detect.)
 "
+"	If g:smartgrep_user_option is defined, it is used for smartgrep binary option.
+"
 "	If you use MacVim, add smartgrep path to .vimrc file.
 "		example:
 "	        let $PATH .= ':~/bin'
@@ -95,15 +98,18 @@ function! RSmartHilight(word)
   redraw!
 endfunction
 
+if !exists('g:smartgrep_user_option')
+  let g:smartgrep_user_option=''
+endif
+
 function! RSmartGrepEWG(word)
   if exists("g:smartgrep_no_detectrepo")
     set grepprg=smartgrep\ -ew
   else
     set grepprg=smartgrep\ -ew\ -g
-    "set grepprg=smartgrep\ -ew\ -g\ --nojs\ --ignore-dir\ Windows
   endif
   silent! execute "cd " . get(g:, 'smartgrep_basedir', '.')
-  silent! execute "lgrep " . a:word
+  silent! execute "lgrep " . g:smartgrep_user_option . " " . a:word
   silent! lopen
   set grepprg&
   call RSmartHilight(a:word)
@@ -114,10 +120,9 @@ function! RSmartGrepHWG(word)
     set grepprg=smartgrep\ -hw
   else
     set grepprg=smartgrep\ -hw\ -g
-    "set grepprg=smartgrep\ -hw\ -g\ --nojs\ --ignore-dir\ Windows
   endif
   silent! execute "cd " . get(g:, 'smartgrep_basedir', '.')
-  silent! execute "lgrep " . a:word
+  silent! execute "lgrep " . g:smartgrep_user_option . " " . a:word
   silent! lopen
   set grepprg&
   call RSmartHilight(a:word)
@@ -128,10 +133,9 @@ function! RSmartGrepIG(word)
     set grepprg=smartgrep\ -i
   else
     set grepprg=smartgrep\ -i\ -g
-    "set grepprg=smartgrep\ -i\ -g\ --nojs\ --ignore-dir\ Windows
   endif
   silent! execute "cd " . get(g:, 'smartgrep_basedir', '.')
-  silent! execute "lgrep " . a:word
+  silent! execute "lgrep " . g:smartgrep_user_option . " " . a:word
   silent! lopen
   set grepprg&
   call RSmartHilight(a:word)
