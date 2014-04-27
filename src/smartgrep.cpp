@@ -198,7 +198,8 @@ void usage( void )
         "  --ignore-dir NAME : exclude NAME folder\n"
 		"  support file extensions : .cpp/.c/.mm/.m/.h/.js/.coffee/.rb/.py/.pl/.sh/\n"
         "                            .java/.scala/.go/.cs/.vb/.bas/.frm/.cls\n"
-        "  Version 3.7.1.0\n"
+        "  limited support file extensions : .erb\n"
+        "  Version 3.7.2.0\n"
 	);
 	print_version();
 }
@@ -327,9 +328,10 @@ bool is_source_file( FILE_TYPE_INFO* p_info, char* file_name ){
 		is_ext( file_name, "java" ) ||
         is_ext( file_name, "scala" ) ||
 		is_ext( file_name, "go" ) ) {
-		return true;
-	} else if( is_shell_file( file_name ) ||
+        return true;
+    } else if( is_shell_file( file_name ) ||
                is_ruby_file( file_name ) ||
+               is_erb_file( file_name ) ||
                is_coffee_file( file_name ) ||
 	           is_python_file( file_name ) ||
                is_perl_file( file_name ) ||
@@ -342,6 +344,7 @@ bool is_source_file( FILE_TYPE_INFO* p_info, char* file_name ){
 
 bool is_shell_file( char* file_name ){ return is_ext( file_name, "sh" ); }
 bool is_ruby_file( char* file_name ){ return is_ext( file_name, "rb" ); }
+bool is_erb_file( char* file_name ){ return is_ext( file_name, "erb" ); }
 bool is_coffee_file( char* file_name ){ return is_ext( file_name, "coffee" ); }
 bool is_python_file( char* file_name ){ return is_ext( file_name, "py" ); }
 bool is_perl_file( char* file_name ){ return is_ext( file_name, "pl" ); }
@@ -409,6 +412,8 @@ void parse_file( char* file_name, int wordtype, char* target_word )
         file_extension = kPerl;
     } else if( is_vb_file( file_name ) ){
         file_extension = kVB;
+    } else if( is_erb_file( file_name ) ){
+        file_extension = kAsIs;
 	} else {
 		file_extension = kC; 
 	}
@@ -444,6 +449,8 @@ void parse_file( char* file_name, int wordtype, char* target_word )
                                                         file_extension );
             } else if( file_extension == kVB ){
                 found = process_line_exclude_comment_vb( p_data, DATASIZE, wordtype, target_word );
+            } else if( file_extension == kAsIs ){
+                found = process_line_include_comment( p_data, wordtype, target_word );
 			} else {
 				assert( false );
 			}
@@ -733,6 +740,7 @@ bool findword_in_line( char* valid_str, int wordtype, char* target_word )
 }
 
 /**
+ * @brief   as is
  * @retval	true: found
  * @retval	false:not found
  * @param [in] char* buf

@@ -42,6 +42,7 @@
 "   Ver3.7.0.0 2014-03-23 add --ignore-dir option.
 "   Ver3.7.1.0 2014-04-06 multiple --ignore-dir option.
 "   Ver3.7.2.0 2014-04-09 add g:smartgrep_user_option variable.
+"   Ver3.7.3.0 2014-04-27 add .erb, remove git-grep
 "
 " Support OS
 "	Windows/Unix/MacOSX
@@ -61,6 +62,7 @@
 "   Coffee      : .coffee                           #, ###
 "   VBNet       : .vb                               '
 "   VB6         : .bas .frm .cls                    '
+"   AS IS       : .erb                              nothing
 " 
 " How To Install
 "	Put smartgrep.exe or smartgrep in C:\windows\system\ or pathed directory.
@@ -141,14 +143,6 @@ function! RSmartGrepIG(word)
   call RSmartHilight(a:word)
 endfunction
 
-function! RGitGrep(word)
-  set grepprg=git\ grep\ --line-number
-  silent! execute "lgrep " . a:word
-  silent! lopen
-  set grepprg&
-  call RSmartHilight(a:word)
-endfunction
-
 function! RSilverSearcherGrep(word)
   set grepprg=ag\ --nogroup\ --nocolor\ --column
   silent! execute "lgrep " . a:word
@@ -166,7 +160,6 @@ if !exists('g:smartgrep_no_default_key_mappings')
   noremap ,g :call RSmartGrepEWG("<C-R><C-W>")<CR>
   noremap ,h :call RSmartGrepHWG("<C-R><C-W>")<CR>
   noremap ,i :call RSmartGrepIG("<C-R><C-W>")<CR>
-  noremap ,u :call RGitGrep("<C-R><C-W>")<CR>
   noremap ,s :call RSilverSearcherGrep("<C-R><C-W>")<CR>
 endif
 
@@ -179,6 +172,5 @@ if !exists('g:smartgrep_no_default_key_mappings')
   command! -nargs=1 -complete=file R call RSmartGrepEWG("<args>")
   command! -nargs=1 -complete=file Rh call RSmartGrepHWG("<args>")
   command! -nargs=1 -complete=file Ri call RSmartGrepIG("<args>")
-  command! -nargs=1 -complete=file Ru call RGitGrep("<args>")
   command! -nargs=1 -complete=file Rs call RSilverSearcherGrep("<args>")
 endif

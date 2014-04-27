@@ -64,3 +64,4 @@ test:
 	sh ./unittest.sh shell_alpha1 0 
 	sh ./unittest.sh shell_beta1 0 
 	sh ./unittest.sh shell_gamma1 1 
+	sh ./unittest.sh erb_email 2
