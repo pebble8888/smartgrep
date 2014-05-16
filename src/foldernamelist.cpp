@@ -1,5 +1,6 @@
 #include "foldernamelist.h"
 #include <assert.h>
+#include <string.h>
 
 Foldernamelist::Foldernamelist()
 {
