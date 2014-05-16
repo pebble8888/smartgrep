@@ -2,7 +2,7 @@
 " Filename : smartgrep.vim 
 " Brief    : This file is vim plugin
 " Function : grep source file excluding comment 
-" Author   : pebble8888@gmail.com 2009-2013 Copyright
+" Author   : pebble8888@gmail.com 2009-2014 Copyright
 " History  :
 " 	Ver1.0.0.0 2009-09-13 initial revision for grep excluding comment
 "	Ver1.1.0.0 2009-09-27 add word grep function
@@ -43,6 +43,7 @@
 "   Ver3.7.1.0 2014-04-06 multiple --ignore-dir option.
 "   Ver3.7.2.0 2014-04-09 add g:smartgrep_user_option variable.
 "   Ver3.7.3.0 2014-04-27 add .erb, remove git-grep
+"   Ver3.7.4.0 2014-05-16 add support .plist/.strings/.pbxproj
 "
 " Support OS
 "	Windows/Unix/MacOSX
@@ -51,6 +52,7 @@
 "	C++ 		: .c .cpp .cxx .tli .inc .rc 		/* */, //, #if 0 
 "   C++ heder	: .h .hpp .hxx .tlh .inl			/* */, //, #if 0
 "	Objective-C : .m .mm							/* */, //, #if 0
+"   Xcode       : .plist .strings .pbxproj          /* */, //
 "   CSharp      : .cs								/* */, //
 "	JavaScript  : .js								/* */, //
 "   Java        : .java                             /* */, //

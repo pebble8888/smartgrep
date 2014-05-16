@@ -65,3 +65,8 @@ test:
 	sh ./unittest.sh shell_beta1 0 
 	sh ./unittest.sh shell_gamma1 1 
 	sh ./unittest.sh erb_email 2
+	sh ./unittest.sh stringstest 1
+	sh ./unittest.sh testpbxproj 1
+	sh ./unittest.sh testplist 1
+
+

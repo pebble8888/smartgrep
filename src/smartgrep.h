@@ -69,6 +69,7 @@ bool is_coffee_file( char* file_name );
 bool is_python_file( char* file_name );
 bool is_perl_file( char* file_name );
 bool is_vb_file( char* file_name );
+bool is_xcode_resource_file( char* file_name );
 bool is_ext( char* file_name, const char* ext_name );
 bool findword_in_line( char* valid_str, int wordtype, char* target_word );
 bool is_alnum_or_underscore( int val );

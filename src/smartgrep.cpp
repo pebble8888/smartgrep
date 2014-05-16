@@ -197,7 +197,8 @@ void usage( void )
         "  --nojs : exclude .js file\n"
         "  --ignore-dir NAME : exclude NAME folder\n"
 		"  support file extensions : .cpp/.c/.mm/.m/.h/.js/.coffee/.rb/.py/.pl/.sh/\n"
-        "                            .java/.scala/.go/.cs/.vb/.bas/.frm/.cls\n"
+        "                            .java/.scala/.go/.cs/.vb/.bas/.frm/.cls/\n"
+        "                            .plist/.pbxproj/.strings\n"
         "  limited support file extensions : .erb\n"
         "  Version 3.7.2.0\n"
 	);
@@ -327,19 +328,18 @@ bool is_source_file( FILE_TYPE_INFO* p_info, char* file_name ){
 		(p_info->js && is_ext( file_name, "js")) ||
 		is_ext( file_name, "java" ) ||
         is_ext( file_name, "scala" ) ||
-		is_ext( file_name, "go" ) ) {
-        return true;
-    } else if( is_shell_file( file_name ) ||
-               is_ruby_file( file_name ) ||
-               is_erb_file( file_name ) ||
-               is_coffee_file( file_name ) ||
-	           is_python_file( file_name ) ||
-               is_perl_file( file_name ) ||
-               is_vb_file( file_name ) ){
+		is_ext( file_name, "go" ) || 
+        is_shell_file( file_name ) ||
+        is_ruby_file( file_name ) ||
+        is_erb_file( file_name ) ||
+        is_coffee_file( file_name ) ||
+	    is_python_file( file_name ) ||
+        is_perl_file( file_name ) ||
+        is_vb_file( file_name ) ||
+        is_xcode_resource_file( file_name ) ){
 		return true;
-	} else {
-		return false;
 	}
+	return false;
 }
 
 bool is_shell_file( char* file_name ){ return is_ext( file_name, "sh" ); }
@@ -357,6 +357,14 @@ bool is_vb_file( char* file_name ){
     } else {
         return false;
     }
+}
+bool is_xcode_resource_file( char* file_name ){
+    if( is_ext( file_name, "pbxproj" ) ||
+        is_ext( file_name, "strings" ) ||
+        is_ext( file_name, "plist" ) ){
+        return true;
+    }
+    return false;
 }
 
 bool is_header_file( char* file_name ){
