@@ -1,5 +1,8 @@
+[![Build Status](https://travis-ci.org/pebble8888/smartgrep.svg?branch=master)](https://travis-ci.org/pebble8888/smartgrep)
+
 smartgrep
 =======
+
 Grep word in source files excluding comment for vim plugin.  
 Grep is very fast because C compiled binary is used.  
 Auto project detection using .git or .hg folder.  
