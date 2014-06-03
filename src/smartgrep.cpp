@@ -198,7 +198,7 @@ void usage( void )
         "  --ignore-dir NAME : exclude NAME folder\n"
 		"  support file extensions : .cpp/.c/.mm/.m/.h/.js/.coffee/.rb/.py/.pl/.sh/\n"
         "                            .java/.scala/.go/.cs/.vb/.bas/.frm/.cls/\n"
-        "                            .plist/.pbxproj/.strings\n"
+        "                            .plist/.pbxproj/.strings/.swift\n"
         "  limited support file extensions : .erb\n"
         "  Version 3.7.2.0\n"
 	);
@@ -328,7 +328,8 @@ bool is_source_file( FILE_TYPE_INFO* p_info, char* file_name ){
 		(p_info->js && is_ext( file_name, "js")) ||
 		is_ext( file_name, "java" ) ||
         is_ext( file_name, "scala" ) ||
-		is_ext( file_name, "go" ) || 
+		is_ext( file_name, "go" ) ||
+        is_ext( file_name, "swift" ) ||
         is_shell_file( file_name ) ||
         is_ruby_file( file_name ) ||
         is_erb_file( file_name ) ||

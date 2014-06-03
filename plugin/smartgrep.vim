@@ -44,6 +44,7 @@
 "   Ver3.7.2.0 2014-04-09 add g:smartgrep_user_option variable.
 "   Ver3.7.3.0 2014-04-27 add .erb, remove git-grep
 "   Ver3.7.4.0 2014-05-16 add support .plist/.strings/.pbxproj
+"   Ver3.7.5.0 2014-06-03 add support .swift
 "
 " Support OS
 "	Windows/Unix/MacOSX
@@ -52,6 +53,7 @@
 "	C++ 		: .c .cpp .cxx .tli .inc .rc 		/* */, //, #if 0 
 "   C++ heder	: .h .hpp .hxx .tlh .inl			/* */, //, #if 0
 "	Objective-C : .m .mm							/* */, //, #if 0
+"	Swift       : .swift                            /* */, //
 "   Xcode       : .plist .strings .pbxproj          /* */, //
 "   CSharp      : .cs								/* */, //
 "	JavaScript  : .js								/* */, //

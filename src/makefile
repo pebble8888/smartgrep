@@ -68,5 +68,5 @@ test:
 	sh ./unittest.sh stringstest 1
 	sh ./unittest.sh testpbxproj 1
 	sh ./unittest.sh testplist 1
-
+	sh ./unittest.sh swift_alpha 2
 
