@@ -198,7 +198,7 @@ void usage( void )
         "  --ignore-dir NAME : exclude NAME folder\n"
 		"  support file extensions : .cpp/.c/.mm/.m/.h/.js/.coffee/.rb/.py/.pl/.sh/\n"
         "                            .java/.scala/.go/.cs/.vb/.bas/.frm/.cls/\n"
-        "                            .plist/.pbxproj/.strings/.swift\n"
+        "                            .plist/.pbxproj/.strings/.storyboard/.swift\n"
         "  limited support file extensions : .erb\n"
         "  Version 3.7.2.0\n"
 	);
@@ -362,7 +362,8 @@ bool is_vb_file( char* file_name ){
 bool is_xcode_resource_file( char* file_name ){
     if( is_ext( file_name, "pbxproj" ) ||
         is_ext( file_name, "strings" ) ||
-        is_ext( file_name, "plist" ) ){
+        is_ext( file_name, "plist" ) ||
+        is_ext( file_name, "storyboard" ) ){
         return true;
     }
     return false;

@@ -45,6 +45,7 @@
 "   Ver3.7.3.0 2014-04-27 add .erb, remove git-grep
 "   Ver3.7.4.0 2014-05-16 add support .plist/.strings/.pbxproj
 "   Ver3.7.5.0 2014-06-03 add support .swift
+"   Ver3.7.6.0 2014-06-19 add suppoer .storyboard
 "
 " Support OS
 "	Windows/Unix/MacOSX
@@ -54,7 +55,8 @@
 "   C++ heder	: .h .hpp .hxx .tlh .inl			/* */, //, #if 0
 "	Objective-C : .m .mm							/* */, //, #if 0
 "	Swift       : .swift                            /* */, //
-"   Xcode       : .plist .strings .pbxproj          /* */, //
+"   Xcode       : .plist .strings .pbxproj .storyboard 
+"                                                   /* */, //
 "   CSharp      : .cs								/* */, //
 "	JavaScript  : .js								/* */, //
 "   Java        : .java                             /* */, //
