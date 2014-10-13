@@ -198,9 +198,9 @@ void usage( void )
         "  --ignore-dir NAME : exclude NAME folder\n"
 		"  support file extensions : .cpp/.c/.mm/.m/.h/.js/.coffee/.rb/.py/.pl/.sh/\n"
         "                            .java/.scala/.go/.cs/.vb/.bas/.frm/.cls/\n"
-        "                            .plist/.pbxproj/.strings/.storyboard/.swift\n"
+        "                            .plist/.pbxproj/.strings/.storyboard/.swift/.vim\n"
         "  limited support file extensions : .erb\n"
-        "  Version 3.7.2.0\n"
+        "  Version 3.7.7.0\n"
 	);
 	print_version();
 }
@@ -337,6 +337,7 @@ bool is_source_file( FILE_TYPE_INFO* p_info, char* file_name ){
 	    is_python_file( file_name ) ||
         is_perl_file( file_name ) ||
         is_vb_file( file_name ) ||
+        is_vim_file( file_name ) ||
         is_xcode_resource_file( file_name ) ){
 		return true;
 	}
@@ -349,6 +350,7 @@ bool is_erb_file( char* file_name ){ return is_ext( file_name, "erb" ); }
 bool is_coffee_file( char* file_name ){ return is_ext( file_name, "coffee" ); }
 bool is_python_file( char* file_name ){ return is_ext( file_name, "py" ); }
 bool is_perl_file( char* file_name ){ return is_ext( file_name, "pl" ); }
+bool is_vim_file( char* file_name ){ return is_ext( file_name, "vim" ); }
 bool is_vb_file( char* file_name ){
     if( is_ext( file_name, "vb" ) ||
         is_ext( file_name, "frm" ) ||
@@ -424,6 +426,8 @@ void parse_file( char* file_name, int wordtype, char* target_word )
         file_extension = kVB;
     } else if( is_erb_file( file_name ) ){
         file_extension = kAsIs;
+    } else if( is_vim_file( file_name ) ){
+        file_extension = kVim;
 	} else {
 		file_extension = kC; 
 	}
@@ -459,6 +463,8 @@ void parse_file( char* file_name, int wordtype, char* target_word )
                                                         file_extension );
             } else if( file_extension == kVB ){
                 found = process_line_exclude_comment_vb( p_data, DATASIZE, wordtype, target_word );
+            } else if( file_extension == kVim ){
+                found = process_line_exclude_comment_vim( p_data, DATASIZE, wordtype, target_word );
             } else if( file_extension == kAsIs ){
                 found = process_line_include_comment( p_data, wordtype, target_word );
 			} else {
@@ -689,6 +695,33 @@ bool process_line_exclude_comment_vb( char* buf, size_t bufsize, int wordtype, c
 		}
 		if( buf[i] == '\r' ) break;
 		if( buf[i] == '\n' || buf[i] == '\0' ) break;
+		
+		// valid data
+		*ptr = buf[i];
+		++ptr;
+	}
+WHILEOUT:
+	return findword_in_line( valid_str, wordtype, target_word );
+}
+
+/**
+ * vim script
+ */
+bool process_line_exclude_comment_vim( char* buf, size_t bufsize, int wordtype, char* target_word )
+{
+	char valid_str[DATASIZE];
+	memset( valid_str, 0, sizeof(valid_str) );
+
+	size_t i;
+	char* ptr = valid_str;
+	for( i = 0; i < DATASIZE; ++i ){
+		if( buf[i] == '\n' || buf[i] == '\0' ) break; 
+
+        if( buf[i] == '\"' ){
+			// single-line comment
+			break;
+		}
+		if( buf[i] == '\r' ) break;
 		
 		// valid data
 		*ptr = buf[i];

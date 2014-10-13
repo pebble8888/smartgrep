@@ -70,4 +70,5 @@ test:
 	sh ./unittest.sh testplist 1
 	sh ./unittest.sh swift_alpha 2
 	sh ./unittest.sh storyboardtest 1
+	sh ./unittest.sh vim_one 1
 

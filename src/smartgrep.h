@@ -33,6 +33,7 @@ enum {
 	kPython,
     kPerl,
     kVB,
+    kVim, 
     kAsIs,
 };
 
@@ -54,6 +55,7 @@ void parse_file( char* file_name, int wordtype, char* target_word );
 bool process_line_exclude_comment_c( bool* p_isin_multiline_comment, PREP* p_prep, char* buf, size_t bufsize, int wordtype, char* target_word );
 bool process_line_exclude_comment_ruby( bool* p_isin_multiline_comment, char* buf, size_t bufsize, int wordtype, char* target_word, int file_extension );
 bool process_line_exclude_comment_vb( char* buf, size_t bufsize, int wordtype, char* target_word ); 
+bool process_line_exclude_comment_vim( char* buf, size_t bufsize, int wordtype, char* target_word ); 
 bool process_line_include_comment( char* buf, int wordtype, char* target_word );
 #ifdef WIN32
 void parse_directory_win( char* path, FILE_TYPE_INFO* p_info, int wordtype, char* target_word );
@@ -69,6 +71,7 @@ bool is_coffee_file( char* file_name );
 bool is_python_file( char* file_name );
 bool is_perl_file( char* file_name );
 bool is_vb_file( char* file_name );
+bool is_vim_file( char* file_name );
 bool is_xcode_resource_file( char* file_name );
 bool is_ext( char* file_name, const char* ext_name );
 bool findword_in_line( char* valid_str, int wordtype, char* target_word );

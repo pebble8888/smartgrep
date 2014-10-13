@@ -31,13 +31,14 @@ Unix, MacOS X, Windows
 
 Suport Language and Comment Type
 =======
-C, C++, Objective-C, C#, Java Script, Java, Scala, Go   /* */, //, #if 0  
+C, C++, Objective-C, Swift, C#, Java Script, Java, Scala, Go   /* */, //, #if 0  
 Perl        #, =pod, =cut  
 Ruby 	    #, =begin, =end  
 Python      #, """, '''  
 Coffee      #, ###  
 Shell       #  
 VB.Net,VB6  '  
+Vim         "
    
 If you would like to use it for another language, please request me or try this plugin [coolgrep.vim](https://github.com/tyru/coolgrep.vim).  
   
@@ -70,8 +71,10 @@ Usage: smartgrep {-e[w]|-i[w]|-h[w]} [-g] [--nojs] word_you_grep
   -h[w] : recursive [word] grep for .h excluding comment  
   -g : use auto detect git or mercurial repository with the current directory  
   --nojs : exclude js file  
-  support file extensions : .cpp/.c/.mm/.m/.h/.js/.coffee/.pl/.rb/.py/.java/.scala/.go  
-                            .cs/.vb/.bas/.frm/.cls  
+  support file extensions : .cpp/.c/.mm/.m/.h/.js/.coffee/.rb/.py/.pl/.sh  
+                            .java/.scala/.go/.cs/.vb/.bas/.frm/.cls/  
+                            .plist/.pbxproj/.strings/.storyboard/.swift/.vim  
+  limit support file extensions : .erb  
 
 INSTALL
 =======
