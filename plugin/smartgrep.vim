@@ -47,6 +47,7 @@
 "   Ver3.7.5.0 2014-06-03 add support .swift
 "   Ver3.7.6.0 2014-06-19 add suppoer .storyboard
 "   Ver3.7.7.0 2014-10-13 add support .vim
+"   Ver3.7.8.0 2014-12-06 ammend .vim
 "
 " Support OS
 "	Windows/Unix/MacOSX

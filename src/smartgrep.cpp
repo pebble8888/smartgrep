@@ -29,6 +29,8 @@
 #include <assert.h>
 
 const static int DATASIZE = 64 * 1024; // process unit size
+const static char kTab = 0x9;
+const static char kSpace = 0x20;
 
 void test( void )
 {
@@ -712,16 +714,20 @@ bool process_line_exclude_comment_vim( char* buf, size_t bufsize, int wordtype, 
 	char valid_str[DATASIZE];
 	memset( valid_str, 0, sizeof(valid_str) );
 
+	bool found_anything_but_whitespace = false;
 	size_t i;
 	char* ptr = valid_str;
 	for( i = 0; i < DATASIZE; ++i ){
 		if( buf[i] == '\n' || buf[i] == '\0' ) break; 
 
-        if( buf[i] == '\"' ){
+        if( !found_anything_but_whitespace && buf[i] == '\"' ){
 			// single-line comment
 			break;
 		}
+
 		if( buf[i] == '\r' ) break;
+
+		if( !(buf[i] == kSpace || buf[i] == kTab) ) found_anything_but_whitespace = true;
 		
 		// valid data
 		*ptr = buf[i];
