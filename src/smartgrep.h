@@ -66,7 +66,7 @@ bool is_header_file( char* file_name );
 bool is_source_file( FILE_TYPE_INFO* p_info, char* file_name );
 bool is_shell_file( char* file_name );
 bool is_ruby_file( char* file_name );
-bool is_erb_file( char* file_name );
+bool is_asis_file( char* file_name );
 bool is_coffee_file( char* file_name );
 bool is_python_file( char* file_name );
 bool is_perl_file( char* file_name );

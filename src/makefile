@@ -74,4 +74,6 @@ test:
 	sh ./unittest.sh vim_four 1
 	sh ./unittest.sh vim_five 1
 	sh ./unittest.sh vim_six 0
+	sh ./unittest.sh hogehtml 1
+	sh ./unittest.sh hogecss 1
 

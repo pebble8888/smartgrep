@@ -200,9 +200,9 @@ void usage( void )
         "  --ignore-dir NAME : exclude NAME folder\n"
 		"  support file extensions : .cpp/.c/.mm/.m/.h/.js/.coffee/.rb/.py/.pl/.sh/\n"
         "                            .java/.scala/.go/.cs/.vb/.bas/.frm/.cls/\n"
-        "                            .plist/.pbxproj/.strings/.storyboard/.swift/.vim\n"
-        "  limited support file extensions : .erb\n"
-        "  Version 3.7.7.0\n"
+        "                            .plist/.pbxproj/.strings/.storyboard/.swift/.vim/\n"
+        "  limited support file extensions : .erb/.html/css\n"
+        "  Version 3.7.9.0\n"
 	);
 	print_version();
 }
@@ -334,7 +334,7 @@ bool is_source_file( FILE_TYPE_INFO* p_info, char* file_name ){
         is_ext( file_name, "swift" ) ||
         is_shell_file( file_name ) ||
         is_ruby_file( file_name ) ||
-        is_erb_file( file_name ) ||
+        is_asis_file( file_name ) ||
         is_coffee_file( file_name ) ||
 	    is_python_file( file_name ) ||
         is_perl_file( file_name ) ||
@@ -348,7 +348,11 @@ bool is_source_file( FILE_TYPE_INFO* p_info, char* file_name ){
 
 bool is_shell_file( char* file_name ){ return is_ext( file_name, "sh" ); }
 bool is_ruby_file( char* file_name ){ return is_ext( file_name, "rb" ); }
-bool is_erb_file( char* file_name ){ return is_ext( file_name, "erb" ); }
+bool is_asis_file( char* file_name ){
+   	return is_ext( file_name, "erb" ) ||
+		   is_ext( file_name, "html" ) ||
+		   is_ext( file_name, "css" ); 
+}
 bool is_coffee_file( char* file_name ){ return is_ext( file_name, "coffee" ); }
 bool is_python_file( char* file_name ){ return is_ext( file_name, "py" ); }
 bool is_perl_file( char* file_name ){ return is_ext( file_name, "pl" ); }
@@ -426,7 +430,7 @@ void parse_file( char* file_name, int wordtype, char* target_word )
         file_extension = kPerl;
     } else if( is_vb_file( file_name ) ){
         file_extension = kVB;
-    } else if( is_erb_file( file_name ) ){
+    } else if( is_asis_file( file_name ) ){
         file_extension = kAsIs;
     } else if( is_vim_file( file_name ) ){
         file_extension = kVim;

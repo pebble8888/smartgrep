@@ -47,7 +47,8 @@
 "   Ver3.7.5.0 2014-06-03 add support .swift
 "   Ver3.7.6.0 2014-06-19 add suppoer .storyboard
 "   Ver3.7.7.0 2014-10-13 add support .vim
-"   Ver3.7.8.0 2014-12-06 ammend .vim
+"   Ver3.7.8.0 2014-12-06 amend .vim
+"   Ver3.7.9.0 2015-01-16 add support .html/.css
 "
 " Support OS
 "	Windows/Unix/MacOSX
@@ -71,7 +72,7 @@
 "   VBNet       : .vb                               '
 "   VB6         : .bas .frm .cls                    '
 "   Vim         : .vim                              "
-"   AS IS       : .erb                              nothing
+"   AS IS       : .erb .html .css                   nothing
 " 
 " How To Install
 "	Put smartgrep.exe or smartgrep in C:\windows\system\ or pathed directory.
