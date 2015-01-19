@@ -127,6 +127,20 @@ function! RSmartGrepEWG(word)
   call RSmartHilight(a:word)
 endfunction
 
+function! RSmartGrepEG(word)
+  if exists("g:smartgrep_no_detectrepo")
+    set grepprg=smartgrep\ -e
+  else
+    set grepprg=smartgrep\ -e\ -g
+  endif
+  silent! execute "cd " . get(g:, 'smartgrep_basedir', '.')
+  silent! execute "lgrep " . g:smartgrep_user_option . " " . a:word
+  silent! lopen
+  set grepprg&
+  call RSmartHilight(a:word)
+endfunction
+
+
 function! RSmartGrepHWG(word)
   if exists("g:smartgrep_no_detectrepo") 
     set grepprg=smartgrep\ -hw
@@ -175,11 +189,13 @@ endif
 
 if !exists('g:smartgrep_no_default_key_mappings')
   " :R  -> recursive word grep for supported files exclude comment
+  " :Rg -> recursive grep for supported files exclude comment
   " :Rh -> recursive word grep for h file exclude comment
   " :Ri -> recursive grep for supported files include comment
   " :Ru -> git grep
   " :Rs -> ag
   command! -nargs=1 -complete=file R call RSmartGrepEWG("<args>")
+  command! -nargs=1 -complete=file Rg call RSmartGrepEG("<args>")
   command! -nargs=1 -complete=file Rh call RSmartGrepHWG("<args>")
   command! -nargs=1 -complete=file Ri call RSmartGrepIG("<args>")
   command! -nargs=1 -complete=file Rs call RSilverSearcherGrep("<args>")
