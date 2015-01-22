@@ -7,13 +7,14 @@
 #define SMARTGREP_H
 
 
-#define SG_WORDTYPE_WORD			0x01
-#define SG_WORDTYPE_NORMAL			0x02
-#define SG_WORDTYPE_INCLUDE_COMMENT	0x04
-#define SG_WORDTYPE_EXCLUDE_COMMENT	0x08
+#define SG_WORDTYPE_WORD			(1<<0)
+#define SG_WORDTYPE_NORMAL			(1<<1)
+#define SG_WORDTYPE_CASEINSENSITIVE (1<<2)
+#define SG_WORDTYPE_INCLUDE_COMMENT	(1<<3)
+#define SG_WORDTYPE_EXCLUDE_COMMENT	(1<<4)
 
-#define SG_FILETYPE_HEADER	0x01	// .h/.hpp/etc 
-#define SG_FILETYPE_SOURCE	0x02	// .c/.cpp/.m/.mm/.cs/.js etc
+#define SG_FILETYPE_HEADER	(1<<0)	// .h/.hpp/etc 
+#define SG_FILETYPE_SOURCE	(1<<1)	// .c/.cpp/.m/.mm/.cs/.js etc
 
 /* preprocessor comment */
 #define SG_PREP_IFZERO	"#if 0"

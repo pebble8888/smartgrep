@@ -54,8 +54,7 @@ int main(int argc, char* argv[])
     info.filetype = 0;
     info.js = true;
 	if( strcmp( argv[1], "-i" ) == 0 ){
-		info.filetype |= SG_FILETYPE_SOURCE;
-		info.filetype |= SG_FILETYPE_HEADER;
+		info.filetype |= (SG_FILETYPE_SOURCE|SG_FILETYPE_HEADER);
 		wordtype |= SG_WORDTYPE_NORMAL;
 		wordtype |= SG_WORDTYPE_INCLUDE_COMMENT;
 	} else if( strcmp( argv[1], "-h" ) == 0 ){
@@ -63,13 +62,11 @@ int main(int argc, char* argv[])
 		wordtype |= SG_WORDTYPE_NORMAL;
 		wordtype |= SG_WORDTYPE_EXCLUDE_COMMENT;
 	} else if( strcmp( argv[1], "-e" ) == 0 ){
-		info.filetype |= SG_FILETYPE_SOURCE;
-		info.filetype |= SG_FILETYPE_HEADER;
+		info.filetype |= (SG_FILETYPE_SOURCE|SG_FILETYPE_HEADER);
 		wordtype |= SG_WORDTYPE_NORMAL;
 		wordtype |= SG_WORDTYPE_EXCLUDE_COMMENT;
 	} else if( strcmp( argv[1], "-iw" ) == 0 ){
-		info.filetype |= SG_FILETYPE_SOURCE;
-		info.filetype |= SG_FILETYPE_HEADER;
+		info.filetype |= (SG_FILETYPE_SOURCE|SG_FILETYPE_HEADER);
 		wordtype |= SG_WORDTYPE_WORD;
 		wordtype |= SG_WORDTYPE_INCLUDE_COMMENT;
 	} else if( strcmp( argv[1], "-hw" ) == 0 ){
@@ -77,10 +74,14 @@ int main(int argc, char* argv[])
 		wordtype |= SG_WORDTYPE_WORD;
 		wordtype |= SG_WORDTYPE_EXCLUDE_COMMENT;
 	} else if( strcmp( argv[1], "-ew" ) == 0 ){
-		info.filetype |= SG_FILETYPE_SOURCE;
-		info.filetype |= SG_FILETYPE_HEADER;
+		info.filetype |= (SG_FILETYPE_SOURCE|SG_FILETYPE_HEADER);
 		wordtype |= SG_WORDTYPE_WORD;
 		wordtype |= SG_WORDTYPE_EXCLUDE_COMMENT;
+    } else if( strcmp( argv[1], "-c" ) == 0 ){
+        info.filetype |= (SG_FILETYPE_SOURCE|SG_FILETYPE_HEADER);
+        wordtype |= SG_WORDTYPE_NORMAL;
+        wordtype |= SG_WORDTYPE_INCLUDE_COMMENT;
+        wordtype |= SG_WORDTYPE_CASEINSENSITIVE;
 	} else {
 		usage();
 		return 1;
@@ -195,6 +196,7 @@ void usage( void )
 		"  -e[w] : recursive [word] grep for supported file extensions excluding comment\n"
 		"  -i[w] : recursive [word] grep for supported file extensions including comment\n"
 		"  -h[w] : recursive [word] grep for .h excluding comment\n"
+        "  -c : recursive case insensitive grep for supported file extesion including comment\n"
         "  -g : use auto detect git or mercurial repository with the current directory\n"
         "  --nojs : exclude .js file\n"
         "  --ignore-dir NAME : exclude NAME folder\n"
@@ -202,7 +204,7 @@ void usage( void )
         "                            .java/.scala/.go/.cs/.vb/.bas/.frm/.cls/\n"
         "                            .plist/.pbxproj/.strings/.storyboard/.swift/.vim/\n"
         "  limited support file extensions : .erb/.html/css\n"
-        "  Version 3.7.9.0\n"
+        "  Version 3.8.0.0\n"
 	);
 	print_version();
 }
@@ -756,7 +758,11 @@ bool findword_in_line( char* valid_str, int wordtype, char* target_word )
 {
 	if( wordtype & SG_WORDTYPE_NORMAL ){
 		// normal search
-		return ( strstr( valid_str, target_word ) != NULL );
+        if( wordtype & SG_WORDTYPE_CASEINSENSITIVE ){
+            return strcasestr( valid_str, target_word ) != NULL;
+        } else {
+            return strstr( valid_str, target_word ) != NULL;
+        }
 	} else if( wordtype & SG_WORDTYPE_WORD ){
 		// word search
 		int   target_word_len = strlen(target_word);

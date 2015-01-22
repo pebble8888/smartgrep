@@ -49,6 +49,7 @@
 "   Ver3.7.7.0 2014-10-13 add support .vim
 "   Ver3.7.8.0 2014-12-06 amend .vim
 "   Ver3.7.9.0 2015-01-16 add support .html/.css
+"   Ver3.8.0.0 2015-01-22 add case insensitive option
 "
 " Support OS
 "	Windows/Unix/MacOSX
@@ -167,6 +168,19 @@ function! RSmartGrepIG(word)
   call RSmartHilight(a:word)
 endfunction
 
+function! RSmartGrepCG(word)
+  if exists("g:smartgrep_no_detectrepo")
+    set grepprg=smartgrep\ -c
+  else
+    set grepprg=smartgrep\ -c\ -g
+  endif
+  silent! execute "cd " . get(g:, 'smartgrep_basedir', '.')
+  silent! execute "lgrep " . g:smartgrep_user_option . " " . a:word
+  silent! lopen
+  set grepprg&
+  call RSmartHilight(a:word)
+endfunction
+
 function! RSilverSearcherGrep(word)
   set grepprg=ag\ --nogroup\ --nocolor\ --column
   silent! execute "lgrep " . a:word
@@ -192,11 +206,12 @@ if !exists('g:smartgrep_no_default_key_mappings')
   " :Rg -> recursive grep for supported files exclude comment
   " :Rh -> recursive word grep for h file exclude comment
   " :Ri -> recursive grep for supported files include comment
-  " :Ru -> git grep
+  " :Rc -> recursive case insensitive grep for supported files include comment
   " :Rs -> ag
   command! -nargs=1 -complete=file R call RSmartGrepEWG("<args>")
   command! -nargs=1 -complete=file Rg call RSmartGrepEG("<args>")
   command! -nargs=1 -complete=file Rh call RSmartGrepHWG("<args>")
   command! -nargs=1 -complete=file Ri call RSmartGrepIG("<args>")
+  command! -nargs=1 -complete=file Rc call RSmartGrepCG("<args>")
   command! -nargs=1 -complete=file Rs call RSilverSearcherGrep("<args>")
 endif
