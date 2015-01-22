@@ -192,7 +192,7 @@ void smartgrep_getrepo( char* buf, size_t size )
 void usage( void )
 {
 	printf( 
-		"Usage: smartgrep {-e[w]|-i[w]|-h[w]} [-g] [--nojs] [--ignore-dir NAME] word_you_grep\n"
+		"Usage: smartgrep {-e[w]|-i[w]|-h[w]|-c} [-g] [--nojs] [--ignore-dir NAME] word_you_grep\n"
 		"  -e[w] : recursive [word] grep for supported file extensions excluding comment\n"
 		"  -i[w] : recursive [word] grep for supported file extensions including comment\n"
 		"  -h[w] : recursive [word] grep for .h excluding comment\n"
@@ -203,7 +203,7 @@ void usage( void )
 		"  support file extensions : .cpp/.c/.mm/.m/.h/.js/.coffee/.rb/.py/.pl/.sh/\n"
         "                            .java/.scala/.go/.cs/.vb/.bas/.frm/.cls/\n"
         "                            .plist/.pbxproj/.strings/.storyboard/.swift/.vim/\n"
-        "  limited support file extensions : .erb/.html/css\n"
+        "  asis support file extensions : .erb/.html/.css\n"
         "  Version 3.8.0.0\n"
 	);
 	print_version();
