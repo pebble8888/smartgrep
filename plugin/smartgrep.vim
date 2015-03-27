@@ -2,7 +2,7 @@
 " Filename : smartgrep.vim 
 " Brief    : This file is vim plugin
 " Function : grep source file excluding comment 
-" Author   : pebble8888@gmail.com 2009-2014 Copyright
+" Author   : pebble8888@gmail.com 2009-2015 Copyright
 " History  :
 " 	Ver1.0.0.0 2009-09-13 initial revision for grep excluding comment
 "	Ver1.1.0.0 2009-09-27 add word grep function
@@ -50,6 +50,7 @@
 "   Ver3.7.8.0 2014-12-06 amend .vim
 "   Ver3.7.9.0 2015-01-16 add support .html/.css
 "   Ver3.8.0.0 2015-01-22 add case insensitive option
+"   Ver3.8.1.0 2015-03-27 modify .css support, add support .scss
 "
 " Support OS
 "	Windows/Unix/MacOSX
@@ -66,6 +67,8 @@
 "   Java        : .java                             /* */, //
 "   Scala       : .scala                            /* */(can't nest), //
 "   Go          : .go                               /* */, //
+"   scss        : .scss                             /* */, //
+"   css         : .css                              /* */
 "   Ruby        : .rb                               #, =begin, =end
 "   Perl        : .pl                               #, =pod, =cut
 "	Python		: .py								#, three double(single) quotation
@@ -73,7 +76,7 @@
 "   VBNet       : .vb                               '
 "   VB6         : .bas .frm .cls                    '
 "   Vim         : .vim                              "
-"   AS IS       : .erb .html .css                   nothing
+"   AS IS       : .erb .html                        nothing
 " 
 " How To Install
 "	Put smartgrep.exe or smartgrep in C:\windows\system\ or pathed directory.

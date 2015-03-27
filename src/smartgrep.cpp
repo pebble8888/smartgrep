@@ -203,7 +203,8 @@ void usage( void )
 		"  support file extensions : .cpp/.c/.mm/.m/.h/.js/.coffee/.rb/.py/.pl/.sh/\n"
         "                            .java/.scala/.go/.cs/.vb/.bas/.frm/.cls/\n"
         "                            .plist/.pbxproj/.strings/.storyboard/.swift/.vim/\n"
-        "  asis support file extensions : .erb/.html/.css\n"
+        "                            .css/.scss\n"
+        "  asis support file extensions : .erb/.html\n"
         "  Version 3.8.0.0\n"
 	);
 	print_version();
@@ -334,6 +335,8 @@ bool is_source_file( FILE_TYPE_INFO* p_info, char* file_name ){
         is_ext( file_name, "scala" ) ||
 		is_ext( file_name, "go" ) ||
         is_ext( file_name, "swift" ) ||
+        is_ext( file_name, "css" ) ||
+        is_ext( file_name, "scss" ) ||
         is_shell_file( file_name ) ||
         is_ruby_file( file_name ) ||
         is_asis_file( file_name ) ||
@@ -352,8 +355,7 @@ bool is_shell_file( char* file_name ){ return is_ext( file_name, "sh" ); }
 bool is_ruby_file( char* file_name ){ return is_ext( file_name, "rb" ); }
 bool is_asis_file( char* file_name ){
    	return is_ext( file_name, "erb" ) ||
-		   is_ext( file_name, "html" ) ||
-		   is_ext( file_name, "css" ); 
+		   is_ext( file_name, "html" ); 
 }
 bool is_coffee_file( char* file_name ){ return is_ext( file_name, "coffee" ); }
 bool is_python_file( char* file_name ){ return is_ext( file_name, "py" ); }

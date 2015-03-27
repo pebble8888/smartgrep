@@ -76,4 +76,5 @@ test:
 	sh ./unittest.sh vim_six 0
 	sh ./unittest.sh hogehtml 1
 	sh ./unittest.sh hogecss 1
+	sh ./unittest.sh hogescss 1	
 
