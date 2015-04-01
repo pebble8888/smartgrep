@@ -206,7 +206,7 @@ void usage( void )
         "                            .plist/.pbxproj/.strings/.storyboard/.swift/.vim/\n"
         "                            .css/.scss\n"
         "  asis support file extensions : .erb/.html\n"
-        "  Version 3.8.0.0\n"
+        "  Version 3.8.3.0\n"
 	);
 	print_version();
 }
@@ -453,7 +453,8 @@ void parse_file( char* file_name, int wordtype, char* target_word )
 
     bool is_utf16 = false;
     // check BOM for UTF16
-    if( is_cs_file( file_name ) ){
+    if( is_cs_file( file_name ) ||
+        is_xcode_resource_file( file_name ) ){
         while( true ){
             int data[2];
             data[0] = fgetc( fp );
@@ -504,7 +505,7 @@ void parse_file( char* file_name, int wordtype, char* target_word )
                     break;
                 }
             }
-            // wchar_t要素の数
+            // number of wchar_t elements
             size_t p_datasize = t - (wchar_t*)p_data; 
             if( p_datasize == 0 ) break;
 

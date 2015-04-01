@@ -1,7 +1,7 @@
 "
 " Filename : smartgrep.vim 
 " Brief    : This file is vim plugin
-" Function : grep source file excluding comment 
+" Function : grep source file excluding comment and wrapper for major grep command
 " Author   : pebble8888@gmail.com 2009-2015 Copyright
 " History  :
 " 	Ver1.0.0.0 2009-09-13 initial revision for grep excluding comment
@@ -79,6 +79,10 @@
 "   VB6         : .bas .frm .cls                    '
 "   Vim         : .vim                              "
 "   AS IS       : .erb .html                        nothing
+"
+" Support File Encoding
+"   UTF16LE with BOM for C# and xcode resource file.
+"   UTF8 for other file.
 " 
 " How To Install
 "	Put smartgrep.exe or smartgrep in C:\windows\system\ or pathed directory.
