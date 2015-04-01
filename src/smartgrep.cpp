@@ -29,6 +29,7 @@
 #include <assert.h>
 
 const static int DATASIZE = 64 * 1024; // process unit size
+const static int DATASIZE_OUT = DATASIZE*3/sizeof(wchar_t);
 const static char kTab = 0x9;
 const static char kSpace = 0x20;
 
@@ -52,7 +53,7 @@ int main(int argc, char* argv[])
 	int wordtype = 0;
     FILE_TYPE_INFO info;
     info.filetype = 0;
-    info.js = true;
+    info.typejs = true;
 	if( strcmp( argv[1], "-i" ) == 0 ){
 		info.filetype |= (SG_FILETYPE_SOURCE|SG_FILETYPE_HEADER);
 		wordtype |= SG_WORDTYPE_NORMAL;
@@ -90,7 +91,7 @@ int main(int argc, char* argv[])
         if( strcmp( argv[i], "-g" ) == 0 ){
             use_repo = true;
         } else if( strcmp( argv[i], "--nojs" ) == 0 ){
-            info.js = false;
+            info.typejs = false;
         } else if( strcmp( argv[i], "--ignore-dir" ) == 0 ){
             info.foldernamelist.add_foldername( argv[i+1] );
             ++i;
@@ -320,6 +321,10 @@ void parse_directory_mac( char* path, FILE_TYPE_INFO* p_info, int wordtype, char
 }
 #endif
 
+bool is_cs_file( char* file_name ){
+    return is_ext( file_name, "cs" );
+}
+
 bool is_source_file( FILE_TYPE_INFO* p_info, char* file_name ){
 	if( is_ext( file_name, "c" ) ||
 		is_ext( file_name, "cpp" ) || 
@@ -329,8 +334,8 @@ bool is_source_file( FILE_TYPE_INFO* p_info, char* file_name ){
 		is_ext( file_name, "rc" ) ||
 		is_ext( file_name, "m" ) ||
 		is_ext( file_name, "mm" ) ||
-		is_ext( file_name, "cs" ) || 
-		(p_info->js && is_ext( file_name, "js")) ||
+	    is_ext( file_name, "cs" ) || 
+		(p_info->typejs && is_ext( file_name, "js")) ||
 		is_ext( file_name, "java" ) ||
         is_ext( file_name, "scala" ) ||
 		is_ext( file_name, "go" ) ||
@@ -446,53 +451,116 @@ void parse_file( char* file_name, int wordtype, char* target_word )
 	if( fp == NULL )
 		return;
 
+    bool is_utf16 = false;
+    // check BOM for UTF16
+    if( is_cs_file( file_name ) ){
+        while( true ){
+            int data[2];
+            data[0] = fgetc( fp );
+            if( feof( fp ) || ferror( fp ) ) break;
+            data[1] = fgetc( fp );
+            if( feof( fp ) || ferror( fp ) ) break;
+
+            if( data[0] == 0xff && data[1] == 0xfe ){
+                is_utf16 = true;
+            }
+            break;
+        }
+        if( !is_utf16 ){
+            // back to begin
+            fseek( fp, 0, SEEK_SET );
+        }
+    }
+
 	bool isin_multiline_comment = false;
 	PREP prep;
 
 	// it is presumed that the one line byte size in file don't exceed 64k
-	char p_data[DATASIZE]; 
+    char* p_data = new char[DATASIZE];
+    const char* p_data_end = p_data + DATASIZE;
+
+    char* q_data;
+    if( is_utf16 ){
+        q_data = new char[DATASIZE_OUT];
+    } else {
+        q_data = NULL; 
+    }
+    int q_datasize = 0;
+
 	int lineno;
 	for( lineno = 1; ; ++lineno ){
-		memset( p_data, 0, sizeof(DATASIZE) );
-		char* ptr = fgets( p_data, DATASIZE, fp );
-		if( ptr == NULL )
-			break;
+        if( is_utf16 ){
+            memset( p_data, 0, DATASIZE );
+            memset( q_data, 0, DATASIZE_OUT );
+            wchar_t* t = (wchar_t*)p_data; 
+            while( t < (wchar_t*)p_data_end ){
+                char c1 = fgetc( fp );
+                char c2 = fgetc( fp );
+                if( feof( fp ) || ferror( fp ) ) {
+                    break;
+                }
+                *(t++) = (wchar_t)( c1 + (c2<<8) );
+                if( c1 == 0x0A && c2 == 0x00 ){
+                    break;
+                }
+            }
+            // wchar_t要素の数
+            size_t p_datasize = t - (wchar_t*)p_data; 
+            if( p_datasize == 0 ) break;
+
+            q_datasize = UTF16LEToUTF8( (wchar_t*)p_data, p_datasize, q_data ); 
+        } else {
+            memset( p_data, 0, DATASIZE );
+            char* ptr = fgets( p_data, DATASIZE, fp );
+            if( ptr == NULL ) break;
+        }
+        char* r_data;
+        size_t r_datasize;
+        if( is_utf16 ){
+            r_data = q_data;
+            r_datasize = q_datasize;
+        } else {
+            r_data = p_data;
+            r_datasize = DATASIZE;
+        }
 
 		bool found;
 		if( wordtype & SG_WORDTYPE_EXCLUDE_COMMENT ){
 			if( file_extension == kC ){
 				found = process_line_exclude_comment_c( &isin_multiline_comment, &prep,
-														p_data, DATASIZE, wordtype, target_word );
+														r_data, r_datasize, wordtype, target_word );
 			} else if( file_extension == kShell ||
                        file_extension == kRuby ||
                        file_extension == kCoffee ||
                        file_extension == kPython ||
                        file_extension == kPerl ){
 				found = process_line_exclude_comment_ruby( &isin_multiline_comment,
-                                                        p_data, DATASIZE, wordtype, target_word,
+                                                        r_data, r_datasize, wordtype, target_word,
                                                         file_extension );
             } else if( file_extension == kVB ){
-                found = process_line_exclude_comment_vb( p_data, DATASIZE, wordtype, target_word );
+                found = process_line_exclude_comment_vb( r_data, r_datasize, wordtype, target_word );
             } else if( file_extension == kVim ){
-                found = process_line_exclude_comment_vim( p_data, DATASIZE, wordtype, target_word );
+                found = process_line_exclude_comment_vim( r_data, r_datasize, wordtype, target_word );
             } else if( file_extension == kAsIs ){
-                found = process_line_include_comment( p_data, wordtype, target_word );
+                found = process_line_include_comment( r_data, wordtype, target_word );
 			} else {
 				assert( false );
 			}
 		} else if( wordtype & SG_WORDTYPE_INCLUDE_COMMENT ){
-			found = process_line_include_comment( p_data, wordtype, target_word );
+			found = process_line_include_comment( r_data, wordtype, target_word );
 		} else {
 			assert( false );
 		}
 		if( found ){
 			printf( "%s:%d:", file_name, lineno );
-			for( char* q = p_data; *q != '\r' && *q != '\n'; ++q ){
+			for( char* q = r_data; *q != '\r' && *q != '\n'; ++q ){
 				printf( "%c", *q );
 			}
 			printf( "\n" );
 		}
 	}
+    delete [] p_data;
+    delete [] q_data;
 	fclose( fp );
 }
 
@@ -512,13 +580,13 @@ void parse_file( char* file_name, int wordtype, char* target_word )
 bool process_line_exclude_comment_c( bool* p_isin_multiline_comment, PREP* p_prep,
 									char* buf, size_t bufsize, int wordtype, char* target_word )
 {
-	char valid_str[DATASIZE];
+	char valid_str[DATASIZE_OUT];
 	memset( valid_str, 0, sizeof(valid_str) );
 
 	bool isin_literal = false; // "xxx", 'xxx'
 	size_t i;
 	char* ptr = valid_str;
-	for( i = 0; i < DATASIZE; ++i ){
+	for( i = 0; i < DATASIZE_OUT; ++i ){
 		if( buf[i] == '\n' || buf[i] == '\0' ) break; 
 		if( !isin_literal && !(*p_isin_multiline_comment) && !(p_prep->is_commented())
 			&& buf[i] == '/' && buf[i+1] == '/' ){
@@ -608,7 +676,7 @@ bool process_line_exclude_comment_ruby( bool* p_isin_multiline_comment,
                                 char* buf, size_t bufsize, int wordtype, char* target_word,
                                 int file_extension )
 {
-	char valid_str[DATASIZE];
+	char valid_str[DATASIZE_OUT];
 	memset( valid_str, 0, sizeof(valid_str) );
 
 	bool isin_dq = false; // "xxx"
@@ -616,7 +684,7 @@ bool process_line_exclude_comment_ruby( bool* p_isin_multiline_comment,
 	bool isin_var = false; // "#{}"
 	size_t i;
 	char* ptr = valid_str;
-	for( i = 0; i < DATASIZE; ++i ){
+	for( i = 0; i < DATASIZE_OUT; ++i ){
 		if( buf[i] == '\n' || buf[i] == '\0' ) break; 
 
         if( !(*p_isin_multiline_comment)
@@ -687,13 +755,13 @@ WHILEOUT:
  */
 bool process_line_exclude_comment_vb( char* buf, size_t bufsize, int wordtype, char* target_word )
 {
-	char valid_str[DATASIZE];
+	char valid_str[DATASIZE_OUT];
 	memset( valid_str, 0, sizeof(valid_str) );
 
 	bool isin_dq = false; // "xxx"
 	size_t i;
 	char* ptr = valid_str;
-	for( i = 0; i < DATASIZE; ++i ){
+	for( i = 0; i < DATASIZE_OUT; ++i ){
 		if( buf[i] == '\n' || buf[i] == '\0' ) break; 
 
         if( !isin_dq && buf[i] == '\'' ){
@@ -719,13 +787,13 @@ WHILEOUT:
  */
 bool process_line_exclude_comment_vim( char* buf, size_t bufsize, int wordtype, char* target_word )
 {
-	char valid_str[DATASIZE];
+	char valid_str[DATASIZE_OUT];
 	memset( valid_str, 0, sizeof(valid_str) );
 
 	bool found_anything_but_whitespace = false;
 	size_t i;
 	char* ptr = valid_str;
-	for( i = 0; i < DATASIZE; ++i ){
+	for( i = 0; i < DATASIZE_OUT; ++i ){
 		if( buf[i] == '\n' || buf[i] == '\0' ) break; 
 
         if( !found_anything_but_whitespace && buf[i] == '\"' ){
@@ -849,5 +917,31 @@ void print_version( void )
 		delete [] pVffInfo;
 	}
 #endif
+}
+
+/**
+ * @return bytelength
+ */
+size_t UTF16LEToUTF8( wchar_t* pwIn, int count, char* pOut )
+{
+    wchar_t* pw = pwIn;
+    char* q = pOut;
+    while( pw <  pwIn + count ){
+        if( *pw <= 0x7f ){
+            *(q++) = (char)*pw;
+            if( *pw == 0x0 ){
+                break;
+            }
+        } else if( *pw <= 0x7ff ){
+            *(q++) = (char)((*pw >> 6) | 0xc0);
+            *(q++) = (char)((*pw & 0x3f) | 0x80);
+        } else {
+            *(q++) = (char)((*pw >> 12) | 0xe0);
+            *(q++) = (char)((*pw >> 6 & 0x3f) | 0x80);
+            *(q++) = (char)((*pw & 0x3f) | 0x80);
+        }
+        ++pw;
+    }
+    return q-pOut;
 }
 

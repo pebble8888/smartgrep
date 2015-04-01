@@ -40,9 +40,12 @@ enum {
 
 #include "foldernamelist.h"
 
+/**
+ * @brief command option
+ */
 typedef struct {
     int filetype;
-    bool js;
+    bool typejs;
     Foldernamelist foldernamelist;
 } FILE_TYPE_INFO;
 
@@ -64,6 +67,7 @@ void parse_directory_win( char* path, FILE_TYPE_INFO* p_info, int wordtype, char
 void parse_directory_mac( char* path, FILE_TYPE_INFO* p_info, int wordtype, char* target_word );
 #endif
 bool is_header_file( char* file_name );
+bool is_cs_file( FILE_TYPE_INFO* p_info, char* file_name );
 bool is_source_file( FILE_TYPE_INFO* p_info, char* file_name );
 bool is_shell_file( char* file_name );
 bool is_ruby_file( char* file_name );
@@ -78,6 +82,7 @@ bool is_ext( char* file_name, const char* ext_name );
 bool findword_in_line( char* valid_str, int wordtype, char* target_word );
 bool is_alnum_or_underscore( int val );
 void print_version( void );
+size_t UTF16LEToUTF8( wchar_t* pIn, int count, char* pOut );
 
 void smartgrep_getcwd( char* buf, size_t size );
 void smartgrep_getrepo( char* buf, size_t size );

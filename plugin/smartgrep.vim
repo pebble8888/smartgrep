@@ -52,6 +52,7 @@
 "   Ver3.8.0.0 2015-01-22 add case insensitive option
 "   Ver3.8.1.0 2015-03-27 modify .css support, add support .scss
 "   Ver3.8.2.0 2015-04-01 add jvgrep wrapper.
+"   Ver3.8.3.0 2015-04-01 support utf16le with bom
 "
 " Support OS
 "	Windows/Unix/MacOSX
