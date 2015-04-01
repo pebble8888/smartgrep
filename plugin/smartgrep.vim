@@ -51,6 +51,7 @@
 "   Ver3.7.9.0 2015-01-16 add support .html/.css
 "   Ver3.8.0.0 2015-01-22 add case insensitive option
 "   Ver3.8.1.0 2015-03-27 modify .css support, add support .scss
+"   Ver3.8.2.0 2015-04-01 add jvgrep wrapper.
 "
 " Support OS
 "	Windows/Unix/MacOSX
@@ -185,8 +186,24 @@ function! RSmartGrepCG(word)
 endfunction
 
 function! RSilverSearcherGrep(word)
+  let s:basedir = system('git rev-parse --show-toplevel')
+  let s:cmd = 'lcd ' . s:basedir
+  execute s:cmd
   set grepprg=ag\ --nogroup\ --nocolor\ --column
   silent! execute "lgrep " . a:word
+  silent! lopen
+  set grepprg&
+  call RSmartHilight(a:word)
+endfunction
+
+function! RJvgrep(word)
+  let s:basedir = system('git rev-parse --show-toplevel')
+  let s:cmd = 'lcd ' . s:basedir
+  execute s:cmd
+  set grepprg=jvgrep
+  silent! execute "lgrep " . a:word . " ."
+  set grepprg=jvgrep\ --enc\ utf-16
+  silent! execute "lgrepadd " . a:word . " ."
   silent! lopen
   set grepprg&
   call RSmartHilight(a:word)
@@ -198,10 +215,12 @@ if !exists('g:smartgrep_no_default_key_mappings')
   " ,i  : recursive grep for supported files include comment
   " ,u  : git grep by mouse cursored word
   " ,s  : ag by mouse cursored word
+  " ,j  : jvgrep by ouse cursored word
   noremap ,g :call RSmartGrepEWG("<C-R><C-W>")<CR>
   noremap ,h :call RSmartGrepHWG("<C-R><C-W>")<CR>
   noremap ,i :call RSmartGrepIG("<C-R><C-W>")<CR>
   noremap ,s :call RSilverSearcherGrep("<C-R><C-W>")<CR>
+  noremap ,j :call RJvgrep("<C-R><C-W>")<CR>
 endif
 
 if !exists('g:smartgrep_no_default_key_mappings')
@@ -211,10 +230,12 @@ if !exists('g:smartgrep_no_default_key_mappings')
   " :Ri -> recursive grep for supported files include comment
   " :Rc -> recursive case insensitive grep for supported files include comment
   " :Rs -> ag
+  " :Rj -> jvgrep
   command! -nargs=1 -complete=file R call RSmartGrepEWG("<args>")
   command! -nargs=1 -complete=file Rg call RSmartGrepEG("<args>")
   command! -nargs=1 -complete=file Rh call RSmartGrepHWG("<args>")
   command! -nargs=1 -complete=file Ri call RSmartGrepIG("<args>")
   command! -nargs=1 -complete=file Rc call RSmartGrepCG("<args>")
   command! -nargs=1 -complete=file Rs call RSilverSearcherGrep("<args>")
+  command! -nargs=1 -complete=file Rj call RJvgrep("<args>")
 endif
