@@ -215,12 +215,12 @@ if !exists('g:smartgrep_no_default_key_mappings')
   " ,i  : recursive grep for supported files include comment
   " ,u  : git grep by mouse cursored word
   " ,s  : ag by mouse cursored word
-  " ,j  : jvgrep by ouse cursored word
+  " ,k  : jvgrep by ouse cursored word
   noremap ,g :call RSmartGrepEWG("<C-R><C-W>")<CR>
   noremap ,h :call RSmartGrepHWG("<C-R><C-W>")<CR>
   noremap ,i :call RSmartGrepIG("<C-R><C-W>")<CR>
   noremap ,s :call RSilverSearcherGrep("<C-R><C-W>")<CR>
-  noremap ,j :call RJvgrep("<C-R><C-W>")<CR>
+  noremap ,k :call RJvgrep("<C-R><C-W>")<CR>
 endif
 
 if !exists('g:smartgrep_no_default_key_mappings')
@@ -230,12 +230,12 @@ if !exists('g:smartgrep_no_default_key_mappings')
   " :Ri -> recursive grep for supported files include comment
   " :Rc -> recursive case insensitive grep for supported files include comment
   " :Rs -> ag
-  " :Rj -> jvgrep
+  " :Rk -> jvgrep
   command! -nargs=1 -complete=file R call RSmartGrepEWG("<args>")
   command! -nargs=1 -complete=file Rg call RSmartGrepEG("<args>")
   command! -nargs=1 -complete=file Rh call RSmartGrepHWG("<args>")
   command! -nargs=1 -complete=file Ri call RSmartGrepIG("<args>")
   command! -nargs=1 -complete=file Rc call RSmartGrepCG("<args>")
   command! -nargs=1 -complete=file Rs call RSilverSearcherGrep("<args>")
-  command! -nargs=1 -complete=file Rj call RJvgrep("<args>")
+  command! -nargs=1 -complete=file Rk call RJvgrep("<args>")
 endif
