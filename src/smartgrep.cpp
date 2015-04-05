@@ -511,6 +511,7 @@ void parse_file( char* file_name, int wordtype, char* target_word )
 
             q_datasize = UTF16LEToUTF8( (wchar_t*)p_data, (int)p_datasize, q_data );
         } else {
+            /* バグがあるのでfgetsを使わない方法に変える必要がある */
             memset( p_data, 0, DATASIZE );
             char* ptr = fgets( p_data, DATASIZE, fp );
             if( ptr == NULL ) break;
@@ -563,7 +564,14 @@ void parse_file( char* file_name, int wordtype, char* target_word )
                 found_linebreak = true;
                 printf( "\n" );
             }
-		}
+		} else {
+            char* q = r_data;
+            for( ; *q != '\r' && *q != '\n' && q < r_data + r_datasize; ++q ){
+            }
+            if( q < r_data + r_datasize ){
+                found_linebreak = true;
+            }
+        }
         if( found_linebreak ){
             ++lineno;
         }
