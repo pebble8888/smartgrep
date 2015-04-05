@@ -53,6 +53,7 @@
 "   Ver3.8.1.0 2015-03-27 modify .css support, add support .scss
 "   Ver3.8.2.0 2015-04-01 add jvgrep wrapper.
 "   Ver3.8.3.0 2015-04-01 support utf16le with bom
+"   Ver3.8.4.0 2015-04-05 remove g:smartgrep_basedir
 "
 " Support OS
 "	Windows/Unix/MacOSX
@@ -91,14 +92,6 @@
 "			C:\vim\runtime\plugin\		(for windows)
 "			~/.vim/plugin/				(for Unix)
 "
-"   If g:smartgrep_no_detectrepo is defined and g:smartgrep_basedir isn't defined 
-"   the current directory is used for grep base directory.
-"	If you would like to usually use a fixed grep base directory,
-"   define 'g:smartgrep_basedir' in your .vimrc file.
-" 	    example:
-" 			let g:smartgrep_basedir="c:\\develop" (for windows)
-"			let g:smartgrep_basedir="/develop/"	 (for Unix)
-"
 "   If g:smartgrep_no_detectrepo is not defined
 "   the git or mercurial repogitory detected by the current directory is used.
 "   If repogitory is not detected, it is the same of the case
@@ -130,7 +123,6 @@ function! RSmartGrepEWG(word)
   else
     set grepprg=smartgrep\ -ew\ -g
   endif
-  silent! execute "cd " . get(g:, 'smartgrep_basedir', '.')
   silent! execute "lgrep " . g:smartgrep_user_option . " " . a:word
   silent! lopen
   set grepprg&
@@ -143,7 +135,6 @@ function! RSmartGrepEG(word)
   else
     set grepprg=smartgrep\ -e\ -g
   endif
-  silent! execute "cd " . get(g:, 'smartgrep_basedir', '.')
   silent! execute "lgrep " . g:smartgrep_user_option . " " . a:word
   silent! lopen
   set grepprg&
@@ -157,7 +148,6 @@ function! RSmartGrepHWG(word)
   else
     set grepprg=smartgrep\ -hw\ -g
   endif
-  silent! execute "cd " . get(g:, 'smartgrep_basedir', '.')
   silent! execute "lgrep " . g:smartgrep_user_option . " " . a:word
   silent! lopen
   set grepprg&
@@ -170,7 +160,6 @@ function! RSmartGrepIG(word)
   else
     set grepprg=smartgrep\ -i\ -g
   endif
-  silent! execute "cd " . get(g:, 'smartgrep_basedir', '.')
   silent! execute "lgrep " . g:smartgrep_user_option . " " . a:word
   silent! lopen
   set grepprg&
@@ -183,7 +172,6 @@ function! RSmartGrepCG(word)
   else
     set grepprg=smartgrep\ -c\ -g
   endif
-  silent! execute "cd " . get(g:, 'smartgrep_basedir', '.')
   silent! execute "lgrep " . g:smartgrep_user_option . " " . a:word
   silent! lopen
   set grepprg&

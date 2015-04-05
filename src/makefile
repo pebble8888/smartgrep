@@ -5,6 +5,7 @@
 CC=g++
 TARGET=smartgrep
 LIBS=
+#CFLAGS=-g
 
 ifeq ($(OS),Windows_NT) 
 LIBS+=-lversion -lstdc++
@@ -16,11 +17,14 @@ all:$(TARGET)
 OBJS=smartgrep.o foldernamelist.o
 
 $(TARGET): $(OBJS)
-	$(CC) -o $@ $? $(LIBS)
+	$(CC) $(CFLAGS) -o $@ $? $(LIBS)
 	rm -f $(OBJS)
 	
 .c.o:
-	$(CC) -c $<
+	$(CC) $(CFLAGS) -c $<
+
+.cpp.o:
+	$(CC) $(CFLAGS) -c $<
 
 clean:
 	rm -f $(OBJS) $(TARGET)
