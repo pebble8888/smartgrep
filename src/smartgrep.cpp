@@ -489,7 +489,7 @@ void parse_file( char* file_name, int wordtype, char* target_word )
     int q_datasize = 0;
 
 	int lineno;
-	for( lineno = 1; ; ++lineno ){
+	for( lineno = 1; ;){
         if( is_utf16 ){
             memset( p_data, 0, DATASIZE );
             memset( q_data, 0, DATASIZE_OUT );
@@ -506,10 +506,10 @@ void parse_file( char* file_name, int wordtype, char* target_word )
                 }
             }
             // number of wchar_t elements
-            size_t p_datasize = t - (wchar_t*)p_data; 
+            size_t p_datasize = t - (wchar_t*)p_data;
             if( p_datasize == 0 ) break;
 
-            q_datasize = UTF16LEToUTF8( (wchar_t*)p_data, p_datasize, q_data ); 
+            q_datasize = UTF16LEToUTF8( (wchar_t*)p_data, (int)p_datasize, q_data );
         } else {
             memset( p_data, 0, DATASIZE );
             char* ptr = fgets( p_data, DATASIZE, fp );
@@ -552,13 +552,21 @@ void parse_file( char* file_name, int wordtype, char* target_word )
 		} else {
 			assert( false );
 		}
+        bool found_linebreak = false;
 		if( found ){
 			printf( "%s:%d:", file_name, lineno );
-			for( char* q = r_data; *q != '\r' && *q != '\n'; ++q ){
+            char* q = r_data;
+            for( ; *q != '\r' && *q != '\n' && q < r_data + r_datasize; ++q ){
 				printf( "%c", *q );
 			}
-			printf( "\n" );
+            if( q < r_data + r_datasize ){
+                found_linebreak = true;
+                printf( "\n" );
+            }
 		}
+        if( found_linebreak ){
+            ++lineno;
+        }
 	}
     delete [] p_data;
     delete [] q_data;
@@ -836,7 +844,7 @@ bool findword_in_line( char* valid_str, int wordtype, char* target_word )
         }
 	} else if( wordtype & SG_WORDTYPE_WORD ){
 		// word search
-		int   target_word_len = strlen(target_word);
+		int   target_word_len = (int)strlen(target_word);
 		char* remain_ptr = valid_str;
 		char* findptr = strstr( valid_str, target_word );
 
@@ -850,7 +858,7 @@ bool findword_in_line( char* valid_str, int wordtype, char* target_word )
 			}
 
 			if( head ){
-				int   remain_str_len = strlen(remain_ptr); 
+				int   remain_str_len = (int)strlen(remain_ptr);
 				if( remain_ptr + remain_str_len == findptr + target_word_len ){
 					tail = true;
 				} else {
@@ -923,7 +931,7 @@ void print_version( void )
 /**
  * @return bytelength
  */
-size_t UTF16LEToUTF8( wchar_t* pwIn, int count, char* pOut )
+int UTF16LEToUTF8( wchar_t* pwIn, int count, char* pOut )
 {
     wchar_t* pw = pwIn;
     char* q = pOut;
@@ -943,6 +951,6 @@ size_t UTF16LEToUTF8( wchar_t* pwIn, int count, char* pOut )
         }
         ++pw;
     }
-    return q-pOut;
+    return (int)(q-pOut);
 }
 

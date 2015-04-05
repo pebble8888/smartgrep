@@ -82,7 +82,7 @@ bool is_ext( char* file_name, const char* ext_name );
 bool findword_in_line( char* valid_str, int wordtype, char* target_word );
 bool is_alnum_or_underscore( int val );
 void print_version( void );
-size_t UTF16LEToUTF8( wchar_t* pIn, int count, char* pOut );
+int UTF16LEToUTF8( wchar_t* pIn, int count, char* pOut );
 
 void smartgrep_getcwd( char* buf, size_t size );
 void smartgrep_getrepo( char* buf, size_t size );
