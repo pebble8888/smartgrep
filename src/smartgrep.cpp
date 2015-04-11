@@ -202,7 +202,7 @@ void usage( void )
         "  --nojs : exclude .js file\n"
         "  --ignore-dir NAME : exclude NAME folder\n"
 		"  support file extensions : .cpp/.c/.mm/.m/.h/.js/.coffee/.rb/.py/.pl/.sh/\n"
-        "                            .java/.scala/.go/.cs/.vb/.bas/.frm/.cls/\n"
+        "                            .java/.scala/.go/.cs/.vb/.bas/.frm/.cls/.pc\n"
         "                            .plist/.pbxproj/.strings/.storyboard/.swift/.vim/\n"
         "                            .css/.scss\n"
         "  asis support file extensions : .erb/.html\n"
@@ -342,6 +342,7 @@ bool is_source_file( FILE_TYPE_INFO* p_info, char* file_name ){
         is_ext( file_name, "swift" ) ||
         is_ext( file_name, "css" ) ||
         is_ext( file_name, "scss" ) ||
+		is_ext( file_name, "pc" ) ||
         is_shell_file( file_name ) ||
         is_ruby_file( file_name ) ||
         is_asis_file( file_name ) ||

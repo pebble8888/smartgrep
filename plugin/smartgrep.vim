@@ -54,6 +54,10 @@
 "   Ver3.8.2.0 2015-04-01 add jvgrep wrapper.
 "   Ver3.8.3.0 2015-04-01 support utf16le with bom
 "   Ver3.8.4.0 2015-04-05 remove g:smartgrep_basedir
+"   Ver3.8.5.0 2015-04-11 add Pro*C
+"
+" License
+"   The MIT License
 "
 " Support OS
 "	Windows/Unix/MacOSX
@@ -62,6 +66,7 @@
 "	C++ 		: .c .cpp .cxx .tli .inc .rc 		/* */, //, #if 0 
 "   C++ heder	: .h .hpp .hxx .tlh .inl			/* */, //, #if 0
 "	Objective-C : .m .mm							/* */, //, #if 0
+"   Pro*C       : .pc                               /* */, //, #if 0
 "	Swift       : .swift                            /* */, //
 "   Xcode       : .plist .strings .pbxproj .storyboard 
 "                                                   /* */, //
