@@ -100,8 +100,10 @@ int main(int argc, char* argv[])
 	char path[512];
 	memset( path, 0, sizeof(path) );
     if( use_repo ){
+        // use repo folder
         smartgrep_getrepo( path, sizeof(path) );
     } else {
+        // user current folder 
         smartgrep_getcwd( path, sizeof(path) );
     }
 	char* word = argv[argc-1];
@@ -122,6 +124,11 @@ void smartgrep_getcwd( char* buf, size_t size )
 #endif
 }
 
+/**
+ * @brief
+ * @param char* buf
+ * @param size_t size
+ */
 void smartgrep_getrepo( char* buf, size_t size )
 {
     char curpath[512];
@@ -134,6 +141,8 @@ void smartgrep_getrepo( char* buf, size_t size )
 	strcpy( buf, curpath );
 	while( idx > 3 ){
 		for( int i = 0; i < 2; ++i ){
+            // 0:.git
+            // 1:.hg
 			strcpy( path, curpath );
 			path[idx] = '\0';
 			if( i == 0 ) strcat( path, "\\.git" );
@@ -163,6 +172,8 @@ void smartgrep_getrepo( char* buf, size_t size )
 #else
     while( true ){
         for( int i = 0; i < 2; ++i ){
+            // 0:.git
+            // 1:.hg
             strcpy( path, curpath );
             path[idx] = '\0'; 
             if( i == 0 ) strcat( path, "/.git" );
@@ -208,7 +219,6 @@ void usage( void )
         "  asis support file extensions : .erb/.html\n"
         "  Version 3.8.3.0\n"
 	);
-	print_version();
 }
 
 #ifdef WIN32
@@ -911,30 +921,6 @@ void test_is_alnum_or_underscore( void )
 bool is_alnum_or_underscore( int val )
 {
 	return isalnum( val ) ? true : val == '_';	
-}
-
-void print_version( void )
-{
-#ifdef WIN32
-	char szFullPath[MAX_PATH];
-	GetModuleFileName( NULL, szFullPath, sizeof(szFullPath) );
-	DWORD dwZero = 0;
-	DWORD dwVerInfoSize = GetFileVersionInfoSize( szFullPath, &dwZero );
-	if( dwVerInfoSize != 0 ){
-		UCHAR* pVffInfo;
-		pVffInfo = new UCHAR[dwVerInfoSize];
-		if( pVffInfo == NULL )
-			return;
-		GetFileVersionInfo( szFullPath, dwZero, dwVerInfoSize, pVffInfo );
-
-		void* pvVersion;
-		UINT VersionLen;
-		VerQueryValue( pVffInfo, TEXT("\\StringFileInfo\\041104b0\\ProductVersion"), &pvVersion, &VersionLen );
-
-		printf( "Version %s\n", pvVersion );
-		delete [] pVffInfo;
-	}
-#endif
 }
 
 /**
