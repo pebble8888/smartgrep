@@ -83,6 +83,3 @@ Windows : build 'smartgrep.exe' from source file in smartgrep/src with MinGW or 
 MacOSX/Linux : build 'smartgrep' from source file in smartgrep/src with g++ to type 'make + [enter]'.  
 So copy smartgrep binary to pathed directory.  
 
-SCREEN SHOT
-=======
-![screen shot](https://raw.github.com/pebble8888/smartgrep/master/smartgrep_screenshot.png)

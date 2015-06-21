@@ -106,6 +106,18 @@ function! RJvgrep(word)
   call RSmartHilight(a:word)
 endfunction
 
+function! RFind(word)
+  let s:basedir = system('git rev-parse --show-toplevel')
+  let s:cmd = 'lcd ' . s:basedir
+  execute s:cmd
+  set grepprg=find\ .\ -type\ f\ -name
+  set grepformat=%f
+  silent! execute "lgrep *" . a:word . "*"
+  silent! lopen
+  set grepprg&
+  set grepformat&
+endfunction
+
 if !exists('g:smartgrep_no_default_key_mappings')
   " <Leader>g  : recursive word grep for supported files exclude comment by mouse cursored word 
   " <Leader>h  : recursive word grep for h file exclude comment by mouse cursored word
@@ -128,6 +140,7 @@ if !exists('g:smartgrep_no_default_key_mappings')
   " :Rc -> recursive case insensitive grep for supported files include comment
   " :Rs -> ag
   " :Rl -> jvgrep
+  " :Rf -> grep filename using find command
   command! -nargs=1 -complete=file R call RSmartGrepEWG("<args>")
   command! -nargs=1 -complete=file Rg call RSmartGrepEG("<args>")
   command! -nargs=1 -complete=file Rh call RSmartGrepHWG("<args>")
@@ -135,4 +148,5 @@ if !exists('g:smartgrep_no_default_key_mappings')
   command! -nargs=1 -complete=file Rc call RSmartGrepCG("<args>")
   command! -nargs=1 -complete=file Rs call RSilverSearcherGrep("<args>")
   command! -nargs=1 -complete=file Rl call RJvgrep("<args>")
+  command! -nargs=1 -complete=file Rf call RFind("<args>")
 endif
