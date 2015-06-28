@@ -43,6 +43,7 @@ Support File Extention                            Support Comment Type
     scss        : .scss                             /* */, //
     css         : .css                              /* */
     Ruby        : .rb                               #, =begin, =end
+    Crystal     : .cr                               #
     Perl        : .pl                               #, =pod, =cut
  	Python		: .py								#, three double(single) quotation
     Coffee      : .coffee                           #, ###
@@ -142,6 +143,7 @@ CHANGELOG
     Ver3.8.4 2015-04-05 remove g:smartgrep_basedir
     Ver3.8.5 2015-04-11 add Pro*C
     Ver3.8.6 2015-04-30 fix bug 
+    Ver3.8.7 2015-06-28 add Crystal(.cr), refactering
 
 ==============================================================================
 

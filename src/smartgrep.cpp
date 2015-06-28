@@ -212,12 +212,12 @@ void usage( void )
         "  -g : use auto detect git or mercurial repository with the current directory\n"
         "  --nojs : exclude .js file\n"
         "  --ignore-dir NAME : exclude NAME folder\n"
-		"  support file extensions : .cpp/.c/.mm/.m/.h/.js/.coffee/.rb/.py/.pl/.sh/\n"
+		"  support file extensions : .cpp/.c/.mm/.m/.h/.js/.coffee/.rb/.py/.pl/.sh/.cr\n"
         "                            .java/.scala/.go/.cs/.vb/.bas/.frm/.cls/.pc\n"
         "                            .plist/.pbxproj/.strings/.storyboard/.swift/.vim/\n"
         "                            .css/.scss\n"
         "  asis support file extensions : .erb/.html\n"
-        "  Version 3.8.3.0\n"
+        "  Version 3.8.7.0\n"
 	);
 }
 
@@ -355,6 +355,7 @@ bool is_source_file( FILE_TYPE_INFO* p_info, char* file_name ){
 		is_ext( file_name, "pc" ) ||
         is_shell_file( file_name ) ||
         is_ruby_file( file_name ) ||
+        is_crystal_file( file_name ) ||
         is_asis_file( file_name ) ||
         is_coffee_file( file_name ) ||
 	    is_python_file( file_name ) ||
@@ -369,6 +370,7 @@ bool is_source_file( FILE_TYPE_INFO* p_info, char* file_name ){
 
 bool is_shell_file( char* file_name ){ return is_ext( file_name, "sh" ); }
 bool is_ruby_file( char* file_name ){ return is_ext( file_name, "rb" ); }
+bool is_crystal_file( char* file_name ){ return is_ext( file_name, "cr" ); }
 bool is_asis_file( char* file_name ){
    	return is_ext( file_name, "erb" ) ||
 		   is_ext( file_name, "html" ); 
@@ -438,7 +440,8 @@ void parse_file( char* file_name, int wordtype, char* target_word )
 {
 	// file extension
 	int file_extension;
-    if( is_shell_file( file_name ) ){
+    if( is_shell_file( file_name ) ||
+        is_crystal_file( file_name ) ){
         file_extension = kShell;
     } else if( is_ruby_file( file_name ) ){
 		file_extension = kRuby; 
