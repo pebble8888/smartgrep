@@ -462,6 +462,7 @@ void parse_file( char* file_name, int wordtype, char* target_word )
 	if( fp == NULL )
 		return;
 
+#ifndef NOFEAT_UTF16
     bool is_utf16 = false;
     // check BOM for UTF16
     if( is_cs_file( file_name ) ||
@@ -478,63 +479,56 @@ void parse_file( char* file_name, int wordtype, char* target_word )
             }
             break;
         }
-        if( !is_utf16 ){
-            // back to begin
-            fseek( fp, 0, SEEK_SET );
-        }
+        // back to begin
+        fseek( fp, 0, SEEK_SET );
     }
+#endif
 
 	bool isin_multiline_comment = false;
 	PREP prep;
 
 	// it is presumed that the one line byte size in file don't exceed 64k
     char* p_data = new char[DATASIZE];
-    const char* p_data_end = p_data + DATASIZE;
-
-    char* q_data;
-    if( is_utf16 ){
+#ifndef NOFEAT_UTF16
+    char* q_data = NULL;
+    if( is_cs_file( file_name ) ||
+        is_xcode_resource_file( file_name ) ){
         q_data = new char[DATASIZE_OUT];
-    } else {
-        q_data = NULL; 
     }
     int q_datasize = 0;
+#endif
 
 	int lineno;
-	for( lineno = 1; ;){
-        if( is_utf16 ){
-            memset( p_data, 0, DATASIZE );
-            memset( q_data, 0, DATASIZE_OUT );
-            wchar_t* t = (wchar_t*)p_data; 
-            while( t < (wchar_t*)p_data_end ){
-                char c1 = fgetc( fp );
-                char c2 = fgetc( fp );
-                if( feof( fp ) || ferror( fp ) ) {
-                    break;
-                }
-                *(t++) = (wchar_t)( c1 + (c2<<8) );
-                if( c1 == 0x0A && c2 == 0x00 ){
-                    break;
-                }
-            }
-            // number of wchar_t elements
-            size_t p_datasize = t - (wchar_t*)p_data;
-            if( p_datasize == 0 ) break;
+    char* r_data = NULL;
+    size_t r_datasize = 0;
+    
+    const int BOMSIZE = 2;
 
-            q_datasize = UTF16LEToUTF8( (wchar_t*)p_data, (int)p_datasize, q_data );
-        } else {
-            /* バグがあるのでfgetsを使わない方法に変える必要がある */
+	for( lineno = 1; ;){
+        if( r_datasize <= 0 ){
+            // In case UTF16LE read next byte to 0xfeff
             memset( p_data, 0, DATASIZE );
-            char* ptr = fgets( p_data, DATASIZE, fp );
-            if( ptr == NULL ) break;
-        }
-        char* r_data;
-        size_t r_datasize;
-        if( is_utf16 ){
-            r_data = q_data;
-            r_datasize = q_datasize;
-        } else {
-            r_data = p_data;
-            r_datasize = DATASIZE;
+            size_t sz = fread( p_data, 1, DATASIZE, fp );
+            if( sz <= 0 ) break;
+#ifndef NOFEAT_UTF16
+            if( is_utf16 ){
+                
+                // number of wchar_t elements
+                size_t p_datasize = (sz-BOMSIZE)/sizeof(int16_t);
+
+                if( p_datasize == 0 ) break;
+
+                memset( q_data, 0, DATASIZE_OUT );
+                q_datasize = UTF16LEToUTF8( (int16_t*)(p_data+BOMSIZE), (int)p_datasize, q_data );
+                
+                r_data = q_data;
+                r_datasize = q_datasize;
+            } else
+#endif
+            {
+                r_data = p_data;
+                r_datasize = sz;
+            }
         }
 
 		bool found;
@@ -568,27 +562,53 @@ void parse_file( char* file_name, int wordtype, char* target_word )
 		if( found ){
 			printf( "%s:%d:", file_name, lineno );
             char* q = r_data;
-            for( ; *q != '\r' && *q != '\n' && q < r_data + r_datasize; ++q ){
+            for( ; q < r_data + r_datasize; ++q ){
+                if( *q == '\n' ){
+                    ++q;
+                    break;
+                } else if( *q == '\r' &&
+                           q+1 < r_data + r_datasize &&
+                          *(q+1) == '\n' ){
+                    q += 2;
+                    break;
+                }
 				printf( "%c", *q );
 			}
             if( q < r_data + r_datasize ){
                 found_linebreak = true;
                 printf( "\n" );
             }
+            const size_t advance = (size_t)(q-r_data);
+            r_data += advance;
+            r_datasize -= advance;
 		} else {
             char* q = r_data;
-            for( ; *q != '\r' && *q != '\n' && q < r_data + r_datasize; ++q ){
+            for( ; q < r_data + r_datasize; ++q ){
+                if( *q == '\n' ){
+                    ++q;
+                    break;
+                } else if( *q == '\r' &&
+                           q+1 < r_data + r_datasize &&
+                          *(q+1) == '\n' ){
+                    q += 2;
+                    break;
+                }
             }
             if( q < r_data + r_datasize ){
                 found_linebreak = true;
             }
+            const size_t advance = (size_t)(q-r_data);
+            r_data += advance;
+            r_datasize -= advance;
         }
         if( found_linebreak ){
             ++lineno;
         }
 	}
     delete [] p_data;
+#ifndef NOFEAT_UTF16
     delete [] q_data;
+#endif
 	fclose( fp );
 }
 
@@ -926,9 +946,9 @@ bool is_alnum_or_underscore( int val )
 /**
  * @return bytelength
  */
-int UTF16LEToUTF8( wchar_t* pwIn, int count, char* pOut )
+int UTF16LEToUTF8( int16_t* pwIn, int count, char* pOut )
 {
-    wchar_t* pw = pwIn;
+    int16_t* pw = pwIn;
     char* q = pOut;
     while( pw <  pwIn + count ){
         if( *pw <= 0x7f ){
