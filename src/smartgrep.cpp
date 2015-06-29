@@ -491,12 +491,12 @@ void parse_file( char* file_name, int wordtype, char* target_word )
 	PREP prep;
 
 	// it is presumed that the one line byte size in file don't exceed 64k
-    char* p_data = new char[DATASIZE];
+    char* p_data = new char[DATASIZE+1];
 #ifndef NOFEAT_UTF16
     char* q_data = NULL;
     if( is_cs_file( file_name ) ||
         is_xcode_resource_file( file_name ) ){
-        q_data = new char[DATASIZE_OUT];
+        q_data = new char[DATASIZE_OUT+1];
     }
     int q_datasize = 0;
 #endif
@@ -552,12 +552,12 @@ void parse_file( char* file_name, int wordtype, char* target_word )
             } else if( file_extension == kVim ){
                 found = process_line_exclude_comment_vim( r_data, r_datasize, wordtype, target_word );
             } else if( file_extension == kAsIs ){
-                found = process_line_include_comment( r_data, wordtype, target_word );
+                found = process_line_include_comment( r_data, r_datasize, wordtype, target_word );
 			} else {
 				assert( false );
 			}
 		} else if( wordtype & SG_WORDTYPE_INCLUDE_COMMENT ){
-			found = process_line_include_comment( r_data, wordtype, target_word );
+			found = process_line_include_comment( r_data, r_datasize, wordtype, target_word );
 		} else {
 			assert( false );
 		}
@@ -631,7 +631,7 @@ void parse_file( char* file_name, int wordtype, char* target_word )
 bool process_line_exclude_comment_c( bool* p_isin_multiline_comment, PREP* p_prep,
 									char* buf, size_t bufsize, int wordtype, char* target_word )
 {
-	char valid_str[DATASIZE_OUT];
+	char valid_str[DATASIZE_OUT+1];
 	memset( valid_str, 0, sizeof(valid_str) );
 
 	bool isin_literal = false; // "xxx", 'xxx'
@@ -709,14 +709,14 @@ bool process_line_exclude_comment_c( bool* p_isin_multiline_comment, PREP* p_pre
 		} else if( !isin_literal && !(*p_isin_multiline_comment) && p_prep->is_commented() ){
 			continue;
 		}
-		if( buf[i] == '\r' ) break;
-		if( buf[i] == '\n' || buf[i] == '\0' ) break;
+		if( buf[i] == '\r' || buf[i] == '\n' || buf[i] == '\0' ) break;
 		
 		// valid data
 		*ptr = buf[i];
 		++ptr;
 	}
 WHILEOUT:
+    *ptr = 0x0; // null terminate
 	return findword_in_line( valid_str, wordtype, target_word );
 }
 
@@ -728,8 +728,7 @@ bool process_line_exclude_comment_ruby( bool* p_isin_multiline_comment,
                                 int file_extension )
 {
 	char valid_str[DATASIZE_OUT];
-	memset( valid_str, 0, sizeof(valid_str) );
-
+	memset( valid_str, 0, sizeof(valid_str) ); 
 	bool isin_dq = false; // "xxx"
 	bool isin_sq = false; // 'xxx'
 	bool isin_var = false; // "#{}"
@@ -790,14 +789,15 @@ bool process_line_exclude_comment_ruby( bool* p_isin_multiline_comment,
                    && isin_dq && file_extension == kRuby && isin_var && buf[i] == '}' ){
 			isin_var = false;
 		}
-		if( buf[i] == '\r' ) break;
-		if( buf[i] == '\n' || buf[i] == '\0' ) break;
+		if( buf[i] == '\r' || buf[i] == '\n' || buf[i] == '\0' ) break;
 		
 		// valid data
 		*ptr = buf[i];
 		++ptr;
 	}
+
 WHILEOUT:
+    *ptr = 0x0; // null terminate
 	return findword_in_line( valid_str, wordtype, target_word );
 }
 
@@ -806,7 +806,7 @@ WHILEOUT:
  */
 bool process_line_exclude_comment_vb( char* buf, size_t bufsize, int wordtype, char* target_word )
 {
-	char valid_str[DATASIZE_OUT];
+	char valid_str[DATASIZE_OUT+1];
 	memset( valid_str, 0, sizeof(valid_str) );
 
 	bool isin_dq = false; // "xxx"
@@ -822,14 +822,14 @@ bool process_line_exclude_comment_vb( char* buf, size_t bufsize, int wordtype, c
 			// reverse isin_dq
 			isin_dq = !isin_dq;
 		}
-		if( buf[i] == '\r' ) break;
-		if( buf[i] == '\n' || buf[i] == '\0' ) break;
+		if( buf[i] == '\r' || buf[i] == '\n' || buf[i] == '\0' ) break;
 		
 		// valid data
 		*ptr = buf[i];
 		++ptr;
 	}
 WHILEOUT:
+    *ptr = 0x0; // null terminate
 	return findword_in_line( valid_str, wordtype, target_word );
 }
 
@@ -838,7 +838,7 @@ WHILEOUT:
  */
 bool process_line_exclude_comment_vim( char* buf, size_t bufsize, int wordtype, char* target_word )
 {
-	char valid_str[DATASIZE_OUT];
+	char valid_str[DATASIZE_OUT+1];
 	memset( valid_str, 0, sizeof(valid_str) );
 
 	bool found_anything_but_whitespace = false;
@@ -861,7 +861,8 @@ bool process_line_exclude_comment_vim( char* buf, size_t bufsize, int wordtype, 
 		++ptr;
 	}
 WHILEOUT:
-	return findword_in_line( valid_str, wordtype, target_word );
+    *ptr = 0x0; // null terminate
+    return findword_in_line( valid_str, wordtype, target_word );
 }
 
 /*
@@ -871,7 +872,8 @@ WHILEOUT:
  * @retval	true : found
  * @retval	false: not found
  *
- * @param	[in] char* 	valid_str
+ * @param	[in] char* 	valid_str       
+
  * @param	[in] int 	wordtype
  * @param	[in] char* 	target_word
  */
@@ -927,9 +929,21 @@ bool findword_in_line( char* valid_str, int wordtype, char* target_word )
  * @param [in] int worktype
  * @param [in] char* target_word
  */
-bool process_line_include_comment( char* buf, int wordtype, char* target_word )
+bool process_line_include_comment( char* buf, size_t bufsize, int wordtype, char* target_word )
 {
-	return findword_in_line( buf, wordtype, target_word );
+    char valid_str[DATASIZE_OUT+1];
+    memset( valid_str, 0, sizeof(valid_str) );
+
+    char* ptr = valid_str;
+    for( int i = 0; i < DATASIZE_OUT; ++i ){
+        if( buf[i] == '\0' || buf[i] == '\r' || buf[i]  =='\n' ){
+            break;
+        }
+        *ptr = buf[i];
+        ++ptr;
+    }
+    *ptr = 0x0; // null terminate
+	return findword_in_line( valid_str, wordtype, target_word );
 }
 
 void test_is_alnum_or_underscore( void )

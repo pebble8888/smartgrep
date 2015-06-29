@@ -7,11 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A24C3C471B3FFC9F0082B039 /* foldernamelist.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A24C3C411B3FFC9F0082B039 /* foldernamelist.cpp */; };
-		A24C3C481B3FFC9F0082B039 /* smartgrep.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A24C3C451B3FFC9F0082B039 /* smartgrep.cpp */; };
+		19F716631B40F2B90002C114 /* foldernamelist.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 19F7165C1B40F2B90002C114 /* foldernamelist.cpp */; };
+		19F716651B40F2B90002C114 /* smartgrep.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 19F716611B40F2B90002C114 /* smartgrep.cpp */; };
+		19F716661B40F3660002C114 /* foldernamelist.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 19F7165C1B40F2B90002C114 /* foldernamelist.cpp */; };
+		19F716671B40F3660002C114 /* smartgrep.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 19F716611B40F2B90002C114 /* smartgrep.cpp */; };
 		A24C3C751B3FFDB20082B039 /* smartgrep_xctest.mm in Sources */ = {isa = PBXBuildFile; fileRef = A24C3C741B3FFDB20082B039 /* smartgrep_xctest.mm */; };
-		A24C3C931B3FFEC90082B039 /* foldernamelist.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A24C3C411B3FFC9F0082B039 /* foldernamelist.cpp */; };
-		A24C3C941B3FFEC90082B039 /* smartgrep.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A24C3C451B3FFC9F0082B039 /* smartgrep.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -27,14 +27,13 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		19F7165C1B40F2B90002C114 /* foldernamelist.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = foldernamelist.cpp; path = ../../src/foldernamelist.cpp; sourceTree = "<group>"; };
+		19F7165D1B40F2B90002C114 /* foldernamelist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = foldernamelist.h; path = ../../src/foldernamelist.h; sourceTree = "<group>"; };
+		19F7165F1B40F2B90002C114 /* prep.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = prep.h; path = ../../src/prep.h; sourceTree = "<group>"; };
+		19F716601B40F2B90002C114 /* resource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = resource.h; path = ../../src/resource.h; sourceTree = "<group>"; };
+		19F716611B40F2B90002C114 /* smartgrep.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = smartgrep.cpp; path = ../../src/smartgrep.cpp; sourceTree = "<group>"; };
+		19F716621B40F2B90002C114 /* smartgrep.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = smartgrep.h; path = ../../src/smartgrep.h; sourceTree = "<group>"; };
 		A24C3C371B3FFC7D0082B039 /* smartgrep */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = smartgrep; sourceTree = BUILT_PRODUCTS_DIR; };
-		A24C3C411B3FFC9F0082B039 /* foldernamelist.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = foldernamelist.cpp; path = ../../../src/foldernamelist.cpp; sourceTree = "<group>"; };
-		A24C3C421B3FFC9F0082B039 /* foldernamelist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = foldernamelist.h; path = ../../../src/foldernamelist.h; sourceTree = "<group>"; };
-		A24C3C431B3FFC9F0082B039 /* prep.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = prep.h; path = ../../../src/prep.h; sourceTree = "<group>"; };
-		A24C3C441B3FFC9F0082B039 /* resource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = resource.h; path = ../../../src/resource.h; sourceTree = "<group>"; };
-		A24C3C451B3FFC9F0082B039 /* smartgrep.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = smartgrep.cpp; path = ../../../src/smartgrep.cpp; sourceTree = "<group>"; };
-		A24C3C461B3FFC9F0082B039 /* smartgrep.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = smartgrep.h; path = ../../../src/smartgrep.h; sourceTree = "<group>"; };
-		A24C3C491B3FFCCD0082B039 /* makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = makefile; path = ../../../src/makefile; sourceTree = "<group>"; };
 		A24C3C701B3FFDB20082B039 /* smartgrep_xctest.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = smartgrep_xctest.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A24C3C731B3FFDB20082B039 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A24C3C741B3FFDB20082B039 /* smartgrep_xctest.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = smartgrep_xctest.mm; sourceTree = "<group>"; };
@@ -58,10 +57,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		19F7165B1B40F2A40002C114 /* smartgrep */ = {
+			isa = PBXGroup;
+			children = (
+				19F7165C1B40F2B90002C114 /* foldernamelist.cpp */,
+				19F7165D1B40F2B90002C114 /* foldernamelist.h */,
+				19F7165F1B40F2B90002C114 /* prep.h */,
+				19F716601B40F2B90002C114 /* resource.h */,
+				19F716611B40F2B90002C114 /* smartgrep.cpp */,
+				19F716621B40F2B90002C114 /* smartgrep.h */,
+			);
+			name = smartgrep;
+			sourceTree = "<group>";
+		};
 		A24C3C2E1B3FFC7D0082B039 = {
 			isa = PBXGroup;
 			children = (
-				A24C3C391B3FFC7D0082B039 /* smartgrep */,
+				19F7165B1B40F2A40002C114 /* smartgrep */,
 				A24C3C711B3FFDB20082B039 /* smartgrep_xctest */,
 				A24C3C381B3FFC7D0082B039 /* Products */,
 			);
@@ -74,20 +86,6 @@
 				A24C3C701B3FFDB20082B039 /* smartgrep_xctest.xctest */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		A24C3C391B3FFC7D0082B039 /* smartgrep */ = {
-			isa = PBXGroup;
-			children = (
-				A24C3C491B3FFCCD0082B039 /* makefile */,
-				A24C3C411B3FFC9F0082B039 /* foldernamelist.cpp */,
-				A24C3C421B3FFC9F0082B039 /* foldernamelist.h */,
-				A24C3C431B3FFC9F0082B039 /* prep.h */,
-				A24C3C441B3FFC9F0082B039 /* resource.h */,
-				A24C3C451B3FFC9F0082B039 /* smartgrep.cpp */,
-				A24C3C461B3FFC9F0082B039 /* smartgrep.h */,
-			);
-			path = smartgrep;
 			sourceTree = "<group>";
 		};
 		A24C3C711B3FFDB20082B039 /* smartgrep_xctest */ = {
@@ -194,8 +192,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A24C3C471B3FFC9F0082B039 /* foldernamelist.cpp in Sources */,
-				A24C3C481B3FFC9F0082B039 /* smartgrep.cpp in Sources */,
+				19F716651B40F2B90002C114 /* smartgrep.cpp in Sources */,
+				19F716631B40F2B90002C114 /* foldernamelist.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -203,8 +201,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A24C3C931B3FFEC90082B039 /* foldernamelist.cpp in Sources */,
-				A24C3C941B3FFEC90082B039 /* smartgrep.cpp in Sources */,
+				19F716661B40F3660002C114 /* foldernamelist.cpp in Sources */,
+				19F716671B40F3660002C114 /* smartgrep.cpp in Sources */,
 				A24C3C751B3FFDB20082B039 /* smartgrep_xctest.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -355,6 +353,7 @@
 				A24C3C401B3FFC7D0082B039 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		A24C3C761B3FFDB20082B039 /* Build configuration list for PBXNativeTarget "smartgrep_xctest" */ = {
 			isa = XCConfigurationList;
@@ -363,6 +362,7 @@
 				A24C3C781B3FFDB20082B039 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

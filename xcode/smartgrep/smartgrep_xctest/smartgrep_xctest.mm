@@ -24,7 +24,7 @@
     [super tearDown];
 }
 
-/*
+#if 0
 - (void)testC {
     char filename[] = "/develop/smartgrep/src/testfile/testsource.c";
     char target_word[] = "c_gamma1";
@@ -33,8 +33,19 @@
     wordtype |= SG_WORDTYPE_EXCLUDE_COMMENT;
     parse_file( filename, wordtype, target_word);
 }
- */
+#endif
 
+- (void)testCInclude {
+    char filename[] = "/develop/smartgrep/src/testfile/testsource.c";
+    char target_word[] = "c_gamma1";
+    int wordtype = 0;
+    wordtype |= SG_WORDTYPE_NORMAL;
+    wordtype |= SG_WORDTYPE_INCLUDE_COMMENT;
+    parse_file( filename, wordtype, target_word);
+}
+
+
+#if 0
 - (void)testCSharp {
     char filename[] = "/develop/smartgrep/src/testfile/test.cs";
     char target_word[] = "csharp_3";
@@ -43,5 +54,6 @@
     wordtype |= SG_WORDTYPE_EXCLUDE_COMMENT;
     parse_file( filename, wordtype, target_word);
 }
+#endif
 
 @end
