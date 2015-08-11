@@ -128,8 +128,8 @@ if !exists('g:smartgrep_no_default_key_mappings')
   noremap <Leader>g :call RSmartGrepEWG("<C-R><C-W>")<CR>
   noremap <Leader>h :call RSmartGrepHWG("<C-R><C-W>")<CR>
   noremap <Leader>i :call RSmartGrepIG("<C-R><C-W>")<CR>
-  noremap <Leader>s :call RSilverSearcherGrep("<C-R><C-W>")<CR>
-  noremap <Leader>l :call RJvgrep("<C-R><C-W>")<CR>
+  "noremap <Leader>s :call RSilverSearcherGrep("<C-R><C-W>")<CR>
+  "noremap <Leader>l :call RJvgrep("<C-R><C-W>")<CR>
 endif
 
 if !exists('g:smartgrep_no_default_key_mappings')
