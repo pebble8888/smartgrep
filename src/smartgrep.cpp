@@ -882,7 +882,11 @@ bool findword_in_line( char* valid_str, int wordtype, char* target_word )
 	if( wordtype & SG_WORDTYPE_NORMAL ){
 		// normal search
         if( wordtype & SG_WORDTYPE_CASEINSENSITIVE ){
+#ifdef WIN32
+            return strstr( valid_str, target_word ) != NULL;
+#else
             return strcasestr( valid_str, target_word ) != NULL;
+#endif
         } else {
             return strstr( valid_str, target_word ) != NULL;
         }
