@@ -1,12 +1,12 @@
 #
 # makefile for Unix / Linux / MacOS / Windows with MinGW
-# Copyright (C) 2011-2013 pebble8888@gmail.com
+# Copyright (C) 2011-2015 pebble8888@gmail.com
 #
-CC=g++
+#CXX=g++
 TARGET=smartgrep
 LIBS=
-#CFLAGS=-g
-CFLAGS=-std=c++11
+#CXXFLAGS=-g
+CXXFLAGS=-std=c++11
 
 ifeq ($(OS),Windows_NT) 
 LIBS+=-lversion -lstdc++
@@ -18,14 +18,14 @@ all:$(TARGET)
 OBJS=smartgrep.o foldernamelist.o
 
 $(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) -o $@ $? $(LIBS)
+	$(CXX) $(CXXFLAGS) -o $@ $? $(LIBS)
 	rm -f $(OBJS)
 	
 .c.o:
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 .cpp.o:
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 clean:
 	rm -f $(OBJS) $(TARGET)
