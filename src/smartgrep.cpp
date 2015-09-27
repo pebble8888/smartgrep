@@ -27,15 +27,47 @@
 
 #include <string.h>
 #include <assert.h>
+#include <queue>
+#include <mutex>
+#include <vector>
+#include <thread>
+
+using namespace std;
 
 const static int DATASIZE = 64 * 1024; // process unit size
 const static int DATASIZE_OUT = DATASIZE*3/sizeof(wchar_t);
 const static char kTab = 0x9;
 const static char kSpace = 0x20;
 
+static queue<string> m_queue;       // use m_queue_mtx for access
+static bool  m_done_adding_files;   // use m_queue_mtx for access
+static mutex m_queue_mtx;
+static condition_variable m_files_ready_cond;
+static mutex m_print_mtx;
+
 void test( void )
 {
 	test_is_alnum_or_underscore();
+}
+
+static void search_worker(const int wordtype, const string word)
+{
+    while (true) {
+        string s;
+        {
+            unique_lock<mutex> lk(m_queue_mtx);
+            while (m_queue.empty()){
+                if (m_done_adding_files) {
+                    lk.unlock();
+                    return; // exit thread
+                }
+                m_files_ready_cond.wait(lk);
+            }
+            s = m_queue.front();
+            m_queue.pop();
+        }
+        parse_file(s.c_str(), wordtype, word.c_str());
+    }
 }
 
 int main(int argc, char* argv[])
@@ -107,11 +139,46 @@ int main(int argc, char* argv[])
         smartgrep_getcwd( path, sizeof(path) );
     }
 	char* word = argv[argc-1];
+    
+    // make worker
+    int num_cores;
+#ifdef _WIN32
+    {           
+        SYSTEM_INFO si;
+        GetSystemInfo(&si);
+        num_cores = si.dwNumberOfProcessors;
+    }   
+#else
+    num_cores = (int)sysconf(_SC_NPROCESSORS_ONLN);
+#endif
+    int workers_len = num_cores-1;
+    if( workers_len < 1 ){
+        workers_len = 1;
+    }
+   
+    m_done_adding_files = false;
+    vector< shared_ptr<thread> > v_thread;
+    for (int i = 0; i < workers_len; ++i) {
+        shared_ptr<thread> th(new thread(search_worker, wordtype, string(word)));
+        v_thread.push_back(th);
+    }
+    
 #ifdef WIN32
 	parse_directory_win( path, &info, wordtype, word );
 #else
 	parse_directory_mac( path, &info, wordtype, word );
 #endif
+    
+    {
+        lock_guard<mutex> lk(m_queue_mtx);
+        m_done_adding_files = true;
+        m_files_ready_cond.notify_all();
+    }
+    
+    for (int i = 0; i < workers_len; ++i) {
+        v_thread[i]->join();
+    }
+
 	return 0;
 }
 
@@ -217,7 +284,7 @@ void usage( void )
         "                            .plist/.pbxproj/.strings/.storyboard/.swift/.vim/\n"
         "                            .css/.scss\n"
         "  asis support file extensions : .erb/.html\n"
-        "  Version 3.8.7.0\n"
+        "  Version 3.9.0\n"
 	);
 }
 
@@ -229,7 +296,7 @@ void usage( void )
  * @param int   wordtype	
  * @param char* target_word
  */
-void parse_directory_win( char* path, FILE_TYPE_INFO* p_info, int wordtype, char* target_word )
+void parse_directory_win( char* path, FILE_TYPE_INFO* p_info, int wordtype, const char* target_word )
 {
 	char path_name[512];
 	strcpy( path_name, path );
@@ -267,7 +334,11 @@ void parse_directory_win( char* path, FILE_TYPE_INFO* p_info, int wordtype, char
 			strcpy( file_name_r, path );
 			strcat( file_name_r, "\\" );
 			strcat( file_name_r, find_data.cFileName );
-			parse_file( file_name_r, wordtype, target_word ); 
+            {
+                lock_guard<mutex> lk(m_queue_mtx);
+                m_queue.push(string(file_name_r));
+                m_files_ready_cond.notify_one();
+            }
 		}
 		BOOL ret = FindNextFile( h_find, &find_data );
 		if( !ret ){
@@ -288,7 +359,7 @@ void parse_directory_win( char* path, FILE_TYPE_INFO* p_info, int wordtype, char
  * @param int   wordtype
  * @param char* target_word
  */
-void parse_directory_mac( char* path, FILE_TYPE_INFO* p_info, int wordtype, char* target_word )
+void parse_directory_mac( char* path, FILE_TYPE_INFO* p_info, int wordtype, const char* target_word )
 {
 	char path_name[512];
 	strcpy( path_name, path );
@@ -324,18 +395,22 @@ void parse_directory_mac( char* path, FILE_TYPE_INFO* p_info, int wordtype, char
 			strcpy( file_name_r, path );
 			strcat( file_name_r, "/" );
 			strcat( file_name_r, p_dirent->d_name );
-			parse_file( file_name_r, wordtype, target_word ); 
+            {
+                lock_guard<mutex> lk(m_queue_mtx);
+                m_queue.push(string(file_name_r));
+                m_files_ready_cond.notify_one();
+            }
 		}
 	}
 	closedir( p_dir );	
 }
 #endif
 
-bool is_cs_file( char* file_name ){
+bool is_cs_file( const char* file_name ){
     return is_ext( file_name, "cs" );
 }
 
-bool is_source_file( FILE_TYPE_INFO* p_info, char* file_name ){
+bool is_source_file( FILE_TYPE_INFO* p_info, const char* file_name ){
 	if( is_ext( file_name, "c" ) ||
 		is_ext( file_name, "cpp" ) || 
 		is_ext( file_name, "cxx" ) ||
@@ -368,18 +443,18 @@ bool is_source_file( FILE_TYPE_INFO* p_info, char* file_name ){
 	return false;
 }
 
-bool is_shell_file( char* file_name ){ return is_ext( file_name, "sh" ); }
-bool is_ruby_file( char* file_name ){ return is_ext( file_name, "rb" ); }
-bool is_crystal_file( char* file_name ){ return is_ext( file_name, "cr" ); }
-bool is_asis_file( char* file_name ){
+bool is_shell_file( const char* file_name ){ return is_ext( file_name, "sh" ); }
+bool is_ruby_file( const char* file_name ){ return is_ext( file_name, "rb" ); }
+bool is_crystal_file( const char* file_name ){ return is_ext( file_name, "cr" ); }
+bool is_asis_file( const char* file_name ){
    	return is_ext( file_name, "erb" ) ||
 		   is_ext( file_name, "html" ); 
 }
-bool is_coffee_file( char* file_name ){ return is_ext( file_name, "coffee" ); }
-bool is_python_file( char* file_name ){ return is_ext( file_name, "py" ); }
-bool is_perl_file( char* file_name ){ return is_ext( file_name, "pl" ); }
-bool is_vim_file( char* file_name ){ return is_ext( file_name, "vim" ); }
-bool is_vb_file( char* file_name ){
+bool is_coffee_file( const char* file_name ){ return is_ext( file_name, "coffee" ); }
+bool is_python_file( const char* file_name ){ return is_ext( file_name, "py" ); }
+bool is_perl_file( const char* file_name ){ return is_ext( file_name, "pl" ); }
+bool is_vim_file( const char* file_name ){ return is_ext( file_name, "vim" ); }
+bool is_vb_file( const char* file_name ){
     if( is_ext( file_name, "vb" ) ||
         is_ext( file_name, "frm" ) ||
         is_ext( file_name, "bas" ) ||
@@ -389,7 +464,7 @@ bool is_vb_file( char* file_name ){
         return false;
     }
 }
-bool is_xcode_resource_file( char* file_name ){
+bool is_xcode_resource_file( const char* file_name ){
     if( is_ext( file_name, "pbxproj" ) ||
         is_ext( file_name, "strings" ) ||
         is_ext( file_name, "plist" ) ||
@@ -399,7 +474,7 @@ bool is_xcode_resource_file( char* file_name ){
     return false;
 }
 
-bool is_header_file( char* file_name ){
+bool is_header_file( const char* file_name ){
 	if( is_ext( file_name, "h" ) ||
 		is_ext( file_name, "hpp" ) ||
 		is_ext( file_name, "hxx" ) ||
@@ -414,7 +489,7 @@ bool is_header_file( char* file_name ){
 /*
  * @param char: ext_name "c", "cpp", "h", etc
  */
-bool is_ext( char* file_name, const char* ext_name ){
+bool is_ext( const char* file_name, const char* ext_name ){
 	char* period = strrchr( file_name, '.' );
 	if( period == NULL ){
 		return false;
@@ -436,7 +511,7 @@ bool is_ext( char* file_name, const char* ext_name ){
  * @param [in] int wordtype
  * @param [in] char* target_word
  */
-void parse_file( char* file_name, int wordtype, char* target_word )
+void parse_file( const char* file_name, int wordtype, const char* target_word )
 {
 	// file extension
 	int file_extension;
@@ -563,23 +638,26 @@ void parse_file( char* file_name, int wordtype, char* target_word )
 		}
         bool found_linebreak = false;
 		if( found ){
-			printf( "%s:%d:", file_name, lineno );
             char* q = r_data;
-            for( ; q < r_data + r_datasize; ++q ){
-                if( *q == '\n' ){
-                    ++q;
-                    break;
-                } else if( *q == '\r' &&
-                           q+1 < r_data + r_datasize &&
-                          *(q+1) == '\n' ){
-                    q += 2;
-                    break;
+            {
+                lock_guard<mutex> lk(m_print_mtx);
+    			printf( "%s:%d:", file_name, lineno );
+                for( ; q < r_data + r_datasize; ++q ){
+                    if( *q == '\n' ){
+                        ++q;
+                        break;
+                    } else if( *q == '\r' &&
+                               q+1 < r_data + r_datasize &&
+                              *(q+1) == '\n' ){
+                        q += 2;
+                        break;
+                    }
+    				printf( "%c", *q );
+    			}
+                if( q < r_data + r_datasize ){
+                    found_linebreak = true;
+                    printf( "\n" );
                 }
-				printf( "%c", *q );
-			}
-            if( q < r_data + r_datasize ){
-                found_linebreak = true;
-                printf( "\n" );
             }
             const size_t advance = (size_t)(q-r_data);
             r_data += advance;
@@ -629,7 +707,7 @@ void parse_file( char* file_name, int wordtype, char* target_word )
  * @param	[in]		char* 	target_word
  */
 bool process_line_exclude_comment_c( bool* p_isin_multiline_comment, PREP* p_prep,
-									char* buf, size_t bufsize, int wordtype, char* target_word )
+									char* buf, size_t bufsize, int wordtype, const char* target_word )
 {
 	char valid_str[DATASIZE_OUT+1];
 	memset( valid_str, 0, sizeof(valid_str) );
@@ -724,7 +802,7 @@ WHILEOUT:
  * dynamic languages
  */
 bool process_line_exclude_comment_ruby( bool* p_isin_multiline_comment,
-                                char* buf, size_t bufsize, int wordtype, char* target_word,
+                                char* buf, size_t bufsize, int wordtype, const char* target_word,
                                 int file_extension )
 {
 	char valid_str[DATASIZE_OUT];
@@ -804,7 +882,7 @@ WHILEOUT:
 /**
  * visual basic 6 and visual basic dot net
  */
-bool process_line_exclude_comment_vb( char* buf, size_t bufsize, int wordtype, char* target_word )
+bool process_line_exclude_comment_vb( char* buf, size_t bufsize, int wordtype, const char* target_word )
 {
 	char valid_str[DATASIZE_OUT+1];
 	memset( valid_str, 0, sizeof(valid_str) );
@@ -836,7 +914,7 @@ WHILEOUT:
 /**
  * vim script
  */
-bool process_line_exclude_comment_vim( char* buf, size_t bufsize, int wordtype, char* target_word )
+bool process_line_exclude_comment_vim( char* buf, size_t bufsize, int wordtype, const char* target_word )
 {
 	char valid_str[DATASIZE_OUT+1];
 	memset( valid_str, 0, sizeof(valid_str) );
@@ -877,7 +955,7 @@ WHILEOUT:
  * @param	[in] int 	wordtype
  * @param	[in] char* 	target_word
  */
-bool findword_in_line( char* valid_str, int wordtype, char* target_word )
+bool findword_in_line( char* valid_str, int wordtype, const char* target_word )
 {
 	if( wordtype & SG_WORDTYPE_NORMAL ){
 		// normal search
@@ -933,7 +1011,7 @@ bool findword_in_line( char* valid_str, int wordtype, char* target_word )
  * @param [in] int worktype
  * @param [in] char* target_word
  */
-bool process_line_include_comment( char* buf, size_t bufsize, int wordtype, char* target_word )
+bool process_line_include_comment( char* buf, size_t bufsize, int wordtype, const char* target_word )
 {
     char valid_str[DATASIZE_OUT+1];
     memset( valid_str, 0, sizeof(valid_str) );
