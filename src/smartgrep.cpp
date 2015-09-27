@@ -285,7 +285,7 @@ void usage( void )
         "  -g : use auto detect git or mercurial repository with the current directory\n"
         "  --nojs : exclude .js file\n"
         "  --ignore-dir NAME : exclude NAME folder\n"
-        "  --no-worker : not use worker for sequencial output\n" 
+        "  --noworker : not use worker for sequencial output\n" 
         "\n"
 		"  support file extensions : .cpp/.c/.mm/.m/.h/.js/.coffee/.rb/.py/.pl/.sh/.cr\n"
         "                            .java/.scala/.go/.cs/.vb/.bas/.frm/.cls/.pc\n"
