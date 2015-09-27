@@ -155,7 +155,7 @@ int main(int argc, char* argv[])
     num_cores = (int)sysconf(_SC_NPROCESSORS_ONLN);
 #endif
     int workers_len = num_cores-1;
-    if( workers_len < 1 || use_worker ){
+    if( workers_len < 1 || !use_worker ){
         workers_len = 1;
     }
    
