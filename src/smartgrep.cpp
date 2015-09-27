@@ -82,6 +82,7 @@ int main(int argc, char* argv[])
 	}
 
     bool use_repo = false;
+    bool use_worker = true;
 	int wordtype = 0;
     FILE_TYPE_INFO info;
     info.filetype = 0;
@@ -127,6 +128,8 @@ int main(int argc, char* argv[])
         } else if( strcmp( argv[i], "--ignore-dir" ) == 0 ){
             info.foldernamelist.add_foldername( argv[i+1] );
             ++i;
+        } else if( strcmp( argv[i], "--noworker" ) == 0 ){
+            use_worker = false;
         }
     }
 	char path[512];
@@ -152,7 +155,7 @@ int main(int argc, char* argv[])
     num_cores = (int)sysconf(_SC_NPROCESSORS_ONLN);
 #endif
     int workers_len = num_cores-1;
-    if( workers_len < 1 ){
+    if( workers_len < 1 || use_worker ){
         workers_len = 1;
     }
    
@@ -271,19 +274,25 @@ void smartgrep_getrepo( char* buf, size_t size )
 void usage( void )
 {
 	printf( 
-		"Usage: smartgrep {-e[w]|-i[w]|-h[w]|-c} [-g] [--nojs] [--ignore-dir NAME] word_you_grep\n"
+		"Usage: smartgrep {-e[w]|-i[w]|-h[w]|-c} [options] word_you_grep\n"
+        "\n"
 		"  -e[w] : recursive [word] grep for supported file extensions excluding comment\n"
 		"  -i[w] : recursive [word] grep for supported file extensions including comment\n"
 		"  -h[w] : recursive [word] grep for .h excluding comment\n"
         "  -c : recursive case insensitive grep for supported file extesion including comment\n"
+        "\n"
+        " [options]\n"
         "  -g : use auto detect git or mercurial repository with the current directory\n"
         "  --nojs : exclude .js file\n"
         "  --ignore-dir NAME : exclude NAME folder\n"
+        "  --no-worker : not use worker for sequencial output\n" 
+        "\n"
 		"  support file extensions : .cpp/.c/.mm/.m/.h/.js/.coffee/.rb/.py/.pl/.sh/.cr\n"
         "                            .java/.scala/.go/.cs/.vb/.bas/.frm/.cls/.pc\n"
         "                            .plist/.pbxproj/.strings/.storyboard/.swift/.vim/\n"
         "                            .css/.scss\n"
         "  asis support file extensions : .erb/.html\n"
+        "\n"
         "  Version 3.9.0\n"
 	);
 }
