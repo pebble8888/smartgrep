@@ -739,7 +739,7 @@ bool process_line_exclude_comment_c( bool* p_isin_multiline_comment, PREP* p_pre
 			continue;
 		} else if( !isin_literal && *p_isin_multiline_comment && !(p_prep->is_commented()) ){
 			// in c comment
-			while( true ){
+			while( i < DATASIZE_OUT ){
 				if( buf[i] == '\n' ) goto WHILEOUT;
 				if( buf[i] == '*' && buf[i+1] == '/' ){
 					break;
@@ -842,7 +842,7 @@ bool process_line_exclude_comment_ruby( bool* p_isin_multiline_comment,
             continue;
         } else if( !isin_dq && !isin_sq && *p_isin_multiline_comment ){
             // in multi-line comment
-            while( true ){
+            while( i < DATASIZE_OUT ){
                 if( buf[i] == '\n' ) goto WHILEOUT;
                 if( file_extension == kRuby && i == 0 && memcmp(&buf[i], "=end", 4) == 0 ){
                     i += 4; break;
