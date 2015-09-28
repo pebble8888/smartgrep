@@ -1,4 +1,3 @@
-[![Build Status](https://travis-ci.org/pebble8888/smartgrep.svg?branch=master)](https://travis-ci.org/pebble8888/smartgrep)
 
 smartgrep
 =======
