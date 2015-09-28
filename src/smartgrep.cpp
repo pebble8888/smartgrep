@@ -720,7 +720,7 @@ bool process_line_exclude_comment_c( bool* p_isin_multiline_comment, PREP* p_pre
 									char* buf, size_t bufsize, int wordtype, const char* target_word )
 {
 	char valid_str[DATASIZE_OUT+1];
-	memset( valid_str, 0, sizeof(valid_str) );
+
 
 	bool isin_literal = false; // "xxx", 'xxx'
 	size_t i;
@@ -816,7 +816,7 @@ bool process_line_exclude_comment_ruby( bool* p_isin_multiline_comment,
                                 int file_extension )
 {
 	char valid_str[DATASIZE_OUT];
-	memset( valid_str, 0, sizeof(valid_str) ); 
+
 	bool isin_dq = false; // "xxx"
 	bool isin_sq = false; // 'xxx'
 	bool isin_var = false; // "#{}"
@@ -895,7 +895,7 @@ WHILEOUT:
 bool process_line_exclude_comment_vb( char* buf, size_t bufsize, int wordtype, const char* target_word )
 {
 	char valid_str[DATASIZE_OUT+1];
-	memset( valid_str, 0, sizeof(valid_str) );
+
 
 	bool isin_dq = false; // "xxx"
 	size_t i;
@@ -927,7 +927,7 @@ WHILEOUT:
 bool process_line_exclude_comment_vim( char* buf, size_t bufsize, int wordtype, const char* target_word )
 {
 	char valid_str[DATASIZE_OUT+1];
-	memset( valid_str, 0, sizeof(valid_str) );
+
 
 	bool found_anything_but_whitespace = false;
 	size_t i;
@@ -1024,7 +1024,7 @@ bool findword_in_line( char* valid_str, int wordtype, const char* target_word )
 bool process_line_include_comment( char* buf, size_t bufsize, int wordtype, const char* target_word )
 {
     char valid_str[DATASIZE_OUT+1];
-    memset( valid_str, 0, sizeof(valid_str) );
+
 
     char* ptr = valid_str;
     for( int i = 0; i < DATASIZE_OUT; ++i ){
