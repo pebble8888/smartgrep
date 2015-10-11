@@ -1,6 +1,6 @@
 *smartgrep.txt* 
 
-Version : 3.8.6 
+Version : 3.10.0
 Author  : pebble8888@gmail.com
 License : MIT license
 ==============================================================================
@@ -144,6 +144,7 @@ CHANGELOG
     Ver3.8.5 2015-04-11 add Pro*C
     Ver3.8.6 2015-04-30 fix bug 
     Ver3.8.7 2015-06-28 add Crystal(.cr), refactering
+    Ver3.9.0 2015-10-11 improve speed, support --no-html
 
 ==============================================================================
 

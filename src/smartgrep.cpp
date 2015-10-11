@@ -88,6 +88,7 @@ int main(int argc, char* argv[])
     FILE_TYPE_INFO info;
     info.filetype = 0;
     info.typejs = true;
+    info.typehtml = true;
 	if( strcmp( argv[1], "-i" ) == 0 ){
 		info.filetype |= (SG_FILETYPE_SOURCE|SG_FILETYPE_HEADER);
 		wordtype |= SG_WORDTYPE_NORMAL;
@@ -126,6 +127,8 @@ int main(int argc, char* argv[])
             use_repo = true;
         } else if( strcmp( argv[i], "--nojs" ) == 0 ){
             info.typejs = false;
+        } else if( strcmp( argv[i], "--nohtml" ) == 0 ){
+            info.typehtml = false;
         } else if( strcmp( argv[i], "--ignore-dir" ) == 0 ){
             info.foldernamelist.add_foldername( argv[i+1] );
             ++i;
@@ -284,6 +287,7 @@ void usage( void )
         "\n"
         " [options]\n"
         "  -g : use auto detect git or mercurial repository with the current directory\n"
+        "  --nohtml : exclude .html file\n"
         "  --nojs : exclude .js file\n"
         "  --ignore-dir NAME : exclude NAME folder\n"
         "  --noworker : not use worker for sequencial output\n" 
@@ -294,7 +298,7 @@ void usage( void )
         "                            .css/.scss\n"
         "  asis support file extensions : .erb/.html\n"
         "\n"
-        "  Version 3.9.0\n"
+        "  Version 3.10.0\n"
 	);
 }
 
@@ -441,7 +445,8 @@ bool is_source_file( FILE_TYPE_INFO* p_info, const char* file_name ){
         is_shell_file( file_name ) ||
         is_ruby_file( file_name ) ||
         is_crystal_file( file_name ) ||
-        is_asis_file( file_name ) ||
+        is_erb_file( file_name ) ||
+        (p_info->typehtml && is_html_file( file_name )) ||
         is_coffee_file( file_name ) ||
 	    is_python_file( file_name ) ||
         is_perl_file( file_name ) ||
@@ -456,10 +461,8 @@ bool is_source_file( FILE_TYPE_INFO* p_info, const char* file_name ){
 bool is_shell_file( const char* file_name ){ return is_ext( file_name, "sh" ); }
 bool is_ruby_file( const char* file_name ){ return is_ext( file_name, "rb" ); }
 bool is_crystal_file( const char* file_name ){ return is_ext( file_name, "cr" ); }
-bool is_asis_file( const char* file_name ){
-   	return is_ext( file_name, "erb" ) ||
-		   is_ext( file_name, "html" ); 
-}
+bool is_erb_file( const char* file_name ){ return is_ext( file_name, "erb" ); }
+bool is_html_file( const char* file_name ){ return is_ext( file_name, "html" ); }
 bool is_coffee_file( const char* file_name ){ return is_ext( file_name, "coffee" ); }
 bool is_python_file( const char* file_name ){ return is_ext( file_name, "py" ); }
 bool is_perl_file( const char* file_name ){ return is_ext( file_name, "pl" ); }
@@ -538,7 +541,8 @@ void parse_file( const char* file_name, int wordtype, const char* target_word )
         file_extension = kPerl;
     } else if( is_vb_file( file_name ) ){
         file_extension = kVB;
-    } else if( is_asis_file( file_name ) ){
+    } else if( is_erb_file( file_name ) ||
+               is_html_file( file_name ) ){
         file_extension = kAsIs;
     } else if( is_vim_file( file_name ) ){
         file_extension = kVim;

@@ -46,6 +46,7 @@ enum {
 typedef struct {
     int filetype;
     bool typejs;
+    bool typehtml;
     Foldernamelist foldernamelist;
 } FILE_TYPE_INFO;
 
@@ -72,7 +73,8 @@ bool is_source_file( FILE_TYPE_INFO* p_info, const char* file_name );
 bool is_shell_file( const char* file_name );
 bool is_ruby_file( const char* file_name );
 bool is_crystal_file( const char* file_name );
-bool is_asis_file( const char* file_name );
+bool is_erb_file( const char* file_name );
+bool is_html_file( const char* file_name );
 bool is_coffee_file( const char* file_name );
 bool is_python_file( const char* file_name );
 bool is_perl_file( const char* file_name );
