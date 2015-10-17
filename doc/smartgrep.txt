@@ -1,6 +1,6 @@
 *smartgrep.txt* 
 
-Version : 3.10.1
+Version : 3.10.2
 Author  : pebble8888@gmail.com
 License : MIT license
 ==============================================================================
@@ -146,6 +146,7 @@ CHANGELOG
     Ver3.8.7 2015-06-28 add Crystal(.cr), refactering
     Ver3.9.0 2015-10-11 improve speed, support --no-html
     Ver3.9.1 2015-10-17 add .cc for C++ source file extension.
+    Ver3.9.2 2015-10-17 add .hh for C++ header file extension.
 
 ==============================================================================
 

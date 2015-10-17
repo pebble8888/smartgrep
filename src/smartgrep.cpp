@@ -298,7 +298,7 @@ void usage( void )
         "                            .css/.scss\n"
         "  asis support file extensions : .erb/.html\n"
         "\n"
-        "  Version 3.10.1\n"
+        "  Version 3.10.2\n"
 	);
 }
 
@@ -490,6 +490,7 @@ bool is_xcode_resource_file( const char* file_name ){
 
 bool is_header_file( const char* file_name ){
 	if( is_ext( file_name, "h" ) ||
+        is_ext( file_name, "hh" ) ||
 		is_ext( file_name, "hpp" ) ||
 		is_ext( file_name, "hxx" ) ||
 		is_ext( file_name, "tlh" ) ||
