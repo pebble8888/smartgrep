@@ -298,7 +298,7 @@ void usage( void )
         "                            .css/.scss\n"
         "  asis support file extensions : .erb/.html\n"
         "\n"
-        "  Version 3.10.0\n"
+        "  Version 3.10.1\n"
 	);
 }
 
@@ -427,6 +427,7 @@ bool is_cs_file( const char* file_name ){
 bool is_source_file( FILE_TYPE_INFO* p_info, const char* file_name ){
 	if( is_ext( file_name, "c" ) ||
 		is_ext( file_name, "cpp" ) || 
+        is_ext( file_name, "cc" ) ||
 		is_ext( file_name, "cxx" ) ||
 		is_ext( file_name, "tli" ) ||
 		is_ext( file_name, "inc" ) ||
