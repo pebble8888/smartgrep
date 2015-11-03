@@ -298,7 +298,7 @@ void usage( void )
         "                            .css/.scss\n"
         "  asis support file extensions : .erb/.html\n"
         "\n"
-        "  Version 3.10.2\n"
+        "  Version 3.9.3\n"
 	);
 }
 
@@ -494,7 +494,8 @@ bool is_header_file( const char* file_name ){
 		is_ext( file_name, "hpp" ) ||
 		is_ext( file_name, "hxx" ) ||
 		is_ext( file_name, "tlh" ) ||
-		is_ext( file_name, "inl" ) ){
+		is_ext( file_name, "inl" ) ||
+        is_ext( file_name, "pro" ) ){
 		return true;
 	} else {
 		return false;
