@@ -1,6 +1,6 @@
 *smartgrep.txt* 
 
-Version : 3.10.2
+Version : 3.9.4
 Author  : pebble8888@gmail.com
 License : MIT license
 ==============================================================================
@@ -40,6 +40,7 @@ Support File Extention                            Support Comment Type
     Java        : .java                             /* */, //
     Scala       : .scala                            /* */(can't nest), //
     Go          : .go                               /* */, //
+    Rust        : .rs                               /* */, //
     scss        : .scss                             /* */, //
     css         : .css                              /* */
     Ruby        : .rb                               #, =begin, =end
@@ -148,6 +149,6 @@ CHANGELOG
     Ver3.9.1 2015-10-17 add .cc for C++ source file extension.
     Ver3.9.2 2015-10-17 add .hh for C++ header file extension.
     Ver3.9.3 2015-11-03 add .pro for C header file extension.
-
+    Ver3.9.4 2015-11-03 add .rs Rust file extension
 ==============================================================================
 
