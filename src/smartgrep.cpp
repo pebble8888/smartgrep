@@ -507,7 +507,7 @@ bool is_header_file( const char* file_name ){
  * @param char: ext_name "c", "cpp", "h", etc
  */
 bool is_ext( const char* file_name, const char* ext_name ){
-	char* period = strrchr( file_name, '.' );
+	char* period = strrchr( (char*)file_name, '.' );
 	if( period == NULL ){
 		return false;
 	}
