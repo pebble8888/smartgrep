@@ -298,7 +298,7 @@ void usage( void )
         "                            .css/.scss\n"
         "  asis support file extensions : .erb/.html\n"
         "\n"
-        "  Version 3.9.4\n"
+        "  Version 3.9.5\n"
 	);
 }
 
@@ -748,7 +748,7 @@ bool process_line_exclude_comment_c( bool* p_isin_multiline_comment, PREP* p_pre
 		} else if( !isin_literal && *p_isin_multiline_comment && !(p_prep->is_commented()) ){
 			// in c comment
 			while( i < DATASIZE_OUT ){
-				if( buf[i] == '\n' ) goto WHILEOUT;
+				if( buf[i] == '\n' || buf[i] == '\0' ) goto WHILEOUT;
 				if( buf[i] == '*' && buf[i+1] == '/' ){
 					break;
 				}
