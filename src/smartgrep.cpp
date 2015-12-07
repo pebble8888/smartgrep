@@ -293,12 +293,12 @@ void usage( void )
         "  --noworker : not use worker for sequencial output\n" 
         "\n"
 		"  support file extensions : .cpp/.c/.mm/.m/.h/.js/.coffee/.rb/.py/.pl/.sh/.cr\n"
-        "                            .java/.scala/.go/.rs/.cs/.vb/.bas/.frm/.cls/.pc\n"
+        "                            .java/.scala/.go/.cs/.xaml/.vb/.bas/.frm/.cls/.pc\n"
         "                            .plist/.pbxproj/.strings/.storyboard/.swift/.vim/\n"
         "                            .css/.scss\n"
         "  asis support file extensions : .erb/.html\n"
         "\n"
-        "  Version 3.9.5\n"
+        "  Version 3.9.6\n"
 	);
 }
 
@@ -435,6 +435,7 @@ bool is_source_file( FILE_TYPE_INFO* p_info, const char* file_name ){
 		is_ext( file_name, "m" ) ||
 		is_ext( file_name, "mm" ) ||
 	    is_ext( file_name, "cs" ) || 
+        is_ext( file_name, "xaml" ) ||
 		(p_info->typejs && is_ext( file_name, "js")) ||
 		is_ext( file_name, "java" ) ||
         is_ext( file_name, "scala" ) ||
