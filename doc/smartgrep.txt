@@ -1,6 +1,6 @@
 *smartgrep.txt* 
 
-Version : 3.9.6
+Version : 3.9.7
 Author  : pebble8888@gmail.com
 License : MIT license
 ==============================================================================
@@ -51,7 +51,7 @@ Support File Extention                            Support Comment Type
     VBNet       : .vb                               '
     VB6         : .bas .frm .cls                    '
     Vim         : .vim                              "
-    AS IS       : .erb .html .xaml                  nothing
+    AS IS       : .erb .html .xaml .resx            nothing
  
 ==============================================================================
 Support File Encoding
@@ -151,5 +151,6 @@ CHANGELOG
     Ver3.9.3 2015-11-03 add .pro for C header file extension.
     Ver3.9.4 2015-11-03 add .rs Rust file extension
     Ver3.9.6 2015-12-07 add xaml(Microsoft .Net) 
+    Ver3.9.7 2016-02-12 add .resx(Microsoft .Net)
 ==============================================================================
 
