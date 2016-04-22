@@ -298,7 +298,7 @@ void usage( void )
         "                            .css/.scss\n"
         "  asis support file extensions : .erb/.html\n"
         "\n"
-        "  Version 3.9.7\n"
+        "  Version 3.9.8\n"
 	);
 }
 
@@ -604,7 +604,7 @@ void parse_file( const char* file_name, int wordtype, const char* target_word )
 
 	for( lineno = 1; ;){
         if( r_datasize <= 0 ){
-            // In case UTF16LE read next byte to 0xfeff
+            // no buffer unprocessed, so read new data.
             memset( p_data, 0, DATASIZE );
             size_t sz = fread( p_data, 1, DATASIZE, fp );
             if( sz <= 0 ) break;
@@ -658,17 +658,22 @@ void parse_file( const char* file_name, int wordtype, const char* target_word )
 		}
         bool found_linebreak = false;
 		if( found ){
+            // found target
             char* q = r_data;
             {
                 lock_guard<mutex> lk(m_print_mtx);
+                // output filename and line number
     			printf( "%s:%d:", file_name, lineno );
+                // output until next newline
                 for( ; q < r_data + r_datasize; ++q ){
                     if( *q == '\n' ){
+                        // found unix newline
                         ++q;
                         break;
                     } else if( *q == '\r' &&
                                q+1 < r_data + r_datasize &&
                               *(q+1) == '\n' ){
+                        // found windows newline
                         q += 2;
                         break;
                     }
@@ -679,18 +684,23 @@ void parse_file( const char* file_name, int wordtype, const char* target_word )
                     printf( "\n" );
                 }
             }
+            // proceed processed buffer size
             const size_t advance = (size_t)(q-r_data);
             r_data += advance;
             r_datasize -= advance;
 		} else {
+            // not found target
+            // proceed to newline
             char* q = r_data;
             for( ; q < r_data + r_datasize; ++q ){
                 if( *q == '\n' ){
+                    // found unit newline
                     ++q;
                     break;
                 } else if( *q == '\r' &&
                            q+1 < r_data + r_datasize &&
                           *(q+1) == '\n' ){
+                    // found windows newline
                     q += 2;
                     break;
                 }
@@ -698,6 +708,7 @@ void parse_file( const char* file_name, int wordtype, const char* target_word )
             if( q < r_data + r_datasize ){
                 found_linebreak = true;
             }
+            // proceed pprocessed buffer size
             const size_t advance = (size_t)(q-r_data);
             r_data += advance;
             r_datasize -= advance;
@@ -733,88 +744,91 @@ bool process_line_exclude_comment_c( bool* p_isin_multiline_comment, PREP* p_pre
 
 
 	bool isin_literal = false; // "xxx", 'xxx'
-	size_t i;
-	char* ptr = valid_str;
-	for( i = 0; i < DATASIZE_OUT; ++i ){
-		if( buf[i] == '\n' || buf[i] == '\0' ) break; 
+    char* p = buf;
+	char* q = valid_str;
+    while (p < buf + bufsize && q < &valid_str[DATASIZE_OUT+1]){
+		if( *p == '\n' || *p == '\0' ) break; 
 		if( !isin_literal && !(*p_isin_multiline_comment) && !(p_prep->is_commented())
-			&& buf[i] == '/' && buf[i+1] == '/' ){
+			&& *p == '/' && *(p+1) == '/'){
 			// C++ comment
 			break;
-		} else if( !isin_literal && !(*p_isin_multiline_comment) && !(p_prep->is_commented())
-					&& buf[i] == '/' && buf[i+1] == '*' ){
+		} else if(!isin_literal && !(*p_isin_multiline_comment) && !(p_prep->is_commented())
+					&& *p == '/' && *(p+1) == '*'){
 			// the begining of C comment
-			i += 2;
+			p += 2;
 			*p_isin_multiline_comment = true;
+            ++p;
 			continue;
-		} else if( !isin_literal && *p_isin_multiline_comment && !(p_prep->is_commented()) ){
+		} else if( !isin_literal && *p_isin_multiline_comment && !(p_prep->is_commented())){
 			// in c comment
-			while( i < DATASIZE_OUT ){
-				if( buf[i] == '\n' || buf[i] == '\0' ) goto WHILEOUT;
-				if( buf[i] == '*' && buf[i+1] == '/' ){
+			while( p < buf + bufsize ){
+				if( *p == '\n' || *p == '\0' ) goto WHILEOUT;
+				if( *p == '*' && *(p+1) == '/'){
 					break;
 				}
-				++i;
+				++p;
 			}
-			i += 2;
+			p += 2;
 			// the end of c comment
 			*p_isin_multiline_comment = false;
 		} else if( !(*p_isin_multiline_comment) && !(p_prep->is_commented())
-					&& ( buf[i] == '\"' || buf[i] == '\'' ) && ( i == 0 || buf[i-1] != '\\' ) ) {
+					&& ( *p == '\"' || *p == '\'') && (p == buf || *(p-1) != '\\' ) ) {
 			// reverse isin_literal
 			isin_literal = !isin_literal;
-		} else if( !isin_literal && !(*p_isin_multiline_comment) && buf[i] == '#' ){
-			if( memcmp( &buf[i], SG_PREP_IF, strlen(SG_PREP_IF) ) == 0 ||
-				memcmp( &buf[i], SG_PREP_IFDEF, strlen(SG_PREP_IFDEF) ) == 0 ||
-				memcmp( &buf[i], SG_PREP_IFNDEF, strlen(SG_PREP_IFNDEF) ) == 0 ){
+		} else if( !isin_literal && !(*p_isin_multiline_comment) && *p == '#' ){
+			if( memcmp( p, SG_PREP_IF, strlen(SG_PREP_IF) ) == 0 ||
+				memcmp( p, SG_PREP_IFDEF, strlen(SG_PREP_IFDEF) ) == 0 ||
+				memcmp( p, SG_PREP_IFNDEF, strlen(SG_PREP_IFNDEF) ) == 0 ){
 				// #if or #ifdef or #ifndef
-				if( memcmp( &buf[i], SG_PREP_IFZERO, strlen(SG_PREP_IFZERO) ) == 0 ) {
+				if( memcmp( p, SG_PREP_IFZERO, strlen(SG_PREP_IFZERO)) == 0 ) {
 					// #if 0
 					p_prep->push( true );
-					i += strlen(SG_PREP_IFZERO);
+					p += strlen(SG_PREP_IFZERO);
 				} else {
 					p_prep->push( false );
-					if( memcmp( &buf[i], SG_PREP_IF, strlen(SG_PREP_IF) ) == 0 ){
-						i += strlen(SG_PREP_IF);
-					} else if( memcmp( &buf[i], SG_PREP_IFDEF, strlen(SG_PREP_IFDEF) ) == 0 ){
-						i += strlen(SG_PREP_IFDEF);
-					} else if( memcmp( &buf[i], SG_PREP_IFNDEF, strlen(SG_PREP_IFNDEF) ) == 0 ){
-						i += strlen(SG_PREP_IFNDEF);
+					if( memcmp( p, SG_PREP_IF, strlen(SG_PREP_IF) ) == 0 ){
+						p += strlen(SG_PREP_IF);
+					} else if( memcmp( p, SG_PREP_IFDEF, strlen(SG_PREP_IFDEF) ) == 0 ){
+						p += strlen(SG_PREP_IFDEF);
+					} else if( memcmp( p, SG_PREP_IFNDEF, strlen(SG_PREP_IFNDEF) ) == 0 ){
+						p += strlen(SG_PREP_IFNDEF);
 					} else {
 						assert( false );
 					}
 				}
+                ++p;
 				continue;
 			} else if( p_prep->can_change_to_else()
-						&& ( memcmp( &buf[i], SG_PREP_ELIF, strlen(SG_PREP_ELIF) ) == 0 ||
-							 memcmp( &buf[i], SG_PREP_ELSE, strlen(SG_PREP_ELSE) ) == 0 ) ){
+					   && ( memcmp( p, SG_PREP_ELIF, strlen(SG_PREP_ELIF) ) == 0 ||
+						    memcmp( p, SG_PREP_ELSE, strlen(SG_PREP_ELSE) ) == 0 ) ){
 				p_prep->change_to_else();
 
-				if( memcmp( &buf[i], SG_PREP_ELIF, strlen(SG_PREP_ELIF) ) == 0 ){
-					i += strlen(SG_PREP_ELIF);
-				} else if( memcmp( &buf[i], SG_PREP_ELSE, strlen(SG_PREP_ELSE) ) == 0 ){
-					i += strlen(SG_PREP_ELSE);
+				if( memcmp( p, SG_PREP_ELIF, strlen(SG_PREP_ELIF) ) == 0 ){
+					p += strlen(SG_PREP_ELIF);
+				} else if( memcmp( p, SG_PREP_ELSE, strlen(SG_PREP_ELSE) ) == 0 ){
+					p += strlen(SG_PREP_ELSE);
 				} else {
 					assert( false );
 				}
+                ++p;
 				continue;
-			} else if( memcmp( &buf[i], SG_PREP_ENDIF, strlen(SG_PREP_ENDIF) ) == 0 ){
+			} else if( memcmp( p, SG_PREP_ENDIF, strlen(SG_PREP_ENDIF) ) == 0 ){
 				// #endif
 				p_prep->pop();
-				i += strlen(SG_PREP_ENDIF);
+				p += strlen(SG_PREP_ENDIF);
 				continue;
 			}
 		} else if( !isin_literal && !(*p_isin_multiline_comment) && p_prep->is_commented() ){
+            ++p;
 			continue;
 		}
-		if( buf[i] == '\r' || buf[i] == '\n' || buf[i] == '\0' ) break;
+		if( *p == '\r' || *p == '\n' || *p == '\0' ) break;
 		
 		// valid data
-		*ptr = buf[i];
-		++ptr;
+		*(q++) = *(p++);
 	}
 WHILEOUT:
-    *ptr = 0x0; // null terminate
+    *q = 0x0; // null terminate
 	return findword_in_line( valid_str, wordtype, target_word );
 }
 
@@ -967,8 +981,8 @@ WHILEOUT:
  * @brief	search string in one line.
  * 			strstr can be hit twice in one line.
  *
- * @retval	true : found
- * @retval	false: not found
+ * @retval	true : found target
+ * @retval	false: not found target
  *
  * @param	[in] char* 	valid_str       
 
@@ -1025,8 +1039,8 @@ bool findword_in_line( char* valid_str, int wordtype, const char* target_word )
 
 /**
  * @brief   as is
- * @retval	true: found
- * @retval	false:not found
+ * @retval	true: found target
+ * @retval	false:not found target
  * @param [in] char* buf
  * @param [in] int worktype
  * @param [in] char* target_word

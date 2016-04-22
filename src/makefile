@@ -83,4 +83,5 @@ test:
 	sh ./unittest.sh hogecss 1
 	sh ./unittest.sh hogescss 1	
 	sh ./unittest.sh Crystal 1
+	sh ./unittest.sh cifzero 3
 
