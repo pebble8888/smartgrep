@@ -840,76 +840,73 @@ bool process_line_exclude_comment_ruby( bool* p_isin_multiline_comment,
                                 int file_extension )
 {
 	char valid_str[DATASIZE_OUT];
-
 	bool isin_dq = false; // "xxx"
 	bool isin_sq = false; // 'xxx'
 	bool isin_var = false; // "#{}"
-	size_t i;
-	char* ptr = valid_str;
-	for( i = 0; i < DATASIZE_OUT; ++i ){
-		if( buf[i] == '\n' || buf[i] == '\0' ) break; 
+	char* q = valid_str;
+    for (char* p = buf; p < buf + bufsize; ++p){
+		if( *p == '\n' || *p == '\0' ) break; 
 
         if( !(*p_isin_multiline_comment)
             && !isin_dq && !isin_sq
-            && ((file_extension == kRuby && i == 0 && memcmp(&buf[i], "=begin", 5) == 0) ||
-                (file_extension == kPerl && i == 0 && memcmp(&buf[i], "=pod", 4) == 0 ) ||
-                (file_extension == kCoffee && memcmp(&buf[i], "###", 3) == 0) ||
+            && ((file_extension == kRuby && p == buf && memcmp(p, "=begin", 5) == 0) ||
+                (file_extension == kPerl && p == buf && memcmp(p, "=pod", 4) == 0 ) ||
+                (file_extension == kCoffee && memcmp(p, "###", 3) == 0) ||
                 (file_extension == kPython &&
-                  ( memcmp(&buf[i], "\"\"\"", 3) == 0 || memcmp(&buf[i], "'''", 3) == 0 ) ) ) )
+                  ( memcmp(p, "\"\"\"", 3) == 0 || memcmp(p, "'''", 3) == 0 ) ) ) )
         {
             // the begining of multi-line comment
-            if( file_extension == kRuby ){ i += 5; }
-            else if( file_extension == kPerl ){ i += 4; }
-            else if( file_extension == kCoffee ){ i += 3; }
-            else if( file_extension == kPython ){ i += 3; }
+            if( file_extension == kRuby ){ p += 5; }
+            else if( file_extension == kPerl ){ p += 4; }
+            else if( file_extension == kCoffee ){ p += 3; }
+            else if( file_extension == kPython ){ p += 3; }
             *p_isin_multiline_comment = true;
             continue;
         } else if( !isin_dq && !isin_sq && *p_isin_multiline_comment ){
             // in multi-line comment
-            while( i < DATASIZE_OUT ){
-                if( buf[i] == '\n' ) goto WHILEOUT;
-                if( file_extension == kRuby && i == 0 && memcmp(&buf[i], "=end", 4) == 0 ){
-                    i += 4; break;
-                } else if( file_extension == kPerl && i == 0 && memcmp(&buf[i], "=cut", 4) == 0 ){
-                    i += 4; break;
-                } else if( file_extension == kCoffee && memcmp(&buf[i], "###", 3) == 0 ){
-                    i += 3; break;
+            while( p < buf + bufsize ){
+                if( *p == '\n' ) goto WHILEOUT;
+                if( file_extension == kRuby && p == buf && memcmp(p, "=end", 4) == 0 ){
+                    p += 4; break;
+                } else if( file_extension == kPerl && p == buf && memcmp(p, "=cut", 4) == 0 ){
+                    p += 4; break;
+                } else if( file_extension == kCoffee && memcmp(p, "###", 3) == 0 ){
+                    p += 3; break;
                 } else if( file_extension == kPython && 
-                           ( memcmp(&buf[i], "\"\"\"",3) == 0 || memcmp(&buf[i], "'''",3) == 0 ) ){
-                    i += 3; break;
+                           ( memcmp(p, "\"\"\"",3) == 0 || memcmp(p, "'''",3) == 0 ) ){
+                    p += 3; break;
                 }
-                ++i;
+                ++p;
             }
             // the end of multi-line comment
             *p_isin_multiline_comment = false;
         } else if( !(*p_isin_multiline_comment)
-            && !isin_sq && !isin_dq && buf[i] == '#' ){
+            && !isin_sq && !isin_dq && *p == '#' ){
 			// single-line comment
 			break;
 		} else if( !(*p_isin_multiline_comment)
-                   && !isin_sq && buf[i] == '\"' && ( i == 0 || buf[i-1] != '\\' ) ){
+                   && !isin_sq && *p == '\"' && ( p == buf || *(p-1) != '\\' ) ){
 			// reverse isin_dq
 			isin_dq = !isin_dq;
 		} else if( !(*p_isin_multiline_comment)
-                   && !isin_dq && buf[i] == '\'' && ( i == 0 || buf[i-1] != '\\' ) ){
+                   && !isin_dq && *p == '\'' && ( p == buf || *(p-1) != '\\' ) ){
 			// reverse isin_sq
 			isin_sq = !isin_sq;
 		} else if( !(*p_isin_multiline_comment)
-                   && isin_dq && !isin_var && buf[i] == '#' && buf[i+1] == '{' ){
+                   && isin_dq && !isin_var && *p == '#' && *(p+1) == '{' ){
 			isin_var = true;
 		} else if( !(*p_isin_multiline_comment)
-                   && isin_dq && file_extension == kRuby && isin_var && buf[i] == '}' ){
+                   && isin_dq && file_extension == kRuby && isin_var && *p == '}' ){
 			isin_var = false;
 		}
-		if( buf[i] == '\r' || buf[i] == '\n' || buf[i] == '\0' ) break;
+		if( *p == '\r' || *p == '\n' || *p == '\0' ) break;
 		
 		// valid data
-		*ptr = buf[i];
-		++ptr;
+		*(q++) = *p;
 	}
 
 WHILEOUT:
-    *ptr = 0x0; // null terminate
+    *q = 0x0; // null terminate
 	return findword_in_line( valid_str, wordtype, target_word );
 }
 
@@ -919,29 +916,27 @@ WHILEOUT:
 bool process_line_exclude_comment_vb( char* buf, size_t bufsize, int wordtype, const char* target_word )
 {
 	char valid_str[DATASIZE_OUT+1];
-
-
 	bool isin_dq = false; // "xxx"
-	size_t i;
-	char* ptr = valid_str;
-	for( i = 0; i < DATASIZE_OUT; ++i ){
-		if( buf[i] == '\n' || buf[i] == '\0' ) break; 
+	//size_t i;
+	char* q = valid_str;
+	//for( i = 0; i < DATASIZE_OUT; ++i ){
+    for (char* p = buf; p < buf + bufsize; ++p){
+		if( *p == '\n' || *p == '\0' ) break; 
 
-        if( !isin_dq && buf[i] == '\'' ){
+        if( !isin_dq && *p == '\'' ){
 			// single-line comment
 			break;
-		} else if( buf[i] == '\"' && ( i == 0 || buf[i-1] != '\\' ) ){
+		} else if( *p == '\"' && ( p == buf || *(p-1) != '\\' ) ){
 			// reverse isin_dq
 			isin_dq = !isin_dq;
 		}
-		if( buf[i] == '\r' || buf[i] == '\n' || buf[i] == '\0' ) break;
+		if( *p == '\r' || *p == '\n' || *p == '\0' ) break;
 		
 		// valid data
-		*ptr = buf[i];
-		++ptr;
+		*(q++) = *p;
 	}
 WHILEOUT:
-    *ptr = 0x0; // null terminate
+    *q = 0x0; // null terminate
 	return findword_in_line( valid_str, wordtype, target_word );
 }
 
@@ -951,29 +946,25 @@ WHILEOUT:
 bool process_line_exclude_comment_vim( char* buf, size_t bufsize, int wordtype, const char* target_word )
 {
 	char valid_str[DATASIZE_OUT+1];
-
-
 	bool found_anything_but_whitespace = false;
-	size_t i;
-	char* ptr = valid_str;
-	for( i = 0; i < DATASIZE_OUT; ++i ){
-		if( buf[i] == '\n' || buf[i] == '\0' ) break; 
+    char* q = valid_str;
+    for (char* p = buf; p < buf + bufsize; ++p){
+		if( *p == '\n' || *p == '\0' ) break; 
 
-        if( !found_anything_but_whitespace && buf[i] == '\"' ){
+        if( !found_anything_but_whitespace && *p == '\"' ){
 			// single-line comment
 			break;
 		}
 
-		if( buf[i] == '\r' ) break;
+		if( *p == '\r' ) break;
 
-		if( !(buf[i] == kSpace || buf[i] == kTab) ) found_anything_but_whitespace = true;
+		if( !(*p == kSpace || *p == kTab) ) found_anything_but_whitespace = true;
 		
 		// valid data
-		*ptr = buf[i];
-		++ptr;
+		*(q++) = *p;
 	}
 WHILEOUT:
-    *ptr = 0x0; // null terminate
+    *q = 0x0; // null terminate
     return findword_in_line( valid_str, wordtype, target_word );
 }
 
@@ -1048,17 +1039,14 @@ bool findword_in_line( char* valid_str, int wordtype, const char* target_word )
 bool process_line_include_comment( char* buf, size_t bufsize, int wordtype, const char* target_word )
 {
     char valid_str[DATASIZE_OUT+1];
-
-
-    char* ptr = valid_str;
-    for( int i = 0; i < DATASIZE_OUT; ++i ){
-        if( buf[i] == '\0' || buf[i] == '\r' || buf[i]  =='\n' ){
+    char* q = valid_str;
+    for ( char* p = buf ; p < buf + bufsize; ++p ){
+        if( *p == '\0' || *p == '\r' || *p  =='\n' ){
             break;
         }
-        *ptr = buf[i];
-        ++ptr;
+        *(q++) = *p;
     }
-    *ptr = 0x0; // null terminate
+    *q = 0x0; // null terminate
 	return findword_in_line( valid_str, wordtype, target_word );
 }
 

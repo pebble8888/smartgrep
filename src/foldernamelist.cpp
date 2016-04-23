@@ -12,9 +12,8 @@ Foldernamelist::~Foldernamelist()
 
 bool Foldernamelist::has_foldername(const char* foldername)
 {
-    std::vector<std::string>::iterator it;
-    for( it = v_foldername.begin(); it != v_foldername.end(); ++it ){
-        if( strcmp( (*it).c_str(), foldername ) == 0 ){
+    for( auto it: v_foldername ){
+        if( strcmp( it.c_str(), foldername ) == 0 ){
             return true;
         }
     }
