@@ -298,7 +298,7 @@ void usage( void )
         "                            .css/.scss\n"
         "  asis support file extensions : .erb/.html\n"
         "\n"
-        "  Version 3.9.8\n"
+        "  Version 3.9.9\n"
 	);
 }
 
@@ -708,7 +708,7 @@ void parse_file( const char* file_name, int wordtype, const char* target_word )
             if( q < r_data + r_datasize ){
                 found_linebreak = true;
             }
-            // proceed pprocessed buffer size
+            // proceed processed buffer size
             const size_t advance = (size_t)(q-r_data);
             r_data += advance;
             r_datasize -= advance;
@@ -747,7 +747,7 @@ bool process_line_exclude_comment_c( bool* p_isin_multiline_comment, PREP* p_pre
     char* p = buf;
 	char* q = valid_str;
     while (p < buf + bufsize && q < &valid_str[DATASIZE_OUT+1]){
-		if( *p == '\n' || *p == '\0' ) break; 
+		if( *p == '\n' || *p == '\0' ) break;
 		if( !isin_literal && !(*p_isin_multiline_comment) && !(p_prep->is_commented())
 			&& *p == '/' && *(p+1) == '/'){
 			// C++ comment
@@ -757,7 +757,6 @@ bool process_line_exclude_comment_c( bool* p_isin_multiline_comment, PREP* p_pre
 			// the begining of C comment
 			p += 2;
 			*p_isin_multiline_comment = true;
-            ++p;
 			continue;
 		} else if( !isin_literal && *p_isin_multiline_comment && !(p_prep->is_commented())){
 			// in c comment
@@ -796,7 +795,6 @@ bool process_line_exclude_comment_c( bool* p_isin_multiline_comment, PREP* p_pre
 						assert( false );
 					}
 				}
-                ++p;
 				continue;
 			} else if( p_prep->can_change_to_else()
 					   && ( memcmp( p, SG_PREP_ELIF, strlen(SG_PREP_ELIF) ) == 0 ||
@@ -810,7 +808,6 @@ bool process_line_exclude_comment_c( bool* p_isin_multiline_comment, PREP* p_pre
 				} else {
 					assert( false );
 				}
-                ++p;
 				continue;
 			} else if( memcmp( p, SG_PREP_ENDIF, strlen(SG_PREP_ENDIF) ) == 0 ){
 				// #endif
@@ -917,9 +914,7 @@ bool process_line_exclude_comment_vb( char* buf, size_t bufsize, int wordtype, c
 {
 	char valid_str[DATASIZE_OUT+1];
 	bool isin_dq = false; // "xxx"
-	//size_t i;
 	char* q = valid_str;
-	//for( i = 0; i < DATASIZE_OUT; ++i ){
     for (char* p = buf; p < buf + bufsize; ++p){
 		if( *p == '\n' || *p == '\0' ) break; 
 
