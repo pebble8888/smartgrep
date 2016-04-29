@@ -11,7 +11,7 @@ else
   OPTION=""
 fi
 
-./smartgrep -ew ${OPTION} ${WORD} > ${OUTFILENAME}
+./smartgrep -ew --noworker ${OPTION} ${WORD} > ${OUTFILENAME}
 
 if [ `grep ${WORD} ${OUTFILENAME}|wc -l` -eq ${LINECOUNT} ]; then
    exit 0
