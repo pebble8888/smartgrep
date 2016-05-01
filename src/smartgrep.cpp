@@ -12,6 +12,7 @@
 #include <time.h>
 #include <ctype.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 
 #ifdef WIN32
 #else
@@ -298,7 +299,7 @@ void usage( void )
         "                            .css/.scss\n"
         "  asis support file extensions : .erb/.html\n"
         "\n"
-        "  Version 3.9.9\n"
+        "  Version 4.1.0\n"
 	);
 }
 
@@ -375,46 +376,41 @@ void parse_directory_win( char* path, FILE_TYPE_INFO* p_info, int wordtype, cons
  */
 void parse_directory_mac( char* path, FILE_TYPE_INFO* p_info, int wordtype, const char* target_word )
 {
-	char path_name[512];
-	strcpy( path_name, path );
-	strcat( path_name, "\\*.*" );
-	
 	DIR* p_dir = opendir( path );
 	if( p_dir == NULL ){
 		printf( "directory read error! [%s]\n", path );
 		return;
 	}
 	struct dirent* p_dirent;
+    struct stat file_info;
 	while( (p_dirent = readdir( p_dir )) != NULL ){
+        char path_name_r[512];
+        strcpy( path_name_r, path );
+        strcat( path_name_r, "/" );
+        strcat( path_name_r, p_dirent->d_name );
+        lstat(path_name_r, &file_info);
+
 		if( strcmp( p_dirent->d_name, "." ) == 0 ||
 		   strcmp( p_dirent->d_name, ".." ) == 0 ){
 			// do nothing
 			;
 		}
-		else if( (p_dirent->d_type == DT_DIR ) &&
+		else if(S_ISDIR(file_info.st_mode) &&
 				p_dirent->d_name[0] != '.' ){
 			// not hidden directory
             if( p_info->foldernamelist.has_foldername( p_dirent->d_name ) ){
                 // ignore the folder
             } else {
-                char path_name_r[512];
-                strcpy( path_name_r, path );
-                strcat( path_name_r, "/" );
-                strcat( path_name_r, p_dirent->d_name );
                 parse_directory_mac( path_name_r, p_info, wordtype, target_word );
             }
 		} else if( ( (p_info->filetype & SG_FILETYPE_SOURCE ) && is_source_file( p_info, p_dirent->d_name ) ) ||
 				  ( (p_info->filetype & SG_FILETYPE_HEADER ) && is_header_file( p_dirent->d_name ) ) ){
-			char file_name_r[512];
-			strcpy( file_name_r, path );
-			strcat( file_name_r, "/" );
-			strcat( file_name_r, p_dirent->d_name );
             {
                 lock_guard<mutex> lk(m_queue_mtx);
-                m_queue.push(string(file_name_r));
+                m_queue.push(string(path_name_r));
                 m_files_ready_cond.notify_one();
             }
-		}
+        }
 	}
 	closedir( p_dir );	
 }
