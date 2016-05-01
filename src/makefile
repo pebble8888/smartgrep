@@ -10,6 +10,8 @@ CXXFLAGS=-std=c++11
 
 ifeq ($(OS),Windows_NT) 
 LIBS+=-lversion -lstdc++
+else
+LIBS+=-lpthread
 endif
 
 all:$(TARGET)
