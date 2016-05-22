@@ -299,7 +299,7 @@ void usage( void )
         "                            .css/.scss\n"
         "  asis support file extensions : .erb/.html\n"
         "\n"
-        "  Version 4.1.0\n"
+        "  Version 4.1.1\n"
 	);
 }
 
@@ -1031,14 +1031,14 @@ bool process_line_include_comment( char* buf, size_t bufsize, int wordtype, cons
 {
     char valid_str[DATASIZE_OUT+1];
     char* q = valid_str;
-    for ( char* p = buf ; p < buf + bufsize; ++p ){
+    for (char* p = buf ; p < buf + bufsize && q < &valid_str[DATASIZE_OUT+1]; ++p){
         if( *p == '\0' || *p == '\r' || *p  =='\n' ){
             break;
         }
         *(q++) = *p;
     }
     *q = 0x0; // null terminate
-	return findword_in_line( valid_str, wordtype, target_word );
+	return findword_in_line(valid_str, wordtype, target_word);
 }
 
 void test_is_alnum_or_underscore( void )
