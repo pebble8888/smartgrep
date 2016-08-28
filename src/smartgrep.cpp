@@ -293,7 +293,7 @@ void usage( void )
         "  --ignore-dir NAME : exclude NAME folder\n"
         "  --noworker : not use worker for sequencial output\n" 
         "\n"
-		"  support file extensions : .cpp/.c/.mm/.m/.h/.js/.coffee/.rb/.py/.pl/.sh/.cr\n"
+		"  support file extensions : .cpp/.c/.mm/.m/.h/.js/.coffee/.rb/.py/.pl/.sh/.cr/.rs\n"
         "                            .java/.scala/.go/.cs/.xaml/.resx/.vb/.bas/.frm/.cls/.pc\n"
         "                            .php/.plist/.pbxproj/.strings/.storyboard/.swift/.vim/\n"
         "                            .css/.scss\n"
