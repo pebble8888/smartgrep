@@ -295,11 +295,11 @@ void usage( void )
         "\n"
 		"  support file extensions : .cpp/.c/.mm/.m/.h/.js/.coffee/.rb/.py/.pl/.sh/.cr/.rs\n"
         "                            .java/.scala/.go/.cs/.xaml/.resx/.vb/.bas/.frm/.cls/.pc\n"
-        "                            .php/.plist/.pbxproj/.strings/.storyboard/.swift/.vim/\n"
+        "                            .php/.plist/.pbxproj/.strings/.storyboard/.swift/.gyb/.vim/\n"
         "                            .css/.scss\n"
         "  asis support file extensions : .erb/.html\n"
         "\n"
-        "  Version 4.1.2\n"
+        "  Version 4.1.3\n"
 	);
 }
 
@@ -439,6 +439,7 @@ bool is_source_file( FILE_TYPE_INFO* p_info, const char* file_name ){
 		is_ext( file_name, "go" ) ||
         is_ext( file_name, "rs" ) ||
         is_ext( file_name, "swift" ) ||
+        is_ext( file_name, "gyb" ) ||
         is_ext( file_name, "css" ) ||
         is_ext( file_name, "scss" ) ||
 		is_ext( file_name, "pc" ) ||
