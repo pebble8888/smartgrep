@@ -88,4 +88,5 @@ test:
 	sh ./unittest.sh cifzero 3
 	sh ./unittest.sh php_alpha 1
 	sh ./unittest.sh fn 1
+	sh ./unittest.sh mynameisxml 1
 

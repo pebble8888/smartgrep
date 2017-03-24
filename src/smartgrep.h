@@ -75,6 +75,7 @@ bool is_ruby_file( const char* file_name );
 bool is_crystal_file( const char* file_name );
 bool is_erb_file( const char* file_name );
 bool is_html_file( const char* file_name );
+bool is_xml_file( const char* file_name );
 bool is_coffee_file( const char* file_name );
 bool is_python_file( const char* file_name );
 bool is_perl_file( const char* file_name );

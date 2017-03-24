@@ -297,9 +297,9 @@ void usage( void )
         "                            .java/.scala/.go/.cs/.xaml/.resx/.vb/.bas/.frm/.cls/.pc\n"
         "                            .php/.plist/.pbxproj/.strings/.storyboard/.swift/.gyb/.vim/\n"
         "                            .css/.scss\n"
-        "  asis support file extensions : .erb/.html\n"
+        "  asis support file extensions : .erb/.html/.xml\n"
         "\n"
-        "  Version 4.1.3\n"
+        "  Version 4.2.0\n"
 	);
 }
 
@@ -449,6 +449,7 @@ bool is_source_file( FILE_TYPE_INFO* p_info, const char* file_name ){
         is_crystal_file( file_name ) ||
         is_erb_file( file_name ) ||
         (p_info->typehtml && is_html_file( file_name )) ||
+        is_xml_file( file_name) ||
         is_coffee_file( file_name ) ||
 	    is_python_file( file_name ) ||
         is_perl_file( file_name ) ||
@@ -465,6 +466,7 @@ bool is_ruby_file( const char* file_name ){ return is_ext( file_name, "rb" ); }
 bool is_crystal_file( const char* file_name ){ return is_ext( file_name, "cr" ); }
 bool is_erb_file( const char* file_name ){ return is_ext( file_name, "erb" ); }
 bool is_html_file( const char* file_name ){ return is_ext( file_name, "html" ); }
+bool is_xml_file( const char* file_name ){ return is_ext( file_name, "xml" ); }
 bool is_coffee_file( const char* file_name ){ return is_ext( file_name, "coffee" ); }
 bool is_python_file( const char* file_name ){ return is_ext( file_name, "py" ); }
 bool is_perl_file( const char* file_name ){ return is_ext( file_name, "pl" ); }
@@ -546,7 +548,8 @@ void parse_file( const char* file_name, int wordtype, const char* target_word )
     } else if( is_vb_file( file_name ) ){
         file_extension = kVB;
     } else if( is_erb_file( file_name ) ||
-               is_html_file( file_name ) ){
+               is_html_file( file_name ) ||
+               is_xml_file( file_name ) ){
         file_extension = kAsIs;
     } else if( is_vim_file( file_name ) ){
         file_extension = kVim;
