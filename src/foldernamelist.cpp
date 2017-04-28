@@ -4,6 +4,10 @@
 
 Foldernamelist::Foldernamelist()
 {
+    v_foldername.push_back(std::string(".vs"));
+    v_foldername.push_back(std::string(".svn"));
+    v_foldername.push_back(std::string(".git"));
+    v_foldername.push_back(std::string(".hg"));
 }
 
 Foldernamelist::~Foldernamelist()
