@@ -299,7 +299,9 @@ void usage( void )
         "                            .css/.scss\n"
         "  asis support file extensions : .erb/.html/.xml\n"
         "\n"
-        "  Version 4.2.0\n"
+        "  ignore directory : .git/.hg/.svn/.vs\n"
+        "\n"
+        "  Version 4.2.1\n"
 	);
 }
 
