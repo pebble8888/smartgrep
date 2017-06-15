@@ -301,7 +301,7 @@ void usage( void )
         "\n"
         "  ignore directory : .git/.hg/.svn/.vs\n"
         "\n"
-        "  Version 4.2.1\n"
+        "  Version 4.2.2\n"
 	);
 }
 
@@ -665,9 +665,9 @@ void parse_file( const char* file_name, int wordtype, const char* target_word )
             char* q = r_data;
             {
                 lock_guard<mutex> lk(m_print_mtx);
-                // output filename and line number
+                // output filename and line number or EOF
     			printf( "%s:%d:", file_name, lineno );
-                // output until next newline
+                // output until next newline or EOF
                 for( ; q < r_data + r_datasize; ++q ){
                     if( *q == '\n' ){
                         // found unix newline
@@ -684,8 +684,11 @@ void parse_file( const char* file_name, int wordtype, const char* target_word )
     			}
                 if( q < r_data + r_datasize ){
                     found_linebreak = true;
-                    printf( "\n" );
+                } else {
+                    // almost EOF
+                    // TODO:not a completely valid logic
                 }
+                printf( "\n" );
             }
             // proceed processed buffer size
             const size_t advance = (size_t)(q-r_data);
