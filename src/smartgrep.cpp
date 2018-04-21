@@ -301,7 +301,7 @@ void usage( void )
         "\n"
         "  ignore directory : .git/.hg/.svn/.vs\n"
         "\n"
-        "  Version 4.2.2\n"
+        "  Version 4.2.3\n"
 	);
 }
 
@@ -867,22 +867,33 @@ bool process_line_exclude_comment_ruby( bool* p_isin_multiline_comment,
             continue;
         } else if( !isin_dq && !isin_sq && *p_isin_multiline_comment ){
             // in multi-line comment
+            bool found = false;
             while( p < buf + bufsize ){
                 if( *p == '\n' ) goto WHILEOUT;
                 if( file_extension == kRuby && p == buf && memcmp(p, "=end", 4) == 0 ){
-                    p += 4; break;
+                    p += 4;
+                    found = true;
+                    break;
                 } else if( file_extension == kPerl && p == buf && memcmp(p, "=cut", 4) == 0 ){
-                    p += 4; break;
+                    p += 4;
+                    found = true;
+                    break;
                 } else if( file_extension == kCoffee && memcmp(p, "###", 3) == 0 ){
-                    p += 3; break;
+                    p += 3;
+                    found = true;
+                    break;
                 } else if( file_extension == kPython && 
                            ( memcmp(p, "\"\"\"",3) == 0 || memcmp(p, "'''",3) == 0 ) ){
-                    p += 3; break;
+                    p += 3;
+                    found = true;
+                    break;
                 }
                 ++p;
             }
-            // the end of multi-line comment
-            *p_isin_multiline_comment = false;
+            if (found){
+                // the end of multi-line comment
+                *p_isin_multiline_comment = false;
+            }
         } else if( !(*p_isin_multiline_comment)
             && !isin_sq && !isin_dq && *p == '#' ){
 			// single-line comment
