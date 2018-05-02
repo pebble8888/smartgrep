@@ -432,7 +432,7 @@ bool is_source_file( FILE_TYPE_INFO* p_info, const char* file_name ){
 		is_ext( file_name, "rc" ) ||
 		is_ext( file_name, "m" ) ||
 		is_ext( file_name, "mm" ) ||
-	    is_ext( file_name, "cs" ) || 
+	    (is_ext( file_name, "cs" ) && !is_last(file_name, ".g.cs") && !is_last(file_name, ".g.i.cs")) ||
         is_ext( file_name, "xaml" ) ||
         is_ext( file_name, "resx" ) ||
 		(p_info->typejs && is_ext( file_name, "js")) ||
@@ -523,6 +523,28 @@ bool is_ext( const char* file_name, const char* ext_name ){
 		*q = tolower( *p );
 	}
 	return ( strcmp( buf, ext_name ) == 0 );
+}
+
+bool is_last(const char* file_name, const char* last_name) {
+    int i = strlen(file_name);
+    int len = strlen(last_name);
+    if (len <= 0) {
+        return false;
+    }
+    i -= 1;
+    int j = len - 1;
+    while (i >= 0 && j >= 0) {
+        if (file_name[i] == last_name[j]) {
+            if (j == 0) {
+                return true;
+            }
+        } else {
+            return false;
+        }
+        i -= 1;
+        j -= 1;
+    }
+    return false;
 }
 
 /*

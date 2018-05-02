@@ -83,6 +83,7 @@ bool is_vb_file( const char* file_name );
 bool is_vim_file( const char* file_name );
 bool is_xcode_resource_file( const char* file_name );
 bool is_ext( const char* file_name, const char* ext_name );
+bool is_last(const char* file_name, const char* last_name);
 bool findword_in_line( char* valid_str, int wordtype, const char* target_word );
 bool is_alnum_or_underscore( int val );
 void print_version( void );
