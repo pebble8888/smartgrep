@@ -293,7 +293,7 @@ void usage( void )
         "  --ignore-dir NAME : exclude NAME folder\n"
         "  --noworker : not use worker for sequencial output\n" 
         "\n"
-		"  support file extensions : .cpp/.c/.mm/.m/.h/.js/.coffee/.rb/.py/.pl/.sh/.cr/.rs\n"
+		"  support file extensions : .cpp/.c/.mm/.m/.h/.js/.coffee/.rb/.py/.pl/.sh/.cr/.rs/.toml\n"
         "                            .java/.scala/.go/.cs/.xaml/.resx/.vb/.bas/.frm/.cls/.pc\n"
         "                            .php/.plist/.pbxproj/.strings/.storyboard/.swift/.gyb/.vim/\n"
         "                            .css/.scss\n"
@@ -301,7 +301,7 @@ void usage( void )
         "\n"
         "  ignore directory : .git/.hg/.svn/.vs\n"
         "\n"
-        "  Version 4.2.3\n"
+        "  Version 4.2.4\n"
 	);
 }
 
@@ -440,6 +440,7 @@ bool is_source_file( FILE_TYPE_INFO* p_info, const char* file_name ){
         is_ext( file_name, "scala" ) ||
 		is_ext( file_name, "go" ) ||
         is_ext( file_name, "rs" ) ||
+        is_ext( file_name, "toml" ) ||
         is_ext( file_name, "swift" ) ||
         is_ext( file_name, "gyb" ) ||
         is_ext( file_name, "css" ) ||
