@@ -294,14 +294,14 @@ void usage( void )
         "  --noworker : not use worker for sequencial output\n" 
         "\n"
 		"  support file extensions : .cpp/.c/.mm/.m/.h/.js/.coffee/.rb/.py/.pl/.sh/.cr/.rs/.toml\n"
-        "                            .java/.scala/.go/.cs/.xaml/.resx/.vb/.bas/.frm/.cls/.pc\n"
+        "                            .java/.scala/.go/.cs/.xaml/.resx/.vb/.bas/.frm/.cls/.pc/.cu\n"
         "                            .php/.plist/.pbxproj/.strings/.storyboard/.swift/.gyb/.vim/\n"
         "                            .css/.scss\n"
         "  asis support file extensions : .erb/.html/.xml\n"
         "\n"
         "  ignore directory : .git/.hg/.svn/.vs\n"
         "\n"
-        "  Version 4.2.4\n"
+        "  Version 4.3.0\n"
 	);
 }
 
@@ -446,6 +446,7 @@ bool is_source_file( FILE_TYPE_INFO* p_info, const char* file_name ){
         is_ext( file_name, "css" ) ||
         is_ext( file_name, "scss" ) ||
 		is_ext( file_name, "pc" ) ||
+        is_ext( file_name, "cu" ) ||
         is_ext( file_name, "php" ) ||
         is_shell_file( file_name ) ||
         is_ruby_file( file_name ) ||

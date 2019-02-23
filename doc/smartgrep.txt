@@ -1,6 +1,6 @@
 *smartgrep.txt* 
 
-Version : 4.2.4
+Version : 4.3.0
 Author  : pebble8888@gmail.com
 License : MIT license
 ==============================================================================
@@ -41,6 +41,7 @@ Support File Extention                            Support Comment Type
     Scala       : .scala                            /* */(can't nest), //
     Go          : .go                               /* */, //
     Rust        : .rs, .toml                        /* */, //
+    CUDA        : .cu                               /* */, //
     scss        : .scss                             /* */, //
     css         : .css                              /* */
     Ruby        : .rb                               #, =begin, =end
