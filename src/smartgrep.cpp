@@ -33,6 +33,7 @@
 #include <condition_variable>
 #include <vector>
 #include <thread>
+#include <memory>
 
 using namespace std;
 
@@ -47,7 +48,7 @@ static mutex m_queue_mtx;
 static condition_variable m_files_ready_cond;
 static mutex m_print_mtx;
 
-void test( void )
+void test(void)
 {
 	test_is_alnum_or_underscore();
 }
@@ -78,7 +79,7 @@ int main(int argc, char* argv[])
 	test();
 #endif
 
-	if( argc-1 < 2 ){
+	if (argc-1 < 2) {
 		usage();
 		return 1;
 	}
@@ -90,31 +91,31 @@ int main(int argc, char* argv[])
     info.filetype = 0;
     info.typejs = true;
     info.typehtml = true;
-	if( strcmp( argv[1], "-i" ) == 0 ){
+	if (strcmp( argv[1], "-i" ) == 0) {
 		info.filetype |= (SG_FILETYPE_SOURCE|SG_FILETYPE_HEADER);
 		wordtype |= SG_WORDTYPE_NORMAL;
 		wordtype |= SG_WORDTYPE_INCLUDE_COMMENT;
-	} else if( strcmp( argv[1], "-h" ) == 0 ){
+	} else if (strcmp( argv[1], "-h" ) == 0) {
 		info.filetype |= SG_FILETYPE_HEADER;
 		wordtype |= SG_WORDTYPE_NORMAL;
 		wordtype |= SG_WORDTYPE_EXCLUDE_COMMENT;
-	} else if( strcmp( argv[1], "-e" ) == 0 ){
+	} else if (strcmp( argv[1], "-e" ) == 0) {
 		info.filetype |= (SG_FILETYPE_SOURCE|SG_FILETYPE_HEADER);
 		wordtype |= SG_WORDTYPE_NORMAL;
 		wordtype |= SG_WORDTYPE_EXCLUDE_COMMENT;
-	} else if( strcmp( argv[1], "-iw" ) == 0 ){
+	} else if (strcmp( argv[1], "-iw" ) == 0) {
 		info.filetype |= (SG_FILETYPE_SOURCE|SG_FILETYPE_HEADER);
 		wordtype |= SG_WORDTYPE_WORD;
 		wordtype |= SG_WORDTYPE_INCLUDE_COMMENT;
-	} else if( strcmp( argv[1], "-hw" ) == 0 ){
+	} else if (strcmp( argv[1], "-hw" ) == 0) {
 		info.filetype |= SG_FILETYPE_HEADER;
 		wordtype |= SG_WORDTYPE_WORD;
 		wordtype |= SG_WORDTYPE_EXCLUDE_COMMENT;
-	} else if( strcmp( argv[1], "-ew" ) == 0 ){
+	} else if (strcmp( argv[1], "-ew" ) == 0) {
 		info.filetype |= (SG_FILETYPE_SOURCE|SG_FILETYPE_HEADER);
 		wordtype |= SG_WORDTYPE_WORD;
 		wordtype |= SG_WORDTYPE_EXCLUDE_COMMENT;
-    } else if( strcmp( argv[1], "-c" ) == 0 ){
+    } else if (strcmp( argv[1], "-c" ) == 0) {
         info.filetype |= (SG_FILETYPE_SOURCE|SG_FILETYPE_HEADER);
         wordtype |= SG_WORDTYPE_NORMAL;
         wordtype |= SG_WORDTYPE_INCLUDE_COMMENT;
@@ -123,35 +124,35 @@ int main(int argc, char* argv[])
 		usage();
 		return 1;
 	}
-    for( int i = 2; i < argc; ++i ){
-        if( strcmp( argv[i], "-g" ) == 0 ){
+    for (int i = 2; i < argc; ++i) {
+        if (strcmp( argv[i], "-g" ) == 0) {
             use_repo = true;
-        } else if( strcmp( argv[i], "--nojs" ) == 0 ){
+        } else if (strcmp(argv[i], "--nojs") == 0) {
             info.typejs = false;
-        } else if( strcmp( argv[i], "--nohtml" ) == 0 ){
+        } else if (strcmp(argv[i], "--nohtml") == 0) {
             info.typehtml = false;
-        } else if( strcmp( argv[i], "--ignore-dir" ) == 0 ){
-            info.foldernamelist.add_foldername( argv[i+1] );
+        } else if (strcmp(argv[i], "--ignore-dir") == 0) {
+            info.foldernamelist.add_foldername(argv[i+1]);
             ++i;
-        } else if( strcmp( argv[i], "--noworker" ) == 0 ){
+        } else if (strcmp(argv[i], "--noworker") == 0) {
             use_worker = false;
         }
     }
 	char path[512];
-	memset( path, 0, sizeof(path) );
-    if( use_repo ){
+	memset(path, 0, sizeof(path));
+    if (use_repo) {
         // use repo folder
-        smartgrep_getrepo( path, sizeof(path) );
+        smartgrep_getrepo(path, sizeof(path));
     } else {
         // user current folder 
-        smartgrep_getcwd( path, sizeof(path) );
+        smartgrep_getcwd(path, sizeof(path));
     }
 	char* word = argv[argc-1];
     
     // make worker
     int num_cores;
 #ifdef _WIN32
-    {           
+    {
         SYSTEM_INFO si;
         GetSystemInfo(&si);
         num_cores = si.dwNumberOfProcessors;
@@ -160,21 +161,21 @@ int main(int argc, char* argv[])
     num_cores = (int)sysconf(_SC_NPROCESSORS_ONLN);
 #endif
     int workers_len = num_cores-1;
-    if( workers_len < 1 || !use_worker ){
+    if (workers_len < 1 || !use_worker) {
         workers_len = 1;
     }
    
     m_done_adding_files = false;
-    vector< shared_ptr<thread> > v_thread;
+    vector<shared_ptr<thread>> v_thread;
     for (int i = 0; i < workers_len; ++i) {
-        shared_ptr<thread> th(new thread(search_worker, wordtype, string(word)));
+        shared_ptr<thread> th = make_shared<thread>(search_worker, wordtype, string(word));
         v_thread.push_back(th);
     }
     
 #ifdef WIN32
-	parse_directory_win( path, &info, wordtype, word );
+	parse_directory_win(path, &info, wordtype, word);
 #else
-	parse_directory_mac( path, &info, wordtype, word );
+	parse_directory_mac(path, &info, wordtype, word);
 #endif
     
     {
@@ -190,12 +191,12 @@ int main(int argc, char* argv[])
 	return 0;
 }
 
-void smartgrep_getcwd( char* buf, size_t size )
+void smartgrep_getcwd(char* buf, size_t size)
 {
 #ifdef WIN32
-	GetCurrentDirectory( size, buf );
+	GetCurrentDirectory(size, buf);
 #else
-	getcwd( buf, size );
+	getcwd(buf, size);
 #endif
 }
 
@@ -204,31 +205,31 @@ void smartgrep_getcwd( char* buf, size_t size )
  * @param char* buf
  * @param size_t size
  */
-void smartgrep_getrepo( char* buf, size_t size )
+void smartgrep_getrepo(char* buf, size_t size)
 {
     char curpath[512];
-    memset( curpath, 0, sizeof(curpath) );
-    smartgrep_getcwd( curpath, sizeof(curpath) );
+    memset(curpath, 0, sizeof(curpath));
+    smartgrep_getcwd(curpath, sizeof(curpath));
     size_t idx = strlen(curpath);
     char path[512]; 
 #ifdef WIN32
-	assert( strlen(curpath) < size );
-	strcpy( buf, curpath );
-	while( idx > 3 ){
-		for( int i = 0; i < 2; ++i ){
+	assert(strlen(curpath) < size);
+	strcpy(buf, curpath);
+	while (idx > 3) {
+		for (int i = 0; i < 2; ++i) {
             // 0:.git
             // 1:.hg
-			strcpy( path, curpath );
+			strcpy(path, curpath);
 			path[idx] = '\0';
-			if( i == 0 ) strcat( path, "\\.git" );
-			else if( i == 1 ) strcat( path, "\\.hg" );
+			if (i == 0) strcat(path, "\\.git");
+			else if (i == 1) strcat(path, "\\.hg");
 			// check
 			HANDLE h_find;
 			WIN32_FIND_DATA find_data;
-			h_find = FindFirstFile( path, &find_data );
-			if( h_find != INVALID_HANDLE_VALUE ){
+			h_find = FindFirstFile(path, &find_data);
+			if (h_find != INVALID_HANDLE_VALUE) {
 				// can access
-				FindClose( h_find );
+				FindClose(h_find);
 				path[idx] = '\0';
 				size_t len = strlen(path);
 				assert( len < size );
@@ -237,19 +238,19 @@ void smartgrep_getrepo( char* buf, size_t size )
 			}
 		}
 		path[idx] = '\0';
-		char* r = strrchr( path, '\\' );
-		if( r == NULL ){
-			strcpy( buf, curpath );
+		char* r = strrchr(path, '\\');
+		if (r == NULL) {
+			strcpy(buf, curpath);
 			return;
 		}
 		idx = (size_t)(r - path);
 	}
 #else
-    while( true ){
-        for( int i = 0; i < 2; ++i ){
+    while (true) {
+        for (int i = 0; i < 2; ++i) {
             // 0:.git
             // 1:.hg
-            strcpy( path, curpath );
+            strcpy(path, curpath);
             path[idx] = '\0'; 
             if( i == 0 ) strcat( path, "/.git" );
             else if( i == 1 ) strcat( path, "/.hg" );
@@ -528,13 +529,13 @@ bool is_ext( const char* file_name, const char* ext_name ){
 }
 
 bool is_last(const char* file_name, const char* last_name) {
-    int i = strlen(file_name);
-    int len = strlen(last_name);
+    size_t i = strlen(file_name);
+    size_t len = strlen(last_name);
     if (len <= 0) {
         return false;
     }
     i -= 1;
-    int j = len - 1;
+    size_t j = len - 1;
     while (i >= 0 && j >= 0) {
         if (file_name[i] == last_name[j]) {
             if (j == 0) {
@@ -613,12 +614,12 @@ void parse_file( const char* file_name, int wordtype, const char* target_word )
 	PREP prep;
 
 	// it is presumed that the one line byte size in file don't exceed 64k
-    char* p_data = new char[DATASIZE+1];
+    unique_ptr<char[]> p_data = make_unique<char[]>(DATASIZE+1);
 #ifndef NOFEAT_UTF16
-    char* q_data = NULL;
+    unique_ptr<char[]> q_data; // = NULL;
     if( is_cs_file( file_name ) ||
         is_xcode_resource_file( file_name ) ){
-        q_data = new char[DATASIZE_OUT+1];
+        q_data = make_unique<char[]>(DATASIZE_OUT+1);
     }
     int q_datasize = 0;
 #endif
@@ -632,8 +633,8 @@ void parse_file( const char* file_name, int wordtype, const char* target_word )
 	for( lineno = 1; ;){
         if( r_datasize <= 0 ){
             // no buffer unprocessed, so read new data.
-            memset( p_data, 0, DATASIZE );
-            size_t sz = fread( p_data, 1, DATASIZE, fp );
+            memset( p_data.get(), 0, DATASIZE );
+            size_t sz = fread( p_data.get(), 1, DATASIZE, fp );
             if( sz <= 0 ) break;
 #ifndef NOFEAT_UTF16
             if( is_utf16 ){
@@ -643,15 +644,15 @@ void parse_file( const char* file_name, int wordtype, const char* target_word )
 
                 if( p_datasize == 0 ) break;
 
-                memset( q_data, 0, DATASIZE_OUT );
-                q_datasize = UTF16LEToUTF8( (int16_t*)(p_data+BOMSIZE), (int)p_datasize, q_data );
+                memset( q_data.get(), 0, DATASIZE_OUT );
+                q_datasize = UTF16LEToUTF8( (int16_t*)(p_data.get()+BOMSIZE), (int)p_datasize, q_data.get() );
                 
-                r_data = q_data;
+                r_data = q_data.get();
                 r_datasize = q_datasize;
             } else
 #endif
             {
-                r_data = p_data;
+                r_data = p_data.get();
                 r_datasize = sz;
             }
         }
@@ -747,10 +748,6 @@ void parse_file( const char* file_name, int wordtype, const char* target_word )
             ++lineno;
         }
 	}
-    delete [] p_data;
-#ifndef NOFEAT_UTF16
-    delete [] q_data;
-#endif
 	fclose( fp );
 }
 
