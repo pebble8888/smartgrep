@@ -16,8 +16,8 @@ Foldernamelist::~Foldernamelist()
 
 bool Foldernamelist::has_foldername(const char* foldername)
 {
-    for( auto it: v_foldername ){
-        if( strcmp( it.c_str(), foldername ) == 0 ){
+    for (auto it: v_foldername) {
+        if (strcmp( it.c_str(), foldername) == 0) {
             return true;
         }
     }
@@ -26,9 +26,9 @@ bool Foldernamelist::has_foldername(const char* foldername)
 
 void Foldernamelist::add_foldername(const char* foldername)
 {
-    if( strlen(foldername) == 0 ) {
+    if (strlen(foldername) == 0) {
         assert( false );
     }
-    v_foldername.push_back( std::string( foldername ) );
+    v_foldername.push_back(std::string(foldername));
 }
 

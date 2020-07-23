@@ -3,7 +3,7 @@
  * @author	pebble8888@gmail.com
  */
 
-#ifdef WIN32
+#ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN 
 #endif
 
@@ -14,7 +14,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 #else
 #include <unistd.h>
 #include <dirent.h>
@@ -22,7 +22,7 @@
 
 #include "smartgrep.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <windows.h>
 #endif
 
@@ -35,30 +35,28 @@
 #include <thread>
 #include <memory>
 
-using namespace std;
-
 const static int DATASIZE = 64 * 1024; // process unit size
 const static int DATASIZE_OUT = DATASIZE*3/sizeof(wchar_t);
 const static char kTab = 0x9;
 const static char kSpace = 0x20;
 
-static queue<string> m_queue;       // use m_queue_mtx for access
-static bool  m_done_adding_files;   // use m_queue_mtx for access
-static mutex m_queue_mtx;
-static condition_variable m_files_ready_cond;
-static mutex m_print_mtx;
+static std::queue<std::string> m_queue;       // use m_queue_mtx for access
+static bool m_done_adding_files;   // use m_queue_mtx for access
+static std::mutex m_queue_mtx;
+static std::condition_variable m_files_ready_cond;
+static std::mutex m_print_mtx;
 
 void test(void)
 {
 	test_is_alnum_or_underscore();
 }
 
-static void search_worker(const int wordtype, const string word)
+static void search_worker(const int wordtype, const std::string word)
 {
     while (true) {
-        string s;
+        std::string s;
         {
-            unique_lock<mutex> lk(m_queue_mtx);
+            std::unique_lock<std::mutex> lk(m_queue_mtx);
             while (m_queue.empty()){
                 if (m_done_adding_files) {
                     lk.unlock();
@@ -166,20 +164,20 @@ int main(int argc, char* argv[])
     }
    
     m_done_adding_files = false;
-    vector<shared_ptr<thread>> v_thread;
+    std::vector<std::shared_ptr<std::thread>> v_thread;
     for (int i = 0; i < workers_len; ++i) {
-        shared_ptr<thread> th = make_shared<thread>(search_worker, wordtype, string(word));
+        auto th = std::make_shared<std::thread>(search_worker, wordtype, std::string(word));
         v_thread.push_back(th);
     }
     
-#ifdef WIN32
+#ifdef _WIN32
 	parse_directory_win(path, &info, wordtype, word);
 #else
 	parse_directory_mac(path, &info, wordtype, word);
 #endif
     
     {
-        lock_guard<mutex> lk(m_queue_mtx);
+        std::lock_guard<std::mutex> lk(m_queue_mtx);
         m_done_adding_files = true;
         m_files_ready_cond.notify_all();
     }
@@ -193,7 +191,7 @@ int main(int argc, char* argv[])
 
 void smartgrep_getcwd(char* buf, size_t size)
 {
-#ifdef WIN32
+#ifdef _WIN32
 	GetCurrentDirectory(size, buf);
 #else
 	getcwd(buf, size);
@@ -212,7 +210,7 @@ void smartgrep_getrepo(char* buf, size_t size)
     smartgrep_getcwd(curpath, sizeof(curpath));
     size_t idx = strlen(curpath);
     char path[512]; 
-#ifdef WIN32
+#ifdef _WIN32
 	assert(strlen(curpath) < size);
 	strcpy(buf, curpath);
 	while (idx > 3) {
@@ -306,7 +304,7 @@ void usage(void)
 	);
 }
 
-#ifdef WIN32
+#ifdef _WIN32
 /*
  * @param char* path
  * @param int   filetype	SG_FILETYPE_SOURCE: .c/.cpp/.m/.mm/etc
@@ -354,7 +352,7 @@ void parse_directory_win(char* path, FILE_TYPE_INFO* p_info, int wordtype, const
 			strcat(file_name_r, find_data.cFileName);
             {
                 lock_guard<mutex> lk(m_queue_mtx);
-                m_queue.push(string(file_name_r));
+                m_queue.push(std::string(file_name_r));
                 m_files_ready_cond.notify_one();
             }
 		}
@@ -409,8 +407,8 @@ void parse_directory_mac(char* path, FILE_TYPE_INFO* p_info, int wordtype, const
 		} else if (((p_info->filetype & SG_FILETYPE_SOURCE) && is_source_file(p_info, p_dirent->d_name)) ||
 				  ((p_info->filetype & SG_FILETYPE_HEADER) && is_header_file(p_dirent->d_name))) {
             {
-                lock_guard<mutex> lk(m_queue_mtx);
-                m_queue.push(string(path_name_r));
+                std::lock_guard<std::mutex> lk(m_queue_mtx);
+                m_queue.push(std::string(path_name_r));
                 m_files_ready_cond.notify_one();
             }
         }
@@ -614,12 +612,12 @@ void parse_file(const char* file_name, int wordtype, const char* target_word)
 	PREP prep;
 
 	// it is presumed that the one line byte size in file don't exceed 64k
-    unique_ptr<char[]> p_data = make_unique<char[]>(DATASIZE+1);
+    auto p_data = std::make_unique<char[]>(DATASIZE+1);
 #ifndef NOFEAT_UTF16
-    unique_ptr<char[]> q_data; // = NULL;
+    std::unique_ptr<char[]> q_data; // = NULL;
     if (is_cs_file( file_name) ||
         is_xcode_resource_file(file_name)) {
-        q_data = make_unique<char[]>(DATASIZE_OUT+1);
+        q_data = std::make_unique<char[]>(DATASIZE_OUT+1);
     }
     int q_datasize = 0;
 #endif
@@ -689,7 +687,7 @@ void parse_file(const char* file_name, int wordtype, const char* target_word)
             // found target
             char* q = r_data;
             {
-                lock_guard<mutex> lk(m_print_mtx);
+                std::lock_guard<std::mutex> lk(m_print_mtx);
                 // output filename and line number or EOF
     			printf("%s:%d:", file_name, lineno);
                 // output until next newline or EOF
@@ -1017,7 +1015,7 @@ bool findword_in_line(char* valid_str, int wordtype, const char* target_word)
 	if (wordtype & SG_WORDTYPE_NORMAL) {
 		// normal search
         if (wordtype & SG_WORDTYPE_CASEINSENSITIVE) {
-#ifdef WIN32
+#ifdef _WIN32
             return strstr(valid_str, target_word) != NULL;
 #else
             return strcasestr(valid_str, target_word) != NULL;
