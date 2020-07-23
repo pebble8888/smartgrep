@@ -57,19 +57,19 @@ typedef struct {
  */
 void usage(void);
 void parse_file(const char* file_name, int wordtype, const char* target_word);
-bool process_line_exclude_comment_c(bool* p_isin_multiline_comment, PREP* p_prep, char* buf, size_t bufsize, int wordtype, const char* target_word);
-bool process_line_exclude_comment_ruby(bool* p_isin_multiline_comment, char* buf, size_t bufsize, int wordtype, const char* target_word, int file_extension);
-bool process_line_exclude_comment_vb(char* buf, size_t bufsize, int wordtype, const char* target_word); 
-bool process_line_exclude_comment_vim(char* buf, size_t bufsize, int wordtype, const char* target_word); 
-bool process_line_include_comment(char* buf, size_t bufsize, int wordtype, const char* target_word);
-#ifdef WIN32
-void parse_directory_win(char* path, FILE_TYPE_INFO* p_info, int wordtype, const char* target_word);
+bool process_line_exclude_comment_c(bool& isin_multiline_comment, Prep* p_prep, char* buf, size_t bufsize, int wordtype, const char* target_word);
+bool process_line_exclude_comment_ruby(bool& isin_multiline_comment, char* buf, size_t bufsize, int wordtype, const char* target_word, int file_extension);
+bool process_line_exclude_comment_vb(const char* buf, size_t bufsize, int wordtype, const char* target_word); 
+bool process_line_exclude_comment_vim(const char* buf, size_t bufsize, int wordtype, const char* target_word); 
+bool process_line_include_comment(const char* buf, size_t bufsize, int wordtype, const char* target_word);
+#ifdef _WIN32
+void parse_directory_win(const char* path, const FILE_TYPE_INFO& info, int wordtype, const char* target_word);
 #else
-void parse_directory_mac(char* path, FILE_TYPE_INFO* p_info, int wordtype, const char* target_word);
+void parse_directory_mac(const char* path, const FILE_TYPE_INFO& info, int wordtype, const char* target_word);
 #endif
 bool is_header_file(const char* file_name);
-bool is_cs_file(FILE_TYPE_INFO* p_info, const char* file_name);
-bool is_source_file(FILE_TYPE_INFO* p_info, const char* file_name);
+bool is_cs_file(const char* file_name);
+bool is_source_file(const FILE_TYPE_INFO& info, const char* file_name);
 bool is_shell_file(const char* file_name);
 bool is_ruby_file(const char* file_name);
 bool is_crystal_file(const char* file_name);

@@ -6,7 +6,7 @@
 TARGET=smartgrep
 LIBS=
 #CXXFLAGS=-g
-CXXFLAGS=-std=c++14
+CXXFLAGS=-std=c++14 -Wall
 
 ifeq ($(OS),Windows_NT) 
 LIBS+=-lversion -lstdc++
@@ -16,8 +16,7 @@ endif
 
 all:$(TARGET)
 
-
-OBJS=smartgrep.o foldernamelist.o
+OBJS=smartgrep.o foldernamelist.o prep.o
 
 $(TARGET): $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $@ $? $(LIBS)

@@ -171,9 +171,9 @@ int main(int argc, char* argv[])
     }
     
 #ifdef _WIN32
-	parse_directory_win(path, &info, wordtype, word);
+	parse_directory_win(path, info, wordtype, word);
 #else
-	parse_directory_mac(path, &info, wordtype, word);
+	parse_directory_mac(path, info, wordtype, word);
 #endif
     
     {
@@ -237,7 +237,7 @@ void smartgrep_getrepo(char* buf, size_t size)
 		}
 		path[idx] = '\0';
 		char* r = strrchr(path, '\\');
-		if (r == NULL) {
+		if (r == nullptr) {
 			strcpy(buf, curpath);
 			return;
 		}
@@ -250,24 +250,24 @@ void smartgrep_getrepo(char* buf, size_t size)
             // 1:.hg
             strcpy(path, curpath);
             path[idx] = '\0'; 
-            if( i == 0 ) strcat( path, "/.git" );
-            else if( i == 1 ) strcat( path, "/.hg" );
+            if( i == 0 ) strcat(path, "/.git");
+            else if( i == 1 ) strcat(path, "/.hg");
             // check
             DIR* p_dir = opendir( path );
-            if( p_dir != NULL ){
+            if (p_dir != nullptr) {
                 // can access
                 closedir( p_dir );
                 path[idx] = '\0';
                 size_t len = strlen(path);
-                assert( len < size );
-                strcpy( buf, path );
+                assert(len < size);
+                strcpy(buf, path);
                 return;
             }
         }
         path[idx] = '\0';
-        char* r = strrchr( path, '/' );
-        if( r == NULL ){
-            strcpy( buf, curpath );
+        char* r = strrchr(path, '/');
+        if (r == nullptr) {
+            strcpy(buf, curpath);
             return;
         }
         idx = (size_t)(r - path); 
@@ -306,21 +306,20 @@ void usage(void)
 
 #ifdef _WIN32
 /*
- * @param char* path
- * @param int   filetype	SG_FILETYPE_SOURCE: .c/.cpp/.m/.mm/etc
- * 							SG_FILETYPE_HEADER: .h/.hpp/etc
- * @param int   wordtype	
- * @param char* target_word
+ * @param path
+ * @param filetype	SG_FILETYPE_SOURCE: .c/.cpp/.m/.mm/etc
+ * 					SG_FILETYPE_HEADER: .h/.hpp/etc
+ * @param wordtype	
+ * @param target_word
  */
-void parse_directory_win(char* path, FILE_TYPE_INFO* p_info, int wordtype, const char* target_word)
+void parse_directory_win(const char* path, const FILE_TYPE_INFO& info, int wordtype, const char* target_word)
 {
 	char path_name[512];
 	strcpy(path_name, path);
 	strcat(path_name, "\\*.*");
 	
-	HANDLE h_find;
 	WIN32_FIND_DATA find_data;
-	h_find = FindFirstFile(path_name, &find_data);
+	const auto h_find = FindFirstFile(path_name, &find_data);
 	if (h_find == INVALID_HANDLE_VALUE) {
 		printf("directory read error! [%s]\n", path);
 		return;
@@ -334,17 +333,17 @@ void parse_directory_win(char* path, FILE_TYPE_INFO* p_info, int wordtype, const
 		else if ((find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) &&
 		         find_data.cFileName[0] != '.') {
 			// not hidden directory
-            if (p_info->foldernamelist.has_foldername( find_data.cFileName )) {
+            if (info.foldernamelist.has_foldername( find_data.cFileName )) {
                 // ignore the folder
             } else {
                 char path_name_r[512];
                 strcpy(path_name_r, path);
                 strcat(path_name_r, "\\");
                 strcat(path_name_r, find_data.cFileName);
-                parse_directory_win(path_name_r, p_info, wordtype, target_word);
+                parse_directory_win(path_name_r, info, wordtype, target_word);
             }
-		} else if (((p_info->filetype & SG_FILETYPE_SOURCE) && is_source_file(p_info, find_data.cFileName)) ||
-				   ((p_info->filetype & SG_FILETYPE_HEADER) && is_header_file(find_data.cFileName))) {
+		} else if (((info.filetype & SG_FILETYPE_SOURCE) && is_source_file(info, find_data.cFileName)) ||
+				   ((info.filetype & SG_FILETYPE_HEADER) && is_header_file(find_data.cFileName))) {
             // file
 			char file_name_r[512];
 			strcpy(file_name_r, path);
@@ -369,22 +368,22 @@ void parse_directory_win(char* path, FILE_TYPE_INFO* p_info, int wordtype, const
 #else
 
 /*
- * @param char* path
- * @param int   filetype	SG_FILETYPE_SOURCE: .c/.cpp/.m/.mm/.cs/.js etc
- * 							SG_FILETYPE_HEADER: .h/.hpp/etc
- * @param int   wordtype
- * @param char* target_word
+ * @param path
+ * @param filetype	SG_FILETYPE_SOURCE: .c/.cpp/.m/.mm/.cs/.js etc
+ * 					SG_FILETYPE_HEADER: .h/.hpp/etc
+ * @param wordtype
+ * @param target_word
  */
-void parse_directory_mac(char* path, FILE_TYPE_INFO* p_info, int wordtype, const char* target_word)
+void parse_directory_mac(const char* path, const FILE_TYPE_INFO& info, int wordtype, const char* target_word)
 {
 	DIR* p_dir = opendir(path);
-	if (p_dir == NULL){
+	if (p_dir == nullptr){
 		printf("directory read error! [%s]\n", path);
 		return;
 	}
 	struct dirent* p_dirent;
     struct stat file_info;
-	while ((p_dirent = readdir(p_dir)) != NULL) {
+	while ((p_dirent = readdir(p_dir)) != nullptr) {
         char path_name_r[512];
         strcpy(path_name_r, path);
         strcat(path_name_r, "/");
@@ -392,20 +391,20 @@ void parse_directory_mac(char* path, FILE_TYPE_INFO* p_info, int wordtype, const
         lstat(path_name_r, &file_info);
 
 		if (strcmp(p_dirent->d_name, ".") == 0 ||
-		   strcmp(p_dirent->d_name, "..") == 0) {
+		    strcmp(p_dirent->d_name, "..") == 0) {
 			// do nothing
 			;
 		}
 		else if(S_ISDIR(file_info.st_mode) &&
 				p_dirent->d_name[0] != '.') {
 			// not hidden directory
-            if (p_info->foldernamelist.has_foldername(p_dirent->d_name)) {
+            if (info.foldernamelist.has_foldername(p_dirent->d_name)) {
                 // ignore the folder
             } else {
-                parse_directory_mac(path_name_r, p_info, wordtype, target_word);
+                parse_directory_mac(path_name_r, info, wordtype, target_word);
             }
-		} else if (((p_info->filetype & SG_FILETYPE_SOURCE) && is_source_file(p_info, p_dirent->d_name)) ||
-				  ((p_info->filetype & SG_FILETYPE_HEADER) && is_header_file(p_dirent->d_name))) {
+		} else if (((info.filetype & SG_FILETYPE_SOURCE) && is_source_file(info, p_dirent->d_name)) ||
+				  ((info.filetype & SG_FILETYPE_HEADER) && is_header_file(p_dirent->d_name))) {
             {
                 std::lock_guard<std::mutex> lk(filenames_mtx_);
                 filenames_queue_.push(std::string(path_name_r));
@@ -421,7 +420,7 @@ bool is_cs_file(const char* file_name) {
     return is_ext(file_name, "cs");
 }
 
-bool is_source_file(FILE_TYPE_INFO* p_info, const char* file_name) {
+bool is_source_file(const FILE_TYPE_INFO& info, const char* file_name) {
 	if (is_ext(file_name, "c") ||
 		is_ext(file_name, "cpp") || 
         is_ext(file_name, "cc") ||
@@ -434,7 +433,7 @@ bool is_source_file(FILE_TYPE_INFO* p_info, const char* file_name) {
 	    (is_ext(file_name, "cs") && !is_last(file_name, ".g.cs") && !is_last(file_name, ".g.i.cs")) ||
         is_ext(file_name, "xaml") ||
         is_ext(file_name, "resx") ||
-		(p_info->typejs && is_ext(file_name, "js")) ||
+		(info.typejs && is_ext(file_name, "js")) ||
 		is_ext(file_name, "java") ||
         is_ext(file_name, "scala") ||
 		is_ext(file_name, "go") ||
@@ -451,7 +450,7 @@ bool is_source_file(FILE_TYPE_INFO* p_info, const char* file_name) {
         is_ruby_file(file_name) ||
         is_crystal_file(file_name) ||
         is_erb_file(file_name) ||
-        (p_info->typehtml && is_html_file(file_name)) ||
+        (info.typehtml && is_html_file(file_name)) ||
         is_xml_file(file_name) ||
         is_coffee_file(file_name) ||
 	    is_python_file(file_name) ||
@@ -513,7 +512,7 @@ bool is_header_file(const char* file_name) {
  */
 bool is_ext(const char* file_name, const char* ext_name) {
 	char* period = strrchr((char*)file_name, '.');
-	if (period == NULL) {
+	if (period == nullptr) {
 		return false;
 	}
 	char buf[512];
@@ -583,7 +582,7 @@ void parse_file(const char* file_name, int wordtype, const char* target_word)
 	}
 
 	FILE* fp = fopen(file_name, "rb");
-	if (fp == NULL)
+	if (fp == nullptr)
 		return;
 
 #ifndef NOFEAT_UTF16
@@ -609,13 +608,13 @@ void parse_file(const char* file_name, int wordtype, const char* target_word)
 #endif
 
 	bool isin_multiline_comment = false;
-	PREP prep;
+	Prep prep;
 
 	// it is presumed that the one line byte size in file don't exceed 64k
     auto p_data = std::make_unique<char[]>(DATASIZE+1);
 #ifndef NOFEAT_UTF16
-    std::unique_ptr<char[]> q_data; // = NULL;
-    if (is_cs_file( file_name) ||
+    std::unique_ptr<char[]> q_data;
+    if (is_cs_file(file_name) ||
         is_xcode_resource_file(file_name)) {
         q_data = std::make_unique<char[]>(DATASIZE_OUT+1);
     }
@@ -623,7 +622,7 @@ void parse_file(const char* file_name, int wordtype, const char* target_word)
 #endif
 
 	int lineno;
-    char* r_data = NULL;
+    char* r_data = nullptr;
     size_t r_datasize = 0;
     
     const int BOMSIZE = 2;
@@ -658,14 +657,14 @@ void parse_file(const char* file_name, int wordtype, const char* target_word)
 		bool found;
 		if (wordtype & SG_WORDTYPE_EXCLUDE_COMMENT) {
 			if (file_extension == kC) {
-				found = process_line_exclude_comment_c(&isin_multiline_comment, &prep,
+				found = process_line_exclude_comment_c(isin_multiline_comment, &prep,
 													r_data, r_datasize, wordtype, target_word);
 			} else if (file_extension == kShell ||
                        file_extension == kRuby ||
                        file_extension == kCoffee ||
                        file_extension == kPython ||
                        file_extension == kPerl) {
-				found = process_line_exclude_comment_ruby(&isin_multiline_comment,
+				found = process_line_exclude_comment_ruby(isin_multiline_comment,
                                                         r_data, r_datasize, wordtype, target_word,
                                                         file_extension);
             } else if (file_extension == kVB) {
@@ -755,34 +754,34 @@ void parse_file(const char* file_name, int wordtype, const char* target_word)
  * @retval 	true : found
  * @retval	false: not found
  *
- * @param	[in/out] 	bool* 	p_isin_multiline_comment 		whether in C comment
- * @param   [in/out]    PREP* 	p_prep
- * @param	[in]		char* 	buf
- * @param	[in]		size_t	bufsize
- * @param	[in]		int 	wordtype
- * @param	[in]		char* 	target_word
+ * @param	[in/out] p_isin_multiline_comment 		whether in C comment
+ * @param   [in/out] Prep* 	p_prep
+ * @param	[in]	 char* 	buf
+ * @param	[in]	 size_t	bufsize
+ * @param	[in]	 int 	wordtype
+ * @param	[in]	 char* 	target_word
  */
-bool process_line_exclude_comment_c(bool* p_isin_multiline_comment, PREP* p_prep,
+bool process_line_exclude_comment_c(bool& isin_multiline_comment, Prep* p_prep,
 									char* buf, size_t bufsize, int wordtype, const char* target_word)
 {
 	char valid_str[DATASIZE_OUT+1];
 
 	bool isin_literal = false; // "xxx", 'xxx'
-    char* p = buf;
+    auto p = buf;
 	char* q = valid_str;
     while (p < buf + bufsize && q < &valid_str[DATASIZE_OUT+1]) {
 		if (*p == '\n' || *p == '\0') break;
-		if (!isin_literal && !(*p_isin_multiline_comment) && !(p_prep->is_commented())
+		if (!isin_literal && !isin_multiline_comment && !(p_prep->is_commented())
 			&& *p == '/' && *(p+1) == '/') {
 			// C++ comment
 			break;
-		} else if (!isin_literal && !(*p_isin_multiline_comment) && !(p_prep->is_commented())
+		} else if (!isin_literal && !isin_multiline_comment && !(p_prep->is_commented())
 					&& *p == '/' && *(p+1) == '*') {
 			// the begining of C comment
 			p += 2;
-			*p_isin_multiline_comment = true;
+			isin_multiline_comment = true;
 			continue;
-		} else if (!isin_literal && *p_isin_multiline_comment && !(p_prep->is_commented())) {
+		} else if (!isin_literal && isin_multiline_comment && !(p_prep->is_commented())) {
 			// in c comment
 			while (p < buf + bufsize) {
 				if (*p == '\n' || *p == '\0') goto WHILEOUT;
@@ -793,12 +792,12 @@ bool process_line_exclude_comment_c(bool* p_isin_multiline_comment, PREP* p_prep
 			}
 			p += 2;
 			// the end of c comment
-			*p_isin_multiline_comment = false;
-		} else if (!(*p_isin_multiline_comment) && !(p_prep->is_commented())
+			isin_multiline_comment = false;
+		} else if (!isin_multiline_comment && !(p_prep->is_commented())
 					&& ( *p == '\"' || *p == '\'') && (p == buf || *(p-1) != '\\')) {
 			// reverse isin_literal
 			isin_literal = !isin_literal;
-		} else if (!isin_literal && !(*p_isin_multiline_comment) && *p == '#') {
+		} else if (!isin_literal && !isin_multiline_comment && *p == '#') {
 			if (memcmp(p, SG_PREP_IF, strlen(SG_PREP_IF)) == 0 ||
 				memcmp(p, SG_PREP_IFDEF, strlen(SG_PREP_IFDEF)) == 0 ||
 				memcmp(p, SG_PREP_IFNDEF, strlen(SG_PREP_IFNDEF)) == 0 ) {
@@ -809,7 +808,7 @@ bool process_line_exclude_comment_c(bool* p_isin_multiline_comment, PREP* p_prep
 					p += strlen(SG_PREP_IFZERO);
 				} else {
 					p_prep->push(false);
-					if (memcmp( p, SG_PREP_IF, strlen(SG_PREP_IF)) == 0) {
+					if (memcmp(p, SG_PREP_IF, strlen(SG_PREP_IF)) == 0) {
 						p += strlen(SG_PREP_IF);
 					} else if (memcmp(p, SG_PREP_IFDEF, strlen(SG_PREP_IFDEF)) == 0) {
 						p += strlen(SG_PREP_IFDEF);
@@ -839,7 +838,7 @@ bool process_line_exclude_comment_c(bool* p_isin_multiline_comment, PREP* p_prep
 				p += strlen(SG_PREP_ENDIF);
 				continue;
 			}
-		} else if (!isin_literal && !(*p_isin_multiline_comment) && p_prep->is_commented()) {
+		} else if (!isin_literal && !isin_multiline_comment && p_prep->is_commented()) {
             ++p;
 			continue;
 		}
@@ -856,7 +855,7 @@ WHILEOUT:
 /**
  * dynamic languages
  */
-bool process_line_exclude_comment_ruby(bool* p_isin_multiline_comment,
+bool process_line_exclude_comment_ruby(bool& isin_multiline_comment,
                                 char* buf, size_t bufsize, int wordtype, const char* target_word,
                                 int file_extension)
 {
@@ -868,7 +867,7 @@ bool process_line_exclude_comment_ruby(bool* p_isin_multiline_comment,
     for (char* p = buf; p < buf + bufsize; ++p) {
 		if (*p == '\n' || *p == '\0') break; 
 
-        if (!(*p_isin_multiline_comment)
+        if (!isin_multiline_comment
             && !isin_dq && !isin_sq
             && ((file_extension == kRuby && p == buf && memcmp(p, "=begin", 5) == 0) ||
                 (file_extension == kPerl && p == buf && memcmp(p, "=pod", 4) == 0) ||
@@ -881,9 +880,9 @@ bool process_line_exclude_comment_ruby(bool* p_isin_multiline_comment,
             else if (file_extension == kPerl) { p += 4; }
             else if (file_extension == kCoffee) { p += 3; }
             else if (file_extension == kPython) { p += 3; }
-            *p_isin_multiline_comment = true;
+            isin_multiline_comment = true;
             continue;
-        } else if (!isin_dq && !isin_sq && *p_isin_multiline_comment) {
+        } else if (!isin_dq && !isin_sq && isin_multiline_comment) {
             // in multi-line comment
             bool found = false;
             while (p < buf + bufsize) {
@@ -910,24 +909,24 @@ bool process_line_exclude_comment_ruby(bool* p_isin_multiline_comment,
             }
             if (found) {
                 // the end of multi-line comment
-                *p_isin_multiline_comment = false;
+                isin_multiline_comment = false;
             }
-        } else if (!(*p_isin_multiline_comment)
+        } else if (!isin_multiline_comment
             && !isin_sq && !isin_dq && *p == '#') {
 			// single-line comment
 			break;
-		} else if (!(*p_isin_multiline_comment)
+		} else if (!isin_multiline_comment
                    && !isin_sq && *p == '\"' && ( p == buf || *(p-1) != '\\')) {
 			// reverse isin_dq
 			isin_dq = !isin_dq;
-		} else if (!(*p_isin_multiline_comment)
+		} else if (!isin_multiline_comment
                    && !isin_dq && *p == '\'' && ( p == buf || *(p-1) != '\\')) {
 			// reverse isin_sq
 			isin_sq = !isin_sq;
-		} else if (!(*p_isin_multiline_comment)
+		} else if (!isin_multiline_comment
                    && isin_dq && !isin_var && *p == '#' && *(p+1) == '{') {
 			isin_var = true;
-		} else if (!(*p_isin_multiline_comment)
+		} else if (!isin_multiline_comment
                    && isin_dq && file_extension == kRuby && isin_var && *p == '}') {
 			isin_var = false;
 		}
@@ -945,12 +944,12 @@ WHILEOUT:
 /**
  * visual basic 6 and visual basic dot net
  */
-bool process_line_exclude_comment_vb(char* buf, size_t bufsize, int wordtype, const char* target_word)
+bool process_line_exclude_comment_vb(const char* buf, size_t bufsize, int wordtype, const char* target_word)
 {
 	char valid_str[DATASIZE_OUT+1];
 	bool isin_dq = false; // "xxx"
 	char* q = valid_str;
-    for (char* p = buf; p < buf + bufsize; ++p) {
+    for (auto p = (char*)buf; p < buf + bufsize; ++p) {
 		if (*p == '\n' || *p == '\0') break; 
 
         if (!isin_dq && *p == '\'') {
@@ -965,7 +964,6 @@ bool process_line_exclude_comment_vb(char* buf, size_t bufsize, int wordtype, co
 		// valid data
 		*(q++) = *p;
 	}
-WHILEOUT:
     *q = 0x0; // null terminate
 	return findword_in_line(valid_str, wordtype, target_word);
 }
@@ -973,12 +971,12 @@ WHILEOUT:
 /**
  * vim script
  */
-bool process_line_exclude_comment_vim(char* buf, size_t bufsize, int wordtype, const char* target_word)
+bool process_line_exclude_comment_vim(const char* buf, size_t bufsize, int wordtype, const char* target_word)
 {
 	char valid_str[DATASIZE_OUT+1];
 	bool found_anything_but_whitespace = false;
     char* q = valid_str;
-    for (char* p = buf; p < buf + bufsize; ++p) {
+    for (auto p = (char*)buf; p < buf + bufsize; ++p) {
 		if (*p == '\n' || *p == '\0' ) break;
 
         if (!found_anything_but_whitespace && *p == '\"') {
@@ -993,7 +991,6 @@ bool process_line_exclude_comment_vim(char* buf, size_t bufsize, int wordtype, c
 		// valid data
 		*(q++) = *p;
 	}
-WHILEOUT:
     *q = 0x0; // null terminate
     return findword_in_line(valid_str, wordtype, target_word);
 }
@@ -1016,22 +1013,22 @@ bool findword_in_line(char* valid_str, int wordtype, const char* target_word)
 		// normal search
         if (wordtype & SG_WORDTYPE_CASEINSENSITIVE) {
 #ifdef _WIN32
-            return strstr(valid_str, target_word) != NULL;
+            return strstr(valid_str, target_word) != nullptr;
 #else
-            return strcasestr(valid_str, target_word) != NULL;
+            return strcasestr(valid_str, target_word) != nullptr;
 #endif
         } else {
-            return strstr(valid_str, target_word) != NULL;
+            return strstr(valid_str, target_word) != nullptr;
         }
 	} else if (wordtype & SG_WORDTYPE_WORD) {
 		// word search
-		int   target_word_len = (int)strlen(target_word);
+		const auto target_word_len = (int)strlen(target_word);
 		char* remain_ptr = valid_str;
 		char* findptr = strstr( valid_str, target_word );
 
-		while (findptr != NULL) {
-			bool  head = false;
-			bool  tail = false;
+		while (findptr != nullptr) {
+			bool head = false;
+			bool tail = false;
 			if (findptr == remain_ptr) {
 				head = true;
 			} else {
@@ -1061,16 +1058,17 @@ bool findword_in_line(char* valid_str, int wordtype, const char* target_word)
 /**
  * @brief   as is
  * @retval	true: found target
- * @retval	false:not found target
- * @param [in] char* buf
- * @param [in] int worktype
- * @param [in] char* target_word
+ * @retval	false: not found target
+ * @param [in] buf
+ * @param [in] bufsize
+ * @param [in] worktype
+ * @param [in] target_word
  */
-bool process_line_include_comment(char* buf, size_t bufsize, int wordtype, const char* target_word)
+bool process_line_include_comment(const char* buf, size_t bufsize, int wordtype, const char* target_word)
 {
     char valid_str[DATASIZE_OUT+1];
     char* q = valid_str;
-    for (char* p = buf ; p < buf + bufsize && q < &valid_str[DATASIZE_OUT+1]; ++p) {
+    for (auto p = (char*)buf ; p < buf + bufsize && q < &valid_str[DATASIZE_OUT+1]; ++p) {
         if (*p == '\0' || *p == '\r' || *p  =='\n') {
             break;
         }
