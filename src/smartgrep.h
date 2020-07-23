@@ -57,8 +57,8 @@ typedef struct {
  */
 void usage(void);
 void parse_file(const char* file_name, int wordtype, const char* target_word);
-bool process_line_exclude_comment_c(bool& isin_multiline_comment, Prep* p_prep, char* buf, size_t bufsize, int wordtype, const char* target_word);
-bool process_line_exclude_comment_ruby(bool& isin_multiline_comment, char* buf, size_t bufsize, int wordtype, const char* target_word, int file_extension);
+bool process_line_exclude_comment_c(bool& isin_multiline_comment, Prep& prep, const char* buf, size_t bufsize, int wordtype, const char* target_word);
+bool process_line_exclude_comment_ruby(bool& isin_multiline_comment, const char* buf, size_t bufsize, int wordtype, const char* target_word, int file_extension);
 bool process_line_exclude_comment_vb(const char* buf, size_t bufsize, int wordtype, const char* target_word); 
 bool process_line_exclude_comment_vim(const char* buf, size_t bufsize, int wordtype, const char* target_word); 
 bool process_line_include_comment(const char* buf, size_t bufsize, int wordtype, const char* target_word);
@@ -91,7 +91,7 @@ int UTF16LEToUTF8(int16_t* pIn, int count, char* pOut);
 
 void smartgrep_getcwd(char* buf, size_t size);
 void smartgrep_getrepo(char* buf, size_t size);
-void test_is_alnum_or_underscore( void);
+void test_is_alnum_or_underscore(void);
 void test(void);
 
 #endif /* SMARTGREP_H */

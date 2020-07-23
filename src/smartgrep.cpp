@@ -657,7 +657,7 @@ void parse_file(const char* file_name, int wordtype, const char* target_word)
 		bool found;
 		if (wordtype & SG_WORDTYPE_EXCLUDE_COMMENT) {
 			if (file_extension == kC) {
-				found = process_line_exclude_comment_c(isin_multiline_comment, &prep,
+				found = process_line_exclude_comment_c(isin_multiline_comment, prep,
 													r_data, r_datasize, wordtype, target_word);
 			} else if (file_extension == kShell ||
                        file_extension == kRuby ||
@@ -748,21 +748,26 @@ void parse_file(const char* file_name, int wordtype, const char* target_word)
 	fclose(fp);
 }
 
-/*
- * @brief	parse one line in file excluding comemnt
+/**
+ * @brief parse one line in file excluding comemnt
  *
- * @retval 	true : found
- * @retval	false: not found
+ * @retval true : found
+ * @retval false: not found
  *
- * @param	[in/out] p_isin_multiline_comment 		whether in C comment
- * @param   [in/out] Prep* 	p_prep
- * @param	[in]	 char* 	buf
- * @param	[in]	 size_t	bufsize
- * @param	[in]	 int 	wordtype
- * @param	[in]	 char* 	target_word
+ * @param [in/out] isin_multiline_comment 		whether in C comment
+ * @param [in/out] prep
+ * @param [in] buf
+ * @param [in] bufsize
+ * @param [in] wordtype
+ * @param [in] target_word
  */
-bool process_line_exclude_comment_c(bool& isin_multiline_comment, Prep* p_prep,
-									char* buf, size_t bufsize, int wordtype, const char* target_word)
+bool process_line_exclude_comment_c(
+    bool& isin_multiline_comment,
+    Prep& prep,
+    const char* buf,
+    size_t bufsize,
+    int wordtype,
+    const char* target_word)
 {
 	char valid_str[DATASIZE_OUT+1];
 
@@ -771,17 +776,17 @@ bool process_line_exclude_comment_c(bool& isin_multiline_comment, Prep* p_prep,
 	char* q = valid_str;
     while (p < buf + bufsize && q < &valid_str[DATASIZE_OUT+1]) {
 		if (*p == '\n' || *p == '\0') break;
-		if (!isin_literal && !isin_multiline_comment && !(p_prep->is_commented())
+		if (!isin_literal && !isin_multiline_comment && !prep.is_commented()
 			&& *p == '/' && *(p+1) == '/') {
 			// C++ comment
 			break;
-		} else if (!isin_literal && !isin_multiline_comment && !(p_prep->is_commented())
+		} else if (!isin_literal && !isin_multiline_comment && !prep.is_commented()
 					&& *p == '/' && *(p+1) == '*') {
 			// the begining of C comment
 			p += 2;
 			isin_multiline_comment = true;
 			continue;
-		} else if (!isin_literal && isin_multiline_comment && !(p_prep->is_commented())) {
+		} else if (!isin_literal && isin_multiline_comment && !prep.is_commented()) {
 			// in c comment
 			while (p < buf + bufsize) {
 				if (*p == '\n' || *p == '\0') goto WHILEOUT;
@@ -793,7 +798,7 @@ bool process_line_exclude_comment_c(bool& isin_multiline_comment, Prep* p_prep,
 			p += 2;
 			// the end of c comment
 			isin_multiline_comment = false;
-		} else if (!isin_multiline_comment && !(p_prep->is_commented())
+		} else if (!isin_multiline_comment && !prep.is_commented()
 					&& ( *p == '\"' || *p == '\'') && (p == buf || *(p-1) != '\\')) {
 			// reverse isin_literal
 			isin_literal = !isin_literal;
@@ -804,10 +809,10 @@ bool process_line_exclude_comment_c(bool& isin_multiline_comment, Prep* p_prep,
 				// #if or #ifdef or #ifndef
 				if (memcmp(p, SG_PREP_IFZERO, strlen(SG_PREP_IFZERO)) == 0) {
 					// #if 0
-					p_prep->push(true);
+					prep.push(true);
 					p += strlen(SG_PREP_IFZERO);
 				} else {
-					p_prep->push(false);
+					prep.push(false);
 					if (memcmp(p, SG_PREP_IF, strlen(SG_PREP_IF)) == 0) {
 						p += strlen(SG_PREP_IF);
 					} else if (memcmp(p, SG_PREP_IFDEF, strlen(SG_PREP_IFDEF)) == 0) {
@@ -819,10 +824,10 @@ bool process_line_exclude_comment_c(bool& isin_multiline_comment, Prep* p_prep,
 					}
 				}
 				continue;
-			} else if (p_prep->can_change_to_else()
+			} else if (prep.can_change_to_else()
 					   && (memcmp(p, SG_PREP_ELIF, strlen(SG_PREP_ELIF)) == 0 ||
 						   memcmp(p, SG_PREP_ELSE, strlen(SG_PREP_ELSE)) == 0)) {
-				p_prep->change_to_else();
+				prep.change_to_else();
 
 				if (memcmp(p, SG_PREP_ELIF, strlen(SG_PREP_ELIF)) == 0) {
 					p += strlen(SG_PREP_ELIF);
@@ -834,11 +839,11 @@ bool process_line_exclude_comment_c(bool& isin_multiline_comment, Prep* p_prep,
 				continue;
 			} else if (memcmp(p, SG_PREP_ENDIF, strlen(SG_PREP_ENDIF)) == 0) {
 				// #endif
-				p_prep->pop();
+				prep.pop();
 				p += strlen(SG_PREP_ENDIF);
 				continue;
 			}
-		} else if (!isin_literal && !isin_multiline_comment && p_prep->is_commented()) {
+		} else if (!isin_literal && !isin_multiline_comment && prep.is_commented()) {
             ++p;
 			continue;
 		}
@@ -855,16 +860,20 @@ WHILEOUT:
 /**
  * dynamic languages
  */
-bool process_line_exclude_comment_ruby(bool& isin_multiline_comment,
-                                char* buf, size_t bufsize, int wordtype, const char* target_word,
-                                int file_extension)
+bool process_line_exclude_comment_ruby(
+    bool& isin_multiline_comment,
+    const char* buf,
+    size_t bufsize,
+    int wordtype,
+    const char* target_word,
+    int file_extension)
 {
 	char valid_str[DATASIZE_OUT];
-	bool isin_dq = false; // "xxx"
-	bool isin_sq = false; // 'xxx'
-	bool isin_var = false; // "#{}"
+	auto isin_dq = false; // "xxx"
+	auto isin_sq = false; // 'xxx'
+	auto isin_var = false; // "#{}"
 	char* q = valid_str;
-    for (char* p = buf; p < buf + bufsize; ++p) {
+    for (auto p = (char*)buf; p < buf + bufsize; ++p) {
 		if (*p == '\n' || *p == '\0') break; 
 
         if (!isin_multiline_comment
