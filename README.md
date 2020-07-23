@@ -2,8 +2,6 @@
 smartgrep  
 =======
 
-[![Build Status](https://travis-ci.org/pebble8888/smartgrep.svg?branch=master)](https://travis-ci.org/pebble8888/smartgrep)
-
 Grep word in source files excluding comment for vim plugin.  
 Grep is very fast because C compiled binary is used.  
 Auto project detection using .git or .hg folder.  
@@ -12,11 +10,11 @@ Example
 =======
 If C source file func.c looks like
 ```c
-void glare_at( int brave_boy, int pretty_girl ){
+void glareAt(int human, int mage){
     /* BUGFIX
-    petrify( brave_boy );
+    petrify(human);
      */
-    petrify( pretty_girl );
+    petrify(mage);
 }
 ```
 ```
@@ -24,7 +22,7 @@ $ smartgrep -ew petrify
 ```
 This command puts
 ```
-/Users/pebble/func.c:5:    petrify( pretty_girl );
+/Users/pebble/func.c:5:    petrify(mage);
 ```
 Support OS
 =======
