@@ -43,7 +43,7 @@ If you would like to use it for another language, please request me or try this 
   
 Usage (smartgrep.vim command)
 =======
-Always git and mercurial repository auto detection works.  
+Git and mercurial repository auto detection works by default setting.  
 If you don't want to use auto detection,  
 define g:smartgrep_basedir in your .vimrc file.  
     example:  
