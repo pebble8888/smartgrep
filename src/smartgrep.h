@@ -55,44 +55,44 @@ typedef struct {
 /**
  * @brief	function prototype
  */
-void usage( void );
-void parse_file( const char* file_name, int wordtype, const char* target_word );
-bool process_line_exclude_comment_c( bool* p_isin_multiline_comment, PREP* p_prep, char* buf, size_t bufsize, int wordtype, const char* target_word );
-bool process_line_exclude_comment_ruby( bool* p_isin_multiline_comment, char* buf, size_t bufsize, int wordtype, const char* target_word, int file_extension );
-bool process_line_exclude_comment_vb( char* buf, size_t bufsize, int wordtype, const char* target_word ); 
-bool process_line_exclude_comment_vim( char* buf, size_t bufsize, int wordtype, const char* target_word ); 
-bool process_line_include_comment( char* buf, size_t bufsize, int wordtype, const char* target_word );
+void usage(void);
+void parse_file(const char* file_name, int wordtype, const char* target_word);
+bool process_line_exclude_comment_c(bool* p_isin_multiline_comment, PREP* p_prep, char* buf, size_t bufsize, int wordtype, const char* target_word);
+bool process_line_exclude_comment_ruby(bool* p_isin_multiline_comment, char* buf, size_t bufsize, int wordtype, const char* target_word, int file_extension);
+bool process_line_exclude_comment_vb(char* buf, size_t bufsize, int wordtype, const char* target_word); 
+bool process_line_exclude_comment_vim(char* buf, size_t bufsize, int wordtype, const char* target_word); 
+bool process_line_include_comment(char* buf, size_t bufsize, int wordtype, const char* target_word);
 #ifdef WIN32
-void parse_directory_win( char* path, FILE_TYPE_INFO* p_info, int wordtype, const char* target_word );
+void parse_directory_win(char* path, FILE_TYPE_INFO* p_info, int wordtype, const char* target_word);
 #else
-void parse_directory_mac( char* path, FILE_TYPE_INFO* p_info, int wordtype, const char* target_word );
+void parse_directory_mac(char* path, FILE_TYPE_INFO* p_info, int wordtype, const char* target_word);
 #endif
-bool is_header_file( const char* file_name );
-bool is_cs_file( FILE_TYPE_INFO* p_info, const char* file_name );
-bool is_source_file( FILE_TYPE_INFO* p_info, const char* file_name );
-bool is_shell_file( const char* file_name );
-bool is_ruby_file( const char* file_name );
-bool is_crystal_file( const char* file_name );
-bool is_erb_file( const char* file_name );
-bool is_html_file( const char* file_name );
-bool is_xml_file( const char* file_name );
-bool is_coffee_file( const char* file_name );
-bool is_python_file( const char* file_name );
-bool is_perl_file( const char* file_name );
-bool is_vb_file( const char* file_name );
-bool is_vim_file( const char* file_name );
-bool is_xcode_resource_file( const char* file_name );
-bool is_ext( const char* file_name, const char* ext_name );
+bool is_header_file(const char* file_name);
+bool is_cs_file(FILE_TYPE_INFO* p_info, const char* file_name);
+bool is_source_file(FILE_TYPE_INFO* p_info, const char* file_name);
+bool is_shell_file(const char* file_name);
+bool is_ruby_file(const char* file_name);
+bool is_crystal_file(const char* file_name);
+bool is_erb_file(const char* file_name);
+bool is_html_file(const char* file_name);
+bool is_xml_file(const char* file_name);
+bool is_coffee_file(const char* file_name);
+bool is_python_file(const char* file_name);
+bool is_perl_file(const char* file_name);
+bool is_vb_file(const char* file_name);
+bool is_vim_file(const char* file_name);
+bool is_xcode_resource_file(const char* file_name);
+bool is_ext(const char* file_name, const char* ext_name);
 bool is_last(const char* file_name, const char* last_name);
-bool findword_in_line( char* valid_str, int wordtype, const char* target_word );
-bool is_alnum_or_underscore( int val );
-void print_version( void );
-int UTF16LEToUTF8( int16_t* pIn, int count, char* pOut );
+bool findword_in_line(char* valid_str, int wordtype, const char* target_word);
+bool is_alnum_or_underscore(int val);
+void print_version(void);
+int UTF16LEToUTF8(int16_t* pIn, int count, char* pOut);
 
-void smartgrep_getcwd( char* buf, size_t size );
-void smartgrep_getrepo( char* buf, size_t size );
-void test_is_alnum_or_underscore( void );
-void test( void );
+void smartgrep_getcwd(char* buf, size_t size);
+void smartgrep_getrepo(char* buf, size_t size);
+void test_is_alnum_or_underscore( void);
+void test(void);
 
 #endif /* SMARTGREP_H */
 
