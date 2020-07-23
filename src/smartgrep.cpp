@@ -40,11 +40,11 @@ const static int DATASIZE_OUT = DATASIZE*3/sizeof(wchar_t);
 const static char kTab = 0x9;
 const static char kSpace = 0x20;
 
-static std::queue<std::string> m_queue;       // use m_queue_mtx for access
-static bool m_done_adding_files;   // use m_queue_mtx for access
-static std::mutex m_queue_mtx;
-static std::condition_variable m_files_ready_cond;
-static std::mutex m_print_mtx;
+static std::queue<std::string> filenames_queue_; // use filenames_mtx_ for access
+static bool done_adding_files_;   // use filenames_mtx_ for access
+static std::mutex filenames_mtx_;
+static std::condition_variable files_ready_cond_;
+static std::mutex print_mtx_; // use for printf call
 
 void test(void)
 {
@@ -56,16 +56,16 @@ static void search_worker(const int wordtype, const std::string word)
     while (true) {
         std::string s;
         {
-            std::unique_lock<std::mutex> lk(m_queue_mtx);
-            while (m_queue.empty()){
-                if (m_done_adding_files) {
+            std::unique_lock<std::mutex> lk(filenames_mtx_);
+            while (filenames_queue_.empty()){
+                if (done_adding_files_) {
                     lk.unlock();
                     return; // exit thread
                 }
-                m_files_ready_cond.wait(lk);
+                files_ready_cond_.wait(lk);
             }
-            s = m_queue.front();
-            m_queue.pop();
+            s = filenames_queue_.front();
+            filenames_queue_.pop();
         }
         parse_file(s.c_str(), wordtype, word.c_str());
     }
@@ -163,7 +163,7 @@ int main(int argc, char* argv[])
         workers_len = 1;
     }
    
-    m_done_adding_files = false;
+    done_adding_files_ = false;
     std::vector<std::shared_ptr<std::thread>> v_thread;
     for (int i = 0; i < workers_len; ++i) {
         auto th = std::make_shared<std::thread>(search_worker, wordtype, std::string(word));
@@ -177,9 +177,9 @@ int main(int argc, char* argv[])
 #endif
     
     {
-        std::lock_guard<std::mutex> lk(m_queue_mtx);
-        m_done_adding_files = true;
-        m_files_ready_cond.notify_all();
+        std::lock_guard<std::mutex> lk(filenames_mtx_);
+        done_adding_files_ = true;
+        files_ready_cond_.notify_all();
     }
     
     for (int i = 0; i < workers_len; ++i) {
@@ -351,9 +351,9 @@ void parse_directory_win(char* path, FILE_TYPE_INFO* p_info, int wordtype, const
 			strcat(file_name_r, "\\");
 			strcat(file_name_r, find_data.cFileName);
             {
-                lock_guard<mutex> lk(m_queue_mtx);
-                m_queue.push(std::string(file_name_r));
-                m_files_ready_cond.notify_one();
+                lock_guard<mutex> lk(filenames_mtx_);
+                filenames_queue_.push(std::string(file_name_r));
+                files_ready_cond_.notify_one();
             }
 		}
 		BOOL ret = FindNextFile(h_find, &find_data);
@@ -407,9 +407,9 @@ void parse_directory_mac(char* path, FILE_TYPE_INFO* p_info, int wordtype, const
 		} else if (((p_info->filetype & SG_FILETYPE_SOURCE) && is_source_file(p_info, p_dirent->d_name)) ||
 				  ((p_info->filetype & SG_FILETYPE_HEADER) && is_header_file(p_dirent->d_name))) {
             {
-                std::lock_guard<std::mutex> lk(m_queue_mtx);
-                m_queue.push(std::string(path_name_r));
-                m_files_ready_cond.notify_one();
+                std::lock_guard<std::mutex> lk(filenames_mtx_);
+                filenames_queue_.push(std::string(path_name_r));
+                files_ready_cond_.notify_one();
             }
         }
 	}
@@ -687,7 +687,7 @@ void parse_file(const char* file_name, int wordtype, const char* target_word)
             // found target
             char* q = r_data;
             {
-                std::lock_guard<std::mutex> lk(m_print_mtx);
+                std::lock_guard<std::mutex> lk(print_mtx_);
                 // output filename and line number or EOF
     			printf("%s:%d:", file_name, lineno);
                 // output until next newline or EOF
