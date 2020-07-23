@@ -91,31 +91,31 @@ int main(int argc, char* argv[])
     info.filetype = 0;
     info.typejs = true;
     info.typehtml = true;
-	if (strcmp( argv[1], "-i" ) == 0) {
+	if (strcmp(argv[1], "-i") == 0) {
 		info.filetype |= (SG_FILETYPE_SOURCE|SG_FILETYPE_HEADER);
 		wordtype |= SG_WORDTYPE_NORMAL;
 		wordtype |= SG_WORDTYPE_INCLUDE_COMMENT;
-	} else if (strcmp( argv[1], "-h" ) == 0) {
+	} else if (strcmp(argv[1], "-h") == 0) {
 		info.filetype |= SG_FILETYPE_HEADER;
 		wordtype |= SG_WORDTYPE_NORMAL;
 		wordtype |= SG_WORDTYPE_EXCLUDE_COMMENT;
-	} else if (strcmp( argv[1], "-e" ) == 0) {
+	} else if (strcmp(argv[1], "-e") == 0) {
 		info.filetype |= (SG_FILETYPE_SOURCE|SG_FILETYPE_HEADER);
 		wordtype |= SG_WORDTYPE_NORMAL;
 		wordtype |= SG_WORDTYPE_EXCLUDE_COMMENT;
-	} else if (strcmp( argv[1], "-iw" ) == 0) {
+	} else if (strcmp(argv[1], "-iw") == 0) {
 		info.filetype |= (SG_FILETYPE_SOURCE|SG_FILETYPE_HEADER);
 		wordtype |= SG_WORDTYPE_WORD;
 		wordtype |= SG_WORDTYPE_INCLUDE_COMMENT;
-	} else if (strcmp( argv[1], "-hw" ) == 0) {
+	} else if (strcmp(argv[1], "-hw") == 0) {
 		info.filetype |= SG_FILETYPE_HEADER;
 		wordtype |= SG_WORDTYPE_WORD;
 		wordtype |= SG_WORDTYPE_EXCLUDE_COMMENT;
-	} else if (strcmp( argv[1], "-ew" ) == 0) {
+	} else if (strcmp(argv[1], "-ew") == 0) {
 		info.filetype |= (SG_FILETYPE_SOURCE|SG_FILETYPE_HEADER);
 		wordtype |= SG_WORDTYPE_WORD;
 		wordtype |= SG_WORDTYPE_EXCLUDE_COMMENT;
-    } else if (strcmp( argv[1], "-c" ) == 0) {
+    } else if (strcmp(argv[1], "-c") == 0) {
         info.filetype |= (SG_FILETYPE_SOURCE|SG_FILETYPE_HEADER);
         wordtype |= SG_WORDTYPE_NORMAL;
         wordtype |= SG_WORDTYPE_INCLUDE_COMMENT;
@@ -125,7 +125,7 @@ int main(int argc, char* argv[])
 		return 1;
 	}
     for (int i = 2; i < argc; ++i) {
-        if (strcmp( argv[i], "-g" ) == 0) {
+        if (strcmp( argv[i], "-g") == 0) {
             use_repo = true;
         } else if (strcmp(argv[i], "--nojs") == 0) {
             info.typejs = false;
@@ -277,7 +277,7 @@ void smartgrep_getrepo(char* buf, size_t size)
 #endif
 }
 
-void usage( void )
+void usage(void)
 {
 	printf( 
 		"Usage: smartgrep {-e[w]|-i[w]|-h[w]|-c} [options] word_you_grep\n"
@@ -314,58 +314,58 @@ void usage( void )
  * @param int   wordtype	
  * @param char* target_word
  */
-void parse_directory_win( char* path, FILE_TYPE_INFO* p_info, int wordtype, const char* target_word )
+void parse_directory_win(char* path, FILE_TYPE_INFO* p_info, int wordtype, const char* target_word)
 {
 	char path_name[512];
-	strcpy( path_name, path );
-	strcat( path_name, "\\*.*" );
+	strcpy(path_name, path);
+	strcat(path_name, "\\*.*");
 	
 	HANDLE h_find;
 	WIN32_FIND_DATA find_data;
-	h_find = FindFirstFile( path_name, &find_data );
-	if( h_find == INVALID_HANDLE_VALUE ){
-		printf( "directory read error! [%s]\n", path );
+	h_find = FindFirstFile(path_name, &find_data);
+	if (h_find == INVALID_HANDLE_VALUE) {
+		printf("directory read error! [%s]\n", path);
 		return;
 	}
-	while( true ){
-		if( strcmp( find_data.cFileName, "." ) == 0 ||
-			strcmp( find_data.cFileName, ".." ) == 0 ){
+	while (true) {
+		if (strcmp( find_data.cFileName, ".") == 0 ||
+			strcmp( find_data.cFileName, "..") == 0) {
 			// do nothing
 			;
 		}
-		else if( (find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY ) &&
-		         find_data.cFileName[0] != '.' ){
+		else if ((find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) &&
+		         find_data.cFileName[0] != '.') {
 			// not hidden directory
-            if( p_info->foldernamelist.has_foldername( find_data.cFileName ) ){
+            if (p_info->foldernamelist.has_foldername( find_data.cFileName )) {
                 // ignore the folder
             } else {
                 char path_name_r[512];
-                strcpy( path_name_r, path );
-                strcat( path_name_r, "\\" );
-                strcat( path_name_r, find_data.cFileName );
-                parse_directory_win( path_name_r, p_info, wordtype, target_word );
+                strcpy(path_name_r, path);
+                strcat(path_name_r, "\\");
+                strcat(path_name_r, find_data.cFileName);
+                parse_directory_win(path_name_r, p_info, wordtype, target_word);
             }
-		} else if( ( (p_info->filetype & SG_FILETYPE_SOURCE ) && is_source_file( p_info, find_data.cFileName ) ) ||
-				   ( (p_info->filetype & SG_FILETYPE_HEADER ) && is_header_file( find_data.cFileName ) ) ){
+		} else if (((p_info->filetype & SG_FILETYPE_SOURCE) && is_source_file(p_info, find_data.cFileName)) ||
+				   ((p_info->filetype & SG_FILETYPE_HEADER) && is_header_file(find_data.cFileName))) {
             // file
 			char file_name_r[512];
-			strcpy( file_name_r, path );
-			strcat( file_name_r, "\\" );
-			strcat( file_name_r, find_data.cFileName );
+			strcpy(file_name_r, path);
+			strcat(file_name_r, "\\");
+			strcat(file_name_r, find_data.cFileName);
             {
                 lock_guard<mutex> lk(m_queue_mtx);
                 m_queue.push(string(file_name_r));
                 m_files_ready_cond.notify_one();
             }
 		}
-		BOOL ret = FindNextFile( h_find, &find_data );
-		if( !ret ){
+		BOOL ret = FindNextFile(h_find, &find_data);
+		if (!ret) {
 			DWORD dwError = GetLastError();
-			assert( dwError == ERROR_NO_MORE_FILES );
+			assert(dwError == ERROR_NO_MORE_FILES);
 			break;
 		}
 	}
-	FindClose( h_find );
+	FindClose(h_find);
 }
 
 #else
@@ -377,37 +377,37 @@ void parse_directory_win( char* path, FILE_TYPE_INFO* p_info, int wordtype, cons
  * @param int   wordtype
  * @param char* target_word
  */
-void parse_directory_mac( char* path, FILE_TYPE_INFO* p_info, int wordtype, const char* target_word )
+void parse_directory_mac(char* path, FILE_TYPE_INFO* p_info, int wordtype, const char* target_word)
 {
-	DIR* p_dir = opendir( path );
-	if( p_dir == NULL ){
-		printf( "directory read error! [%s]\n", path );
+	DIR* p_dir = opendir(path);
+	if (p_dir == NULL){
+		printf("directory read error! [%s]\n", path);
 		return;
 	}
 	struct dirent* p_dirent;
     struct stat file_info;
-	while( (p_dirent = readdir( p_dir )) != NULL ){
+	while ((p_dirent = readdir(p_dir)) != NULL) {
         char path_name_r[512];
-        strcpy( path_name_r, path );
-        strcat( path_name_r, "/" );
-        strcat( path_name_r, p_dirent->d_name );
+        strcpy(path_name_r, path);
+        strcat(path_name_r, "/");
+        strcat(path_name_r, p_dirent->d_name);
         lstat(path_name_r, &file_info);
 
-		if( strcmp( p_dirent->d_name, "." ) == 0 ||
-		   strcmp( p_dirent->d_name, ".." ) == 0 ){
+		if (strcmp(p_dirent->d_name, ".") == 0 ||
+		   strcmp(p_dirent->d_name, "..") == 0) {
 			// do nothing
 			;
 		}
 		else if(S_ISDIR(file_info.st_mode) &&
-				p_dirent->d_name[0] != '.' ){
+				p_dirent->d_name[0] != '.') {
 			// not hidden directory
-            if( p_info->foldernamelist.has_foldername( p_dirent->d_name ) ){
+            if (p_info->foldernamelist.has_foldername(p_dirent->d_name)) {
                 // ignore the folder
             } else {
-                parse_directory_mac( path_name_r, p_info, wordtype, target_word );
+                parse_directory_mac(path_name_r, p_info, wordtype, target_word);
             }
-		} else if( ( (p_info->filetype & SG_FILETYPE_SOURCE ) && is_source_file( p_info, p_dirent->d_name ) ) ||
-				  ( (p_info->filetype & SG_FILETYPE_HEADER ) && is_header_file( p_dirent->d_name ) ) ){
+		} else if (((p_info->filetype & SG_FILETYPE_SOURCE) && is_source_file(p_info, p_dirent->d_name)) ||
+				  ((p_info->filetype & SG_FILETYPE_HEADER) && is_header_file(p_dirent->d_name))) {
             {
                 lock_guard<mutex> lk(m_queue_mtx);
                 m_queue.push(string(path_name_r));
@@ -415,78 +415,78 @@ void parse_directory_mac( char* path, FILE_TYPE_INFO* p_info, int wordtype, cons
             }
         }
 	}
-	closedir( p_dir );	
+	closedir(p_dir);
 }
 #endif
 
-bool is_cs_file( const char* file_name ){
-    return is_ext( file_name, "cs" );
+bool is_cs_file(const char* file_name) {
+    return is_ext(file_name, "cs");
 }
 
-bool is_source_file( FILE_TYPE_INFO* p_info, const char* file_name ){
-	if( is_ext( file_name, "c" ) ||
-		is_ext( file_name, "cpp" ) || 
-        is_ext( file_name, "cc" ) ||
-		is_ext( file_name, "cxx" ) ||
-		is_ext( file_name, "tli" ) ||
-		is_ext( file_name, "inc" ) ||
-		is_ext( file_name, "rc" ) ||
-		is_ext( file_name, "m" ) ||
-		is_ext( file_name, "mm" ) ||
-	    (is_ext( file_name, "cs" ) && !is_last(file_name, ".g.cs") && !is_last(file_name, ".g.i.cs")) ||
-        is_ext( file_name, "xaml" ) ||
-        is_ext( file_name, "resx" ) ||
-		(p_info->typejs && is_ext( file_name, "js")) ||
-		is_ext( file_name, "java" ) ||
-        is_ext( file_name, "scala" ) ||
-		is_ext( file_name, "go" ) ||
-        is_ext( file_name, "rs" ) ||
-        is_ext( file_name, "toml" ) ||
-        is_ext( file_name, "swift" ) ||
-        is_ext( file_name, "gyb" ) ||
-        is_ext( file_name, "css" ) ||
-        is_ext( file_name, "scss" ) ||
-		is_ext( file_name, "pc" ) ||
-        is_ext( file_name, "cu" ) ||
-        is_ext( file_name, "php" ) ||
-        is_shell_file( file_name ) ||
-        is_ruby_file( file_name ) ||
-        is_crystal_file( file_name ) ||
-        is_erb_file( file_name ) ||
-        (p_info->typehtml && is_html_file( file_name )) ||
-        is_xml_file( file_name) ||
-        is_coffee_file( file_name ) ||
-	    is_python_file( file_name ) ||
-        is_perl_file( file_name ) ||
-        is_vb_file( file_name ) ||
-        is_vim_file( file_name ) ||
-        is_xcode_resource_file( file_name ) ){
+bool is_source_file(FILE_TYPE_INFO* p_info, const char* file_name) {
+	if (is_ext(file_name, "c") ||
+		is_ext(file_name, "cpp") || 
+        is_ext(file_name, "cc") ||
+		is_ext(file_name, "cxx") ||
+		is_ext(file_name, "tli") ||
+		is_ext(file_name, "inc") ||
+		is_ext(file_name, "rc") ||
+		is_ext(file_name, "m") ||
+		is_ext(file_name, "mm") ||
+	    (is_ext(file_name, "cs") && !is_last(file_name, ".g.cs") && !is_last(file_name, ".g.i.cs")) ||
+        is_ext(file_name, "xaml") ||
+        is_ext(file_name, "resx") ||
+		(p_info->typejs && is_ext(file_name, "js")) ||
+		is_ext(file_name, "java") ||
+        is_ext(file_name, "scala") ||
+		is_ext(file_name, "go") ||
+        is_ext(file_name, "rs") ||
+        is_ext(file_name, "toml") ||
+        is_ext(file_name, "swift") ||
+        is_ext(file_name, "gyb") ||
+        is_ext(file_name, "css") ||
+        is_ext(file_name, "scss") ||
+		is_ext(file_name, "pc") ||
+        is_ext(file_name, "cu") ||
+        is_ext(file_name, "php") ||
+        is_shell_file(file_name) ||
+        is_ruby_file(file_name) ||
+        is_crystal_file(file_name) ||
+        is_erb_file(file_name) ||
+        (p_info->typehtml && is_html_file(file_name)) ||
+        is_xml_file(file_name) ||
+        is_coffee_file(file_name) ||
+	    is_python_file(file_name) ||
+        is_perl_file(file_name) ||
+        is_vb_file(file_name) ||
+        is_vim_file(file_name) ||
+        is_xcode_resource_file(file_name)) {
 		return true;
 	}
 	return false;
 }
 
-bool is_shell_file( const char* file_name ){ return is_ext( file_name, "sh" ); }
-bool is_ruby_file( const char* file_name ){ return is_ext( file_name, "rb" ); }
-bool is_crystal_file( const char* file_name ){ return is_ext( file_name, "cr" ); }
-bool is_erb_file( const char* file_name ){ return is_ext( file_name, "erb" ); }
-bool is_html_file( const char* file_name ){ return is_ext( file_name, "html" ); }
-bool is_xml_file( const char* file_name ){ return is_ext( file_name, "xml" ); }
-bool is_coffee_file( const char* file_name ){ return is_ext( file_name, "coffee" ); }
-bool is_python_file( const char* file_name ){ return is_ext( file_name, "py" ); }
-bool is_perl_file( const char* file_name ){ return is_ext( file_name, "pl" ); }
-bool is_vim_file( const char* file_name ){ return is_ext( file_name, "vim" ); }
-bool is_vb_file( const char* file_name ){
-    if( is_ext( file_name, "vb" ) ||
-        is_ext( file_name, "frm" ) ||
-        is_ext( file_name, "bas" ) ||
-        is_ext( file_name, "cls" ) ){
+bool is_shell_file(const char* file_name) { return is_ext(file_name, "sh"); }
+bool is_ruby_file(const char* file_name) { return is_ext(file_name, "rb"); }
+bool is_crystal_file(const char* file_name) { return is_ext(file_name, "cr"); }
+bool is_erb_file(const char* file_name) { return is_ext(file_name, "erb"); }
+bool is_html_file(const char* file_name) { return is_ext(file_name, "html"); }
+bool is_xml_file(const char* file_name) { return is_ext(file_name, "xml"); }
+bool is_coffee_file(const char* file_name) { return is_ext(file_name, "coffee"); }
+bool is_python_file(const char* file_name) { return is_ext(file_name, "py"); }
+bool is_perl_file(const char* file_name) { return is_ext(file_name, "pl"); }
+bool is_vim_file(const char* file_name) { return is_ext(file_name, "vim"); }
+bool is_vb_file(const char* file_name) {
+    if (is_ext(file_name, "vb") ||
+        is_ext(file_name, "frm") ||
+        is_ext(file_name, "bas") ||
+        is_ext(file_name, "cls") ){
         return true;
     } else {
         return false;
     }
 }
-bool is_xcode_resource_file( const char* file_name ){
+bool is_xcode_resource_file(const char* file_name) {
     if( is_ext( file_name, "pbxproj" ) ||
         is_ext( file_name, "strings" ) ||
         is_ext( file_name, "plist" ) ||
