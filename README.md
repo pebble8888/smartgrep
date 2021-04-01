@@ -68,12 +68,22 @@ Usage: smartgrep {-e[w]|-i[w]|-h[w]} [-g] [--nojs] word_you_grep
   -e[w] : recursive [word] grep for supported file extensions excluding comment  
   -i[w] : recursive [word] grep for supported file extensions including comment  
   -h[w] : recursive [word] grep for .h excluding comment  
+  -c : recursive case insensitive grep for supported file extension including comment  
+  
+ [options]  
   -g : use auto detect git or mercurial repository with the current directory  
+  --nohtml : exclude .html file  
   --nojs : exclude js file  
-  support file extensions : .cpp/.c/.mm/.m/.h/.js/.coffee/.rb/.py/.pl/.sh  
-                            .java/.scala/.go/.cs/.vb/.bas/.frm/.cls/  
-                            .plist/.pbxproj/.strings/.storyboard/.swift/.vim  
-  limit support file extensions : .erb  
+  --ignore-dir NAME : exclude NAME folder
+  --noworker : no use worker for sequencial output
+
+  support file extensions : .cpp/.c/.mm/.m/.h/.js/.coffee/.rb/.py/.pl/.sh/.rs/.toml  
+                            .java/.scala/.go/.cs/.xaml/.resx/.vb/.bas/.frm/.cls/.pc/.cu  
+                            .php/.plist/.pbxproj/.strings/.storyboard/.swift/.gyv/.vim  
+                            .css/.scss  
+  asis support file extensions : .erb/.html/.xml  
+
+  ignore directory : .git/.hg/.svn/.vs  
 
 INSTALL
 =======
