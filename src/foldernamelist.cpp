@@ -17,6 +17,7 @@ bool Foldernamelist::has_foldername(const char* foldername) const
             return true;
         }
     }
+
     return false;
 }
 
@@ -25,6 +26,7 @@ void Foldernamelist::add_foldername(const char* foldername)
     if (strlen(foldername) == 0) {
         assert(false);
     }
+
     foldernames_.push_back(std::string(foldername));
 }
 

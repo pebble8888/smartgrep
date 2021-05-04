@@ -2,8 +2,7 @@
  * @file	prep.h
  * @author	pebble8888@gmail.com
  */
-#ifndef PREP_H
-#define PREP_H
+#pragma once
 
 #include <assert.h>
 #include <stack>
@@ -32,9 +31,7 @@ public:
     void pop(void);
     int depth(void) const;
 private:
-    int _current_depth;
-    COMMENT_PREP _comment[STACK_COUNT];
+    int _current_depth {};
+    COMMENT_PREP _comment[STACK_COUNT] {};
 };
-
-#endif /* PREP_H */
 

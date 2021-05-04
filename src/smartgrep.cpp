@@ -64,9 +64,11 @@ static void search_worker(const int wordtype, const std::string word)
                 }
                 files_ready_cond_.wait(lk);
             }
+
             s = filenames_queue_.front();
             filenames_queue_.pop();
         }
+
         parse_file(s.c_str(), wordtype, word.c_str());
     }
 }
@@ -122,6 +124,7 @@ int main(int argc, char* argv[])
 		usage();
 		return 1;
 	}
+
     for (int i = 2; i < argc; ++i) {
         if (strcmp( argv[i], "-g") == 0) {
             use_repo = true;
@@ -136,6 +139,7 @@ int main(int argc, char* argv[])
             use_worker = false;
         }
     }
+
 	char path[512];
 	memset(path, 0, sizeof(path));
     if (use_repo) {
@@ -145,6 +149,7 @@ int main(int argc, char* argv[])
         // user current folder 
         smartgrep_getcwd(path, sizeof(path));
     }
+
 	char* word = argv[argc-1];
     
     // make worker
@@ -235,12 +240,14 @@ void smartgrep_getrepo(char* buf, size_t size)
 				return;
 			}
 		}
+
 		path[idx] = '\0';
 		char* r = strrchr(path, '\\');
 		if (r == nullptr) {
 			strcpy(buf, curpath);
 			return;
 		}
+
 		idx = (size_t)(r - path);
 	}
 #else
@@ -264,12 +271,14 @@ void smartgrep_getrepo(char* buf, size_t size)
                 return;
             }
         }
+
         path[idx] = '\0';
         char* r = strrchr(path, '/');
         if (r == nullptr) {
             strcpy(buf, curpath);
             return;
         }
+
         idx = (size_t)(r - path); 
     }
 #endif
@@ -324,6 +333,7 @@ void parse_directory_win(const char* path, const FILE_TYPE_INFO& info, int wordt
 		printf("directory read error! [%s]\n", path);
 		return;
 	}
+
 	while (true) {
 		if (strcmp( find_data.cFileName, ".") == 0 ||
 			strcmp( find_data.cFileName, "..") == 0) {
@@ -355,6 +365,7 @@ void parse_directory_win(const char* path, const FILE_TYPE_INFO& info, int wordt
                 files_ready_cond_.notify_one();
             }
 		}
+
 		BOOL ret = FindNextFile(h_find, &find_data);
 		if (!ret) {
 			DWORD dwError = GetLastError();
@@ -362,6 +373,7 @@ void parse_directory_win(const char* path, const FILE_TYPE_INFO& info, int wordt
 			break;
 		}
 	}
+
 	FindClose(h_find);
 }
 
@@ -377,10 +389,11 @@ void parse_directory_win(const char* path, const FILE_TYPE_INFO& info, int wordt
 void parse_directory_mac(const char* path, const FILE_TYPE_INFO& info, int wordtype, const char* target_word)
 {
 	DIR* p_dir = opendir(path);
-	if (p_dir == nullptr){
+	if (p_dir == nullptr) {
 		printf("directory read error! [%s]\n", path);
 		return;
 	}
+
 	struct dirent* p_dirent;
     struct stat file_info;
 	while ((p_dirent = readdir(p_dir)) != nullptr) {
@@ -394,8 +407,7 @@ void parse_directory_mac(const char* path, const FILE_TYPE_INFO& info, int wordt
 		    strcmp(p_dirent->d_name, "..") == 0) {
 			// do nothing
 			;
-		}
-		else if(S_ISDIR(file_info.st_mode) &&
+		} else if(S_ISDIR(file_info.st_mode) &&
 				p_dirent->d_name[0] != '.') {
 			// not hidden directory
             if (info.foldernamelist.has_foldername(p_dirent->d_name)) {
@@ -412,6 +424,7 @@ void parse_directory_mac(const char* path, const FILE_TYPE_INFO& info, int wordt
             }
         }
 	}
+
 	closedir(p_dir);
 }
 #endif
@@ -460,6 +473,7 @@ bool is_source_file(const FILE_TYPE_INFO& info, const char* file_name) {
         is_xcode_resource_file(file_name)) {
 		return true;
 	}
+
 	return false;
 }
 
@@ -490,6 +504,7 @@ bool is_xcode_resource_file(const char* file_name) {
         is_ext(file_name, "storyboard")) {
         return true;
     }
+
     return false;
 }
 
@@ -515,6 +530,7 @@ bool is_ext(const char* file_name, const char* ext_name) {
 	if (period == nullptr) {
 		return false;
 	}
+
 	char buf[512];
 	memset(buf, 0, sizeof(buf));
 	char* p;
@@ -522,6 +538,7 @@ bool is_ext(const char* file_name, const char* ext_name) {
 	for (p = period + 1, q = buf; *p != '\0'; ++p, ++q) {
 		*q = tolower(*p);
 	}
+
 	return strcmp(buf, ext_name) == 0;
 }
 
@@ -531,6 +548,7 @@ bool is_last(const char* file_name, const char* last_name) {
     if (len <= 0) {
         return false;
     }
+
     i -= 1;
     size_t j = len - 1;
     while (i >= 0 && j >= 0) {
@@ -541,9 +559,11 @@ bool is_last(const char* file_name, const char* last_name) {
         } else {
             return false;
         }
+
         i -= 1;
         j -= 1;
     }
+
     return false;
 }
 
@@ -600,8 +620,10 @@ void parse_file(const char* file_name, int wordtype, const char* target_word)
             if (data[0] == 0xff && data[1] == 0xfe) {
                 is_utf16 = true;
             }
+
             break;
         }
+
         // back to begin
         fseek(fp, 0, SEEK_SET);
     }
@@ -618,6 +640,7 @@ void parse_file(const char* file_name, int wordtype, const char* target_word)
         is_xcode_resource_file(file_name)) {
         q_data = std::make_unique<char[]>(DATASIZE_OUT+1);
     }
+
     int q_datasize = 0;
 #endif
 
@@ -681,6 +704,7 @@ void parse_file(const char* file_name, int wordtype, const char* target_word)
 		} else {
 			assert(false);
 		}
+
         bool found_linebreak = false;
 		if (found) {
             // found target
@@ -704,6 +728,7 @@ void parse_file(const char* file_name, int wordtype, const char* target_word)
                     }
     				printf("%c", *q);
     			}
+
                 if (q < r_data + r_datasize) {
                     found_linebreak = true;
                 } else {
@@ -712,6 +737,7 @@ void parse_file(const char* file_name, int wordtype, const char* target_word)
                 }
                 printf("\n");
             }
+
             // proceed processed buffer size
             const size_t advance = (size_t)(q-r_data);
             r_data += advance;
@@ -736,15 +762,18 @@ void parse_file(const char* file_name, int wordtype, const char* target_word)
             if (q < r_data + r_datasize) {
                 found_linebreak = true;
             }
+
             // proceed processed buffer size
             const size_t advance = (size_t)(q-r_data);
             r_data += advance;
             r_datasize -= advance;
         }
+
         if (found_linebreak) {
             ++lineno;
         }
 	}
+
 	fclose(fp);
 }
 
@@ -823,6 +852,7 @@ bool process_line_exclude_comment_c(
 						assert(false);
 					}
 				}
+
 				continue;
 			} else if (prep.can_change_to_else()
 					   && (memcmp(p, SG_PREP_ELIF, strlen(SG_PREP_ELIF)) == 0 ||
@@ -836,6 +866,7 @@ bool process_line_exclude_comment_c(
 				} else {
 					assert(false);
 				}
+
 				continue;
 			} else if (memcmp(p, SG_PREP_ENDIF, strlen(SG_PREP_ENDIF)) == 0) {
 				// #endif
@@ -847,6 +878,7 @@ bool process_line_exclude_comment_c(
             ++p;
 			continue;
 		}
+
 		if (*p == '\r' || *p == '\n' || *p == '\0') break;
 		
 		// valid data
@@ -916,6 +948,7 @@ bool process_line_exclude_comment_ruby(
                 }
                 ++p;
             }
+
             if (found) {
                 // the end of multi-line comment
                 isin_multiline_comment = false;
@@ -939,6 +972,7 @@ bool process_line_exclude_comment_ruby(
                    && isin_dq && file_extension == kRuby && isin_var && *p == '}') {
 			isin_var = false;
 		}
+
 		if (*p == '\r' || *p == '\n' || *p == '\0') break;
 		
 		// valid data
@@ -968,11 +1002,13 @@ bool process_line_exclude_comment_vb(const char* buf, size_t bufsize, int wordty
 			// reverse isin_dq
 			isin_dq = !isin_dq;
 		}
+
 		if (*p == '\r' || *p == '\n' || *p == '\0') break;
 		
 		// valid data
 		*(q++) = *p;
 	}
+
     *q = 0x0; // null terminate
 	return findword_in_line(valid_str, wordtype, target_word);
 }
@@ -1000,11 +1036,12 @@ bool process_line_exclude_comment_vim(const char* buf, size_t bufsize, int wordt
 		// valid data
 		*(q++) = *p;
 	}
+
     *q = 0x0; // null terminate
     return findword_in_line(valid_str, wordtype, target_word);
 }
 
-/*
+/**
  * @brief	search string in one line.
  * 			strstr can be hit twice in one line.
  *
@@ -1012,7 +1049,6 @@ bool process_line_exclude_comment_vim(const char* buf, size_t bufsize, int wordt
  * @retval	false: not found target
  *
  * @param	[in] char* 	valid_str       
-
  * @param	[in] int 	wordtype
  * @param	[in] char* 	target_word
  */
@@ -1058,8 +1094,10 @@ bool findword_in_line(char* valid_str, int wordtype, const char* target_word)
 			remain_ptr = findptr;
 			findptr = strstr(findptr + target_word_len , target_word);
 		}
+
 		return false;
 	}
+
 	assert(false);
 	return false;
 }
@@ -1081,8 +1119,10 @@ bool process_line_include_comment(const char* buf, size_t bufsize, int wordtype,
         if (*p == '\0' || *p == '\r' || *p  =='\n') {
             break;
         }
+
         *(q++) = *p;
     }
+
     *q = 0x0; // null terminate
 	return findword_in_line(valid_str, wordtype, target_word);
 }
@@ -1122,8 +1162,10 @@ int UTF16LEToUTF8(int16_t* pwIn, int count, char* pOut)
             *(q++) = (char)((*pw >> 6 & 0x3f) | 0x80);
             *(q++) = (char)((*pw & 0x3f) | 0x80);
         }
+
         ++pw;
     }
+
     return (int)(q-pOut);
 }
 
