@@ -3,8 +3,7 @@
  *	@author	pebble8888@gmail.com
  */
 
-#ifndef SMARTGREP_H
-#define SMARTGREP_H
+#pragma once
 
 
 #define SG_WORDTYPE_WORD			(1<<0)
@@ -93,6 +92,4 @@ void smartgrep_getcwd(char* buf, size_t size);
 void smartgrep_getrepo(char* buf, size_t size);
 void test_is_alnum_or_underscore(void);
 void test(void);
-
-#endif /* SMARTGREP_H */
 
