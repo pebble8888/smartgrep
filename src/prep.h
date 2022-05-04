@@ -22,16 +22,15 @@ struct COMMENT_PREP {
 class Prep {
 public:
     Prep();
-    bool is_commented(void) const;
-    int comment_status(void) const;
+    bool is_commented() const;
+    int comment_status() const;
     void push(bool ifzero);
     // not already in SG_ST_ELSE
-    bool can_change_to_else(void) const;
-    void change_to_else(void);
-    void pop(void);
-    int depth(void) const;
+    bool can_change_to_else() const;
+    void change_to_else();
+    void pop();
+    int depth() const;
 private:
     int _current_depth {};
     COMMENT_PREP _comment[STACK_COUNT] {};
 };
-

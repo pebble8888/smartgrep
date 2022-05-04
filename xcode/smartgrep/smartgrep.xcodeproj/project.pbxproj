@@ -12,6 +12,8 @@
 		19F716661B40F3660002C114 /* foldernamelist.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 19F7165C1B40F2B90002C114 /* foldernamelist.cpp */; };
 		19F716671B40F3660002C114 /* smartgrep.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 19F716611B40F2B90002C114 /* smartgrep.cpp */; };
 		A24C3C751B3FFDB20082B039 /* smartgrep_xctest.mm in Sources */ = {isa = PBXBuildFile; fileRef = A24C3C741B3FFDB20082B039 /* smartgrep_xctest.mm */; };
+		A2B723BB28223922007BBDFC /* prep.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2B723BA28223922007BBDFC /* prep.cpp */; };
+		A2B723BC28223995007BBDFC /* prep.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2B723BA28223922007BBDFC /* prep.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -37,6 +39,7 @@
 		A24C3C701B3FFDB20082B039 /* smartgrep_xctest.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = smartgrep_xctest.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A24C3C731B3FFDB20082B039 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A24C3C741B3FFDB20082B039 /* smartgrep_xctest.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = smartgrep_xctest.mm; sourceTree = "<group>"; };
+		A2B723BA28223922007BBDFC /* prep.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = prep.cpp; path = ../../src/prep.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,6 +65,7 @@
 			children = (
 				19F7165C1B40F2B90002C114 /* foldernamelist.cpp */,
 				19F7165D1B40F2B90002C114 /* foldernamelist.h */,
+				A2B723BA28223922007BBDFC /* prep.cpp */,
 				19F7165F1B40F2B90002C114 /* prep.h */,
 				19F716601B40F2B90002C114 /* resource.h */,
 				19F716611B40F2B90002C114 /* smartgrep.cpp */,
@@ -195,6 +199,7 @@
 			files = (
 				19F716651B40F2B90002C114 /* smartgrep.cpp in Sources */,
 				19F716631B40F2B90002C114 /* foldernamelist.cpp in Sources */,
+				A2B723BB28223922007BBDFC /* prep.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -202,6 +207,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A2B723BC28223995007BBDFC /* prep.cpp in Sources */,
 				19F716661B40F3660002C114 /* foldernamelist.cpp in Sources */,
 				19F716671B40F3660002C114 /* smartgrep.cpp in Sources */,
 				A24C3C751B3FFDB20082B039 /* smartgrep_xctest.mm in Sources */,
@@ -216,7 +222,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
@@ -259,7 +265,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -271,7 +277,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
@@ -308,7 +314,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
 			};

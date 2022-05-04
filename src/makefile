@@ -6,7 +6,7 @@
 TARGET=smartgrep
 LIBS=
 #CXXFLAGS=-g
-CXXFLAGS=-std=c++14 -Wall
+CXXFLAGS=-std=c++20 -Wall
 
 ifeq ($(OS),Windows_NT) 
 LIBS+=-lversion -lstdc++

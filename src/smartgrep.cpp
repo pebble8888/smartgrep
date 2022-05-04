@@ -13,6 +13,7 @@
 #include <ctype.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <filesystem>
 
 #ifdef _WIN32
 #else
@@ -51,10 +52,10 @@ void test(void)
 	test_is_alnum_or_underscore();
 }
 
-static void search_worker(const int wordtype, const std::string word)
+static void search_worker(const int wordtype, const std::string& word)
 {
     while (true) {
-        std::string s;
+        std::string filename;
         {
             std::unique_lock<std::mutex> lk(filenames_mtx_);
             while (filenames_queue_.empty()){
@@ -65,11 +66,11 @@ static void search_worker(const int wordtype, const std::string word)
                 files_ready_cond_.wait(lk);
             }
 
-            s = filenames_queue_.front();
+            filename = filenames_queue_.front();
             filenames_queue_.pop();
         }
 
-        parse_file(s.c_str(), wordtype, word.c_str());
+        parse_file(filename.c_str(), wordtype, word.c_str());
     }
 }
 
@@ -140,14 +141,13 @@ int main(int argc, char* argv[])
         }
     }
 
-	char path[512];
-	memset(path, 0, sizeof(path));
+    std::filesystem::path path;
     if (use_repo) {
         // use repo folder
-        smartgrep_getrepo(path, sizeof(path));
+        path = smartgrep_getrepo();
     } else {
         // user current folder 
-        smartgrep_getcwd(path, sizeof(path));
+        path = smartgrep_getcwd();
     }
 
 	char* word = argv[argc-1];
@@ -194,35 +194,31 @@ int main(int argc, char* argv[])
 	return 0;
 }
 
-void smartgrep_getcwd(char* buf, size_t size)
+std::filesystem::path smartgrep_getcwd()
 {
+    constexpr auto size = 512;
+    char buf[size];
 #ifdef _WIN32
 	GetCurrentDirectory(size, buf);
 #else
 	getcwd(buf, size);
 #endif
+    return std::string(buf);
 }
 
-/**
- * @brief
- * @param char* buf
- * @param size_t size
- */
-void smartgrep_getrepo(char* buf, size_t size)
+std::filesystem::path smartgrep_getrepo()
 {
-    char curpath[512];
-    memset(curpath, 0, sizeof(curpath));
-    smartgrep_getcwd(curpath, sizeof(curpath));
-    size_t idx = strlen(curpath);
+    std::filesystem::path result;
+    const auto curpath = smartgrep_getcwd();
+    size_t idx = curpath.string().length();
     char path[512]; 
 #ifdef _WIN32
-	assert(strlen(curpath) < size);
-	strcpy(buf, curpath);
+	result = curpath; 
 	while (idx > 3) {
 		for (int i = 0; i < 2; ++i) {
             // 0:.git
             // 1:.hg
-			strcpy(path, curpath);
+			strcpy(path, curpath.string().c_str());
 			path[idx] = '\0';
 			if (i == 0) strcat(path, "\\.git");
 			else if (i == 1) strcat(path, "\\.hg");
@@ -236,16 +232,14 @@ void smartgrep_getrepo(char* buf, size_t size)
 				path[idx] = '\0';
 				size_t len = strlen(path);
 				assert( len < size );
-				strcpy( buf, path );
-				return;
+				return path;
 			}
 		}
 
 		path[idx] = '\0';
 		char* r = strrchr(path, '\\');
 		if (r == nullptr) {
-			strcpy(buf, curpath);
-			return;
+            return curpath;
 		}
 
 		idx = (size_t)(r - path);
@@ -255,7 +249,7 @@ void smartgrep_getrepo(char* buf, size_t size)
         for (int i = 0; i < 2; ++i) {
             // 0:.git
             // 1:.hg
-            strcpy(path, curpath);
+            strcpy(path, curpath.string().c_str());
             path[idx] = '\0'; 
             if( i == 0 ) strcat(path, "/.git");
             else if( i == 1 ) strcat(path, "/.hg");
@@ -265,18 +259,14 @@ void smartgrep_getrepo(char* buf, size_t size)
                 // can access
                 closedir( p_dir );
                 path[idx] = '\0';
-                size_t len = strlen(path);
-                assert(len < size);
-                strcpy(buf, path);
-                return;
+                return path;
             }
         }
 
         path[idx] = '\0';
         char* r = strrchr(path, '/');
         if (r == nullptr) {
-            strcpy(buf, curpath);
-            return;
+            return curpath;
         }
 
         idx = (size_t)(r - path); 
@@ -284,7 +274,7 @@ void smartgrep_getrepo(char* buf, size_t size)
 #endif
 }
 
-void usage(void)
+void usage()
 {
 	printf( 
 		"Usage: smartgrep {-e[w]|-i[w]|-h[w]|-c} [options] word_you_grep\n"
@@ -321,16 +311,16 @@ void usage(void)
  * @param wordtype	
  * @param target_word
  */
-void parse_directory_win(const char* path, const FILE_TYPE_INFO& info, int wordtype, const char* target_word)
+void parse_directory_win(const std::filesystem::path& path, const FILE_TYPE_INFO& info, int wordtype, const char* target_word)
 {
 	char path_name[512];
-	strcpy(path_name, path);
+	strcpy(path_name, path.string());
 	strcat(path_name, "\\*.*");
 	
 	WIN32_FIND_DATA find_data;
 	const auto h_find = FindFirstFile(path_name, &find_data);
 	if (h_find == INVALID_HANDLE_VALUE) {
-		printf("directory read error! [%s]\n", path);
+		printf("directory read error! [%s]\n", path.string());
 		return;
 	}
 
@@ -346,22 +336,16 @@ void parse_directory_win(const char* path, const FILE_TYPE_INFO& info, int wordt
             if (info.foldernamelist.has_foldername( find_data.cFileName )) {
                 // ignore the folder
             } else {
-                char path_name_r[512];
-                strcpy(path_name_r, path);
-                strcat(path_name_r, "\\");
-                strcat(path_name_r, find_data.cFileName);
+                const auto path_name_r = path / find_data.cFileName; 
                 parse_directory_win(path_name_r, info, wordtype, target_word);
             }
 		} else if (((info.filetype & SG_FILETYPE_SOURCE) && is_source_file(info, find_data.cFileName)) ||
 				   ((info.filetype & SG_FILETYPE_HEADER) && is_header_file(find_data.cFileName))) {
             // file
-			char file_name_r[512];
-			strcpy(file_name_r, path);
-			strcat(file_name_r, "\\");
-			strcat(file_name_r, find_data.cFileName);
+            const auto file_name_r = path / file_data.cFileName;
             {
                 lock_guard<mutex> lk(filenames_mtx_);
-                filenames_queue_.push(std::string(file_name_r));
+                filenames_queue_.push(file_name_r.string());
                 files_ready_cond_.notify_one();
             }
 		}
@@ -386,22 +370,19 @@ void parse_directory_win(const char* path, const FILE_TYPE_INFO& info, int wordt
  * @param wordtype
  * @param target_word
  */
-void parse_directory_mac(const char* path, const FILE_TYPE_INFO& info, int wordtype, const char* target_word)
+void parse_directory_mac(const std::filesystem::path& path, const FILE_TYPE_INFO& info, int wordtype, const char* target_word)
 {
-	DIR* p_dir = opendir(path);
+	DIR* p_dir = opendir(path.string().c_str());
 	if (p_dir == nullptr) {
-		printf("directory read error! [%s]\n", path);
+		printf("directory read error! [%s]\n", path.string().c_str());
 		return;
 	}
 
 	struct dirent* p_dirent;
     struct stat file_info;
 	while ((p_dirent = readdir(p_dir)) != nullptr) {
-        char path_name_r[512];
-        strcpy(path_name_r, path);
-        strcat(path_name_r, "/");
-        strcat(path_name_r, p_dirent->d_name);
-        lstat(path_name_r, &file_info);
+        const auto path_name_r = path / p_dirent->d_name;
+        lstat(path_name_r.string().c_str(), &file_info);
 
 		if (strcmp(p_dirent->d_name, ".") == 0 ||
 		    strcmp(p_dirent->d_name, "..") == 0) {
@@ -419,7 +400,7 @@ void parse_directory_mac(const char* path, const FILE_TYPE_INFO& info, int wordt
 				  ((info.filetype & SG_FILETYPE_HEADER) && is_header_file(p_dirent->d_name))) {
             {
                 std::lock_guard<std::mutex> lk(filenames_mtx_);
-                filenames_queue_.push(std::string(path_name_r));
+                filenames_queue_.push(path_name_r.string());
                 files_ready_cond_.notify_one();
             }
         }

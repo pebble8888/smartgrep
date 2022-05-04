@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <filesystem>
 
 #define SG_WORDTYPE_WORD			(1<<0)
 #define SG_WORDTYPE_NORMAL			(1<<1)
@@ -38,6 +39,7 @@ enum {
 };
 
 #include "foldernamelist.h"
+#include "prep.h"
 
 /**
  * @brief command option
@@ -48,8 +50,6 @@ typedef struct {
     bool typehtml;
     Foldernamelist foldernamelist;
 } FILE_TYPE_INFO;
-
-#include "prep.h"
 
 /**
  * @brief	function prototype
@@ -62,9 +62,9 @@ bool process_line_exclude_comment_vb(const char* buf, size_t bufsize, int wordty
 bool process_line_exclude_comment_vim(const char* buf, size_t bufsize, int wordtype, const char* target_word); 
 bool process_line_include_comment(const char* buf, size_t bufsize, int wordtype, const char* target_word);
 #ifdef _WIN32
-void parse_directory_win(const char* path, const FILE_TYPE_INFO& info, int wordtype, const char* target_word);
+void parse_directory_win(const std::filesystem::path& path, const FILE_TYPE_INFO& info, int wordtype, const char* target_word);
 #else
-void parse_directory_mac(const char* path, const FILE_TYPE_INFO& info, int wordtype, const char* target_word);
+void parse_directory_mac(const std::filesystem::path& path, const FILE_TYPE_INFO& info, int wordtype, const char* target_word);
 #endif
 bool is_header_file(const char* file_name);
 bool is_cs_file(const char* file_name);
@@ -88,8 +88,8 @@ bool is_alnum_or_underscore(int val);
 void print_version(void);
 int UTF16LEToUTF8(int16_t* pIn, int count, char* pOut);
 
-void smartgrep_getcwd(char* buf, size_t size);
-void smartgrep_getrepo(char* buf, size_t size);
+std::filesystem::path smartgrep_getcwd();
+std::filesystem::path smartgrep_getrepo();
 void test_is_alnum_or_underscore(void);
 void test(void);
 

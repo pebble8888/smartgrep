@@ -8,12 +8,12 @@ Prep::Prep()
     }
 }
 
-bool Prep::is_commented(void) const
+bool Prep::is_commented() const
 {
     return comment_status() == SG_ST_IFZERO;
 }
 
-int Prep::comment_status(void) const
+int Prep::comment_status() const
 {
     return _comment[_current_depth].status;
 }
@@ -29,7 +29,7 @@ void Prep::push(bool ifzero)
     }
 }
 
-bool Prep::can_change_to_else(void) const
+bool Prep::can_change_to_else() const
 {
     return comment_status() == SG_ST_IFZERO ||
            comment_status() == SG_ST_IFONE;
@@ -40,13 +40,13 @@ void Prep::change_to_else(void)
     _comment[_current_depth].status = SG_ST_ELSE;
 }
 
-void Prep::pop(void)
+void Prep::pop()
 {
     _comment[_current_depth].status = SG_ST_IFONE;
     --_current_depth;
 }
 
-int Prep::depth(void) const
+int Prep::depth() const
 {
     return _current_depth;
 }
