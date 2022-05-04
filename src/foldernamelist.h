@@ -1,5 +1,5 @@
-#include <vector>
 #include <string>
+#include <unordered_set>
 
 #pragma once
 
@@ -9,6 +9,6 @@ public:
     bool has_foldername(const char* foldername) const;
     void add_foldername(const char* foldername);
 private:
-    std::vector<std::string> foldernames_;
+    std::unordered_set<std::string> foldernames_;
 };
 

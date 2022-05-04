@@ -4,21 +4,16 @@
 
 Foldernamelist::Foldernamelist()
 {
-    foldernames_.push_back(std::string(".vs"));
-    foldernames_.push_back(std::string(".svn"));
-    foldernames_.push_back(std::string(".git"));
-    foldernames_.push_back(std::string(".hg"));
+    foldernames_.insert(std::string(".vs"));
+    foldernames_.insert(std::string(".svn"));
+    foldernames_.insert(std::string(".git"));
+    foldernames_.insert(std::string(".hg"));
 }
 
 bool Foldernamelist::has_foldername(const char* foldername) const
 {
-    for (auto it: foldernames_) {
-        if (strcmp(it.c_str(), foldername) == 0) {
-            return true;
-        }
-    }
-
-    return false;
+    const auto name = std::string(foldername);
+    return foldernames_.contains(name);
 }
 
 void Foldernamelist::add_foldername(const char* foldername)
@@ -27,6 +22,6 @@ void Foldernamelist::add_foldername(const char* foldername)
         assert(false);
     }
 
-    foldernames_.push_back(std::string(foldername));
+    foldernames_.insert(std::string(foldername));
 }
 

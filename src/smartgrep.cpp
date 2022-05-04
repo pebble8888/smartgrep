@@ -130,7 +130,7 @@ int main(int argc, char* argv[])
 	}
 
     for (int i = 2; i < argc; ++i) {
-        if (strcmp( argv[i], "-g") == 0) {
+        if (strcmp(argv[i], "-g") == 0) {
             use_repo = true;
         } else if (strcmp(argv[i], "--nojs") == 0) {
             info.typejs = false;
@@ -241,7 +241,7 @@ std::filesystem::path smartgrep_getrepo()
 				FindClose(h_find);
 				path[idx] = '\0';
 				size_t len = strlen(path);
-				assert( len < size );
+				assert(len < size);
 				return path;
 			}
 		}
@@ -261,10 +261,10 @@ std::filesystem::path smartgrep_getrepo()
             // 1:.hg
             strcpy(path, curpath.string().c_str());
             path[idx] = '\0'; 
-            if( i == 0 ) strcat(path, "/.git");
-            else if( i == 1 ) strcat(path, "/.hg");
+            if (i == 0) strcat(path, "/.git");
+            else if (i == 1) strcat(path, "/.hg");
             // check
-            DIR* p_dir = opendir( path );
+            DIR* p_dir = opendir(path);
             if (p_dir != nullptr) {
                 // can access
                 closedir( p_dir );
@@ -309,7 +309,7 @@ void usage()
         "\n"
         "  ignore directory : .git/.hg/.svn/.vs\n"
         "\n"
-        "  Version 4.3.0\n"
+        "  Version 4.3.1\n"
 	);
 }
 
@@ -323,12 +323,10 @@ void usage()
  */
 void parse_directory_win(const std::filesystem::path& path, const FILE_TYPE_INFO& info, int wordtype, const char* target_word)
 {
-	char path_name[512];
-	strcpy(path_name, path.string());
-	strcat(path_name, "\\*.*");
+    const auto path_name = path / "*.*";
 	
 	WIN32_FIND_DATA find_data;
-	const auto h_find = FindFirstFile(path_name, &find_data);
+	const auto h_find = FindFirstFile(path_name.string().c_str(), &find_data);
 	if (h_find == INVALID_HANDLE_VALUE) {
 		printf("directory read error! [%s]\n", path.string());
 		return;
@@ -343,7 +341,7 @@ void parse_directory_win(const std::filesystem::path& path, const FILE_TYPE_INFO
 		else if ((find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) &&
 		         find_data.cFileName[0] != '.') {
 			// not hidden directory
-            if (info.foldernamelist.has_foldername( find_data.cFileName )) {
+            if (info.foldernamelist.has_foldername(find_data.cFileName)) {
                 // ignore the folder
             } else {
                 const auto path_name_r = path / find_data.cFileName; 
@@ -830,7 +828,7 @@ bool process_line_exclude_comment_c(
 		} else if (!isin_literal && !isin_multiline_comment && *p == '#') {
 			if (memcmp(p, SG_PREP_IF, strlen(SG_PREP_IF)) == 0 ||
 				memcmp(p, SG_PREP_IFDEF, strlen(SG_PREP_IFDEF)) == 0 ||
-				memcmp(p, SG_PREP_IFNDEF, strlen(SG_PREP_IFNDEF)) == 0 ) {
+				memcmp(p, SG_PREP_IFNDEF, strlen(SG_PREP_IFNDEF)) == 0) {
 				// #if or #ifdef or #ifndef
 				if (memcmp(p, SG_PREP_IFZERO, strlen(SG_PREP_IFZERO)) == 0) {
 					// #if 0
@@ -1065,7 +1063,7 @@ bool findword_in_line(char* valid_str, int wordtype, const char* target_word)
 		// word search
 		const auto target_word_len = (int)strlen(target_word);
 		char* remain_ptr = valid_str;
-		char* findptr = strstr( valid_str, target_word );
+		char* findptr = strstr(valid_str, target_word);
 
 		while (findptr != nullptr) {
 			bool head = false;
@@ -1123,7 +1121,7 @@ bool process_line_include_comment(const char* buf, size_t bufsize, int wordtype,
 	return findword_in_line(valid_str, wordtype, target_word);
 }
 
-void test_is_alnum_or_underscore(void)
+void test_is_alnum_or_underscore()
 {
 	assert(is_alnum_or_underscore('a'));
 	assert(is_alnum_or_underscore('A'));
