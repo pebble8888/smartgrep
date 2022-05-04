@@ -87,9 +87,9 @@ bool findword_in_line(char* valid_str, int wordtype, const char* target_word);
 bool is_alnum_or_underscore(int val);
 void print_version(void);
 int UTF16LEToUTF8(int16_t* pIn, int count, char* pOut);
-
 std::filesystem::path smartgrep_getcwd();
 std::filesystem::path smartgrep_getrepo();
 void test_is_alnum_or_underscore(void);
-void test(void);
+void test();
+void printout(std::string&& str);
 

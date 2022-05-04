@@ -14,11 +14,13 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <filesystem>
+#include <regex>
 
 #ifdef _WIN32
 #else
 #include <unistd.h>
 #include <dirent.h>
+#include <pwd.h>
 #endif
 
 #include "smartgrep.h"
@@ -46,8 +48,9 @@ static bool done_adding_files_;   // use filenames_mtx_ for access
 static std::mutex filenames_mtx_;
 static std::condition_variable files_ready_cond_;
 static std::mutex print_mtx_; // use for printf call
+static std::vector<std::string> output_;
 
-void test(void)
+void test()
 {
 	test_is_alnum_or_underscore();
 }
@@ -141,14 +144,15 @@ int main(int argc, char* argv[])
         }
     }
 
-    std::filesystem::path path;
-    if (use_repo) {
-        // use repo folder
-        path = smartgrep_getrepo();
-    } else {
-        // user current folder 
-        path = smartgrep_getcwd();
-    }
+    const std::filesystem::path basepath = [&] {
+        if (use_repo) {
+            // use repo folder
+            return smartgrep_getrepo();
+        } else {
+            // user current folder
+            return smartgrep_getcwd();
+        }
+    }();
 
 	char* word = argv[argc-1];
     
@@ -176,9 +180,9 @@ int main(int argc, char* argv[])
     }
     
 #ifdef _WIN32
-	parse_directory_win(path, info, wordtype, word);
+	parse_directory_win(basepath, info, wordtype, word);
 #else
-	parse_directory_mac(path, info, wordtype, word);
+	parse_directory_mac(basepath, info, wordtype, word);
 #endif
     
     {
@@ -189,6 +193,12 @@ int main(int argc, char* argv[])
     
     for (int i = 0; i < workers_len; ++i) {
         v_thread[i]->join();
+    }
+
+    std::sort(output_.begin(), output_.end());
+
+    for (auto str: output_) {
+        printf("%s", str.c_str());
     }
 
 	return 0;
@@ -691,9 +701,11 @@ void parse_file(const char* file_name, int wordtype, const char* target_word)
             // found target
             char* q = r_data;
             {
-                std::lock_guard<std::mutex> lk(print_mtx_);
+                std::string outstr;
                 // output filename and line number or EOF
-    			printf("%s:%d:", file_name, lineno);
+                char buf[512];
+                sprintf(buf, "%s:%d:", file_name, lineno);
+                outstr = buf;
                 // output until next newline or EOF
                 for (; q < r_data + r_datasize; ++q) {
                     if (*q == '\n') {
@@ -707,7 +719,8 @@ void parse_file(const char* file_name, int wordtype, const char* target_word)
                         q += 2;
                         break;
                     }
-    				printf("%c", *q);
+                    sprintf(buf, "%c", *q);
+                    outstr += buf;
     			}
 
                 if (q < r_data + r_datasize) {
@@ -716,7 +729,9 @@ void parse_file(const char* file_name, int wordtype, const char* target_word)
                     // almost EOF
                     // TODO:not a completely valid logic
                 }
-                printf("\n");
+                // printf("\n");
+                outstr += "\n";
+                printout(std::move(outstr));
             }
 
             // proceed processed buffer size
@@ -1150,3 +1165,8 @@ int UTF16LEToUTF8(int16_t* pwIn, int count, char* pOut)
     return (int)(q-pOut);
 }
 
+void printout(std::string&& str)
+{
+    std::lock_guard<std::mutex> lk(print_mtx_);
+    output_.push_back(str);
+}
