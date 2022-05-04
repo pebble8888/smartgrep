@@ -11,10 +11,11 @@ else
   OPTION=""
 fi
 
-./smartgrep -i ${OPTION} ${WORD} > ${OUTFILENAME}
+./smartgrep -e ${OPTION} ${WORD} > ${OUTFILENAME}
 
 if [ `grep ${WORD} ${OUTFILENAME}|wc -l` -eq ${LINECOUNT} ]; then
    exit 0
 else
+   echo "test ${WORD} ${OUTFILENAME} ${LINECOUNT} failed!" 
    exit 1  
 fi
