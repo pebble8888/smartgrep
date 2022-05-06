@@ -1,2 +1,8 @@
 src/smartgrep
 *.out
+.vs/
+Release/
+x64/
+doc/tags
+src/smartgrep.bsc
+src/smartgrep.vcxproj.user

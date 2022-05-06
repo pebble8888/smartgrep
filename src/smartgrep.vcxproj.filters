@@ -21,6 +21,9 @@
     <ClCompile Include="foldernamelist.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="prep.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">

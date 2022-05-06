@@ -228,10 +228,10 @@ std::filesystem::path smartgrep_getrepo()
 		for (int i = 0; i < 2; ++i) {
             // 0:.git
             // 1:.hg
-			strcpy(path, curpath.string().c_str());
+			strcpy_s(path, curpath.string().c_str());
 			path[idx] = '\0';
-			if (i == 0) strcat(path, "\\.git");
-			else if (i == 1) strcat(path, "\\.hg");
+			if (i == 0) strcat_s(path, "\\.git");
+			else if (i == 1) strcat_s(path, "\\.hg");
 			// check
 			HANDLE h_find;
 			WIN32_FIND_DATA find_data;
@@ -282,6 +282,7 @@ std::filesystem::path smartgrep_getrepo()
         idx = (size_t)(r - path); 
     }
 #endif
+    return result;
 }
 
 void usage()
@@ -328,7 +329,7 @@ void parse_directory_win(const std::filesystem::path& path, const FILE_TYPE_INFO
 	WIN32_FIND_DATA find_data;
 	const auto h_find = FindFirstFile(path_name.string().c_str(), &find_data);
 	if (h_find == INVALID_HANDLE_VALUE) {
-		printf("directory read error! [%s]\n", path.string());
+		printf("directory read error! [%s]\n", path.string().c_str());
 		return;
 	}
 
@@ -350,9 +351,9 @@ void parse_directory_win(const std::filesystem::path& path, const FILE_TYPE_INFO
 		} else if (((info.filetype & SG_FILETYPE_SOURCE) && is_source_file(info, find_data.cFileName)) ||
 				   ((info.filetype & SG_FILETYPE_HEADER) && is_header_file(find_data.cFileName))) {
             // file
-            const auto file_name_r = path / file_data.cFileName;
+            const auto file_name_r = path / find_data.cFileName;
             {
-                lock_guard<mutex> lk(filenames_mtx_);
+                std::lock_guard<std::mutex> lk(filenames_mtx_);
                 filenames_queue_.push(file_name_r.string());
                 files_ready_cond_.notify_one();
             }
@@ -666,7 +667,7 @@ void parse_file(const char* file_name, int wordtype, const char* target_word)
             }
         }
 
-		bool found;
+		bool found = false;
 		if (wordtype & SG_WORDTYPE_EXCLUDE_COMMENT) {
 			if (file_extension == kC) {
 				found = process_line_exclude_comment_c(isin_multiline_comment, prep,
