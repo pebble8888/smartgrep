@@ -54,7 +54,7 @@ typedef struct {
 /**
  * @brief	function prototype
  */
-void usage(void);
+void usage();
 void parse_file(const char* file_name, int wordtype, const char* target_word);
 bool process_line_exclude_comment_c(bool& isin_multiline_comment, Prep& prep, const char* buf, size_t bufsize, int wordtype, const char* target_word);
 bool process_line_exclude_comment_ruby(bool& isin_multiline_comment, const char* buf, size_t bufsize, int wordtype, const char* target_word, int file_extension);
@@ -85,11 +85,11 @@ bool is_ext(const char* file_name, const char* ext_name);
 bool is_last(const char* file_name, const char* last_name);
 bool findword_in_line(char* valid_str, int wordtype, const char* target_word);
 bool is_alnum_or_underscore(int val);
-void print_version(void);
+void print_version();
 int UTF16LEToUTF8(int16_t* pIn, int count, char* pOut);
 std::filesystem::path smartgrep_getcwd();
 std::filesystem::path smartgrep_getrepo();
-void test_is_alnum_or_underscore(void);
+void test_is_alnum_or_underscore();
 void test();
 void printout(std::string&& str);
 

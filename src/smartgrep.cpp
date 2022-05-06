@@ -7,14 +7,22 @@
 #define WIN32_LEAN_AND_MEAN 
 #endif
 
+#include <assert.h>
+#include <condition_variable>
+#include <ctype.h>
+#include <filesystem>
+#include <memory>
+#include <mutex>
+#include <queue>
+#include <regex>
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
-#include <ctype.h>
-#include <sys/types.h>
+#include <string.h>
 #include <sys/stat.h>
-#include <filesystem>
-#include <regex>
+#include <sys/types.h>
+#include <thread>
+#include <time.h>
+#include <vector>
 
 #ifdef _WIN32
 #else
@@ -28,15 +36,6 @@
 #ifdef _WIN32
 #include <windows.h>
 #endif
-
-#include <string.h>
-#include <assert.h>
-#include <queue>
-#include <mutex>
-#include <condition_variable>
-#include <vector>
-#include <thread>
-#include <memory>
 
 const static int DATASIZE = 64 * 1024; // process unit size
 const static int DATASIZE_OUT = DATASIZE*3/sizeof(wchar_t);
@@ -322,7 +321,11 @@ void usage()
  * @param wordtype	
  * @param target_word
  */
-void parse_directory_win(const std::filesystem::path& path, const FILE_TYPE_INFO& info, int wordtype, const char* target_word)
+void parse_directory_win(
+    const std::filesystem::path& path,
+    const FILE_TYPE_INFO& info,
+    int wordtype,
+    const char* target_word)
 {
     const auto path_name = path / "*.*";
 	
@@ -361,7 +364,7 @@ void parse_directory_win(const std::filesystem::path& path, const FILE_TYPE_INFO
 
 		BOOL ret = FindNextFile(h_find, &find_data);
 		if (!ret) {
-			DWORD dwError = GetLastError();
+			const auto dwError = GetLastError();
 			assert(dwError == ERROR_NO_MORE_FILES);
 			break;
 		}
@@ -379,7 +382,11 @@ void parse_directory_win(const std::filesystem::path& path, const FILE_TYPE_INFO
  * @param wordtype
  * @param target_word
  */
-void parse_directory_mac(const std::filesystem::path& path, const FILE_TYPE_INFO& info, int wordtype, const char* target_word)
+void parse_directory_mac(
+    const std::filesystem::path& path,
+    const FILE_TYPE_INFO& info,
+    int wordtype,
+    const char* target_word)
 {
 	DIR* p_dir = opendir(path.string().c_str());
 	if (p_dir == nullptr) {
@@ -619,7 +626,7 @@ void parse_file(const char* file_name, int wordtype, const char* target_word)
     }
 #endif
 
-	bool isin_multiline_comment = false;
+	auto isin_multiline_comment = false;
 	Prep prep;
 
 	// it is presumed that the one line byte size in file don't exceed 64k
@@ -667,7 +674,7 @@ void parse_file(const char* file_name, int wordtype, const char* target_word)
             }
         }
 
-		bool found = false;
+		auto found = false;
 		if (wordtype & SG_WORDTYPE_EXCLUDE_COMMENT) {
 			if (file_extension == kC) {
 				found = process_line_exclude_comment_c(isin_multiline_comment, prep,
@@ -695,7 +702,7 @@ void parse_file(const char* file_name, int wordtype, const char* target_word)
 			assert(false);
 		}
 
-        bool found_linebreak = false;
+        auto found_linebreak = false;
 		if (found) {
             // found target
             char* q = r_data;
@@ -985,7 +992,7 @@ WHILEOUT:
 bool process_line_exclude_comment_vb(const char* buf, size_t bufsize, int wordtype, const char* target_word)
 {
 	char valid_str[DATASIZE_OUT+1];
-	bool isin_dq = false; // "xxx"
+	auto isin_dq = false; // "xxx"
 	char* q = valid_str;
     for (auto p = (char*)buf; p < buf + bufsize; ++p) {
 		if (*p == '\n' || *p == '\0') break; 
@@ -1014,7 +1021,7 @@ bool process_line_exclude_comment_vb(const char* buf, size_t bufsize, int wordty
 bool process_line_exclude_comment_vim(const char* buf, size_t bufsize, int wordtype, const char* target_word)
 {
 	char valid_str[DATASIZE_OUT+1];
-	bool found_anything_but_whitespace = false;
+	auto found_anything_but_whitespace = false;
     char* q = valid_str;
     for (auto p = (char*)buf; p < buf + bufsize; ++p) {
 		if (*p == '\n' || *p == '\0' ) break;
@@ -1067,8 +1074,8 @@ bool findword_in_line(char* valid_str, int wordtype, const char* target_word)
 		char* findptr = strstr(valid_str, target_word);
 
 		while (findptr != nullptr) {
-			bool head = false;
-			bool tail = false;
+			auto head = false;
+			auto tail = false;
 			if (findptr == remain_ptr) {
 				head = true;
 			} else {
