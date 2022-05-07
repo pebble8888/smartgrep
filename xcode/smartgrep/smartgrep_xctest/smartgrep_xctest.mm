@@ -31,7 +31,7 @@
     int wordtype = 0;
     wordtype |= SG_WORDTYPE_WORD;
     wordtype |= SG_WORDTYPE_EXCLUDE_COMMENT;
-    parse_file( filename, wordtype, target_word);
+    parse_file(filename, wordtype, target_word);
 }
 #endif
 
@@ -41,7 +41,7 @@
     int wordtype = 0;
     wordtype |= SG_WORDTYPE_NORMAL;
     wordtype |= SG_WORDTYPE_INCLUDE_COMMENT;
-    parse_file( filename, wordtype, target_word);
+    parse_file(filename, wordtype, target_word);
 }
 
 
@@ -52,8 +52,17 @@
     int wordtype = 0;
     wordtype |= SG_WORDTYPE_WORD;
     wordtype |= SG_WORDTYPE_EXCLUDE_COMMENT;
-    parse_file( filename, wordtype, target_word);
+    parse_file(filename, wordtype, target_word);
 }
 #endif
+
+- (void)testSwift {
+    char filename[] = "/Users/pebble8888/develop/smartgrep/src/testfile/test.swift";
+    char target_word[] = ".beta?";
+    int wordtype = 0;
+    wordtype |= SG_WORDTYPE_NORMAL;
+    wordtype |= SG_WORDTYPE_EXCLUDE_COMMENT;
+    parse_file(filename, wordtype, target_word);
+}
 
 @end
