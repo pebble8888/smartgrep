@@ -15,8 +15,8 @@ enum {
 	SG_ST_ELSE,		/* in #elif or #else */
 };
 
-struct COMMENT_PREP {
-	int status = SG_ST_IFONE;
+struct CommentPrep {
+    int status { SG_ST_IFONE };
 };
 
 class Prep {
@@ -32,5 +32,5 @@ public:
     int depth() const;
 private:
     int _current_depth {};
-    COMMENT_PREP _comment[STACK_COUNT] {};
+    CommentPrep _comment[STACK_COUNT] {};
 };
