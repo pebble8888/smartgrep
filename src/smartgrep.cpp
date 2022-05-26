@@ -805,7 +805,7 @@ bool process_line_exclude_comment_c(
 	bool isin_literal = false; // "xxx", 'xxx'
     auto p = buf;
 	char* q = valid_str;
-    while (p < buf + bufsize && q < &valid_str[DATASIZE_OUT+1]) {
+    while (p < buf + bufsize && q < valid_str + DATASIZE_OUT) {
 		if (*p == '\n' || *p == '\0') break;
 		if (!isin_literal && !isin_multiline_comment && !prep.is_commented()
 			&& *p == '/' && *(p+1) == '/') {
@@ -881,7 +881,11 @@ bool process_line_exclude_comment_c(
 			continue;
 		}
 
-		if (*p == '\r' || *p == '\n' || *p == '\0') break;
+        if (p >= buf + bufsize) {
+            break;
+        }
+
+        if (*p == '\r' || *p == '\n' || *p == '\0') break;
 		
 		// valid data
 		*(q++) = *(p++);
@@ -1117,7 +1121,7 @@ bool process_line_include_comment(const char* buf, size_t bufsize, int wordtype,
 {
     char valid_str[DATASIZE_OUT+1];
     char* q = valid_str;
-    for (auto p = (char*)buf ; p < buf + bufsize && q < &valid_str[DATASIZE_OUT+1]; ++p) {
+    for (auto p = (char*)buf ; p < buf + bufsize && q < valid_str + DATASIZE_OUT;) {
         if (*p == '\0' || *p == '\r' || *p  =='\n') {
             break;
         }
