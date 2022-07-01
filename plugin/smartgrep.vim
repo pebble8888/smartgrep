@@ -16,6 +16,7 @@ if !exists('g:smartgrep_user_option')
   let g:smartgrep_user_option=''
 endif
 
+" exclude comment word
 function! RSmartGrepEWG(word)
   if exists("g:smartgrep_no_detectrepo")
     set grepprg=smartgrep\ -ew
@@ -29,6 +30,7 @@ function! RSmartGrepEWG(word)
   call RSmartHilight(a:word)
 endfunction
 
+" exclude comment
 function! RSmartGrepEG(word)
   if exists("g:smartgrep_no_detectrepo")
     set grepprg=smartgrep\ -e
@@ -42,7 +44,7 @@ function! RSmartGrepEG(word)
   call RSmartHilight(a:word)
 endfunction
 
-
+" .h exclude comment word
 function! RSmartGrepHWG(word)
   if exists("g:smartgrep_no_detectrepo") 
     set grepprg=smartgrep\ -hw
@@ -56,6 +58,7 @@ function! RSmartGrepHWG(word)
   call RSmartHilight(a:word)
 endfunction
 
+" including comment
 function! RSmartGrepIG(word)
   if exists("g:smartgrep_no_detectrepo")
     set grepprg=smartgrep\ -i
@@ -69,6 +72,7 @@ function! RSmartGrepIG(word)
   call RSmartHilight(a:word)
 endfunction
 
+" case insensitive
 function! RSmartGrepCG(word)
   if exists("g:smartgrep_no_detectrepo")
     set grepprg=smartgrep\ -c
@@ -82,6 +86,7 @@ function! RSmartGrepCG(word)
   call RSmartHilight(a:word)
 endfunction
 
+" silver searcher
 function! RSilverSearcherGrep(word)
   let s:basedir = system('git rev-parse --show-toplevel')
   let s:cmd = 'lcd ' . s:basedir
@@ -93,6 +98,7 @@ function! RSilverSearcherGrep(word)
   call RSmartHilight(a:word)
 endfunction
 
+" jvgrep
 function! RJvgrep(word)
   let s:basedir = system('git rev-parse --show-toplevel')
   let s:cmd = 'lcd ' . s:basedir
@@ -106,6 +112,7 @@ function! RJvgrep(word)
   call RSmartHilight(a:word)
 endfunction
 
+" find
 function! RFind(word)
   let s:basedir = system('git rev-parse --show-toplevel')
   let s:cmd = 'lcd ' . s:basedir
