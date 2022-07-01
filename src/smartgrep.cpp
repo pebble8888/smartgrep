@@ -478,7 +478,16 @@ bool is_shell_file(const char* file_name) { return is_ext(file_name, "sh"); }
 bool is_ruby_file(const char* file_name) { return is_ext(file_name, "rb"); }
 bool is_crystal_file(const char* file_name) { return is_ext(file_name, "cr"); }
 bool is_erb_file(const char* file_name) { return is_ext(file_name, "erb"); }
-bool is_html_file(const char* file_name) { return is_ext(file_name, "html"); }
+bool is_html_file(const char* file_name) {
+    if (is_ext(file_name, "html") ||
+        is_ext(file_name, "htm") ||
+        is_ext(file_name, "css")) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 bool is_xml_file(const char* file_name) { return is_ext(file_name, "xml"); }
 bool is_coffee_file(const char* file_name) { return is_ext(file_name, "coffee"); }
 bool is_python_file(const char* file_name) { return is_ext(file_name, "py"); }
@@ -1126,7 +1135,7 @@ bool process_line_include_comment(const char* buf, size_t bufsize, int wordtype,
             break;
         }
 
-        *(q++) = *p;
+        *(q++) = *(p++);
     }
 
     *q = 0x0; // null terminate
