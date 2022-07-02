@@ -555,7 +555,7 @@ bool is_last(const char* file_name, const char* last_name) {
         return false;
     }
 
-    i -= 1;
+    --i;
     size_t j = len - 1;
     while (i >= 0 && j >= 0) {
         if (file_name[i] == last_name[j]) {
@@ -566,8 +566,8 @@ bool is_last(const char* file_name, const char* last_name) {
             return false;
         }
 
-        i -= 1;
-        j -= 1;
+        --i;
+        --j;
     }
 
     return false;
@@ -620,7 +620,7 @@ void parse_file(const char* file_name, int wordtype, const char* target_word)
             int data[2];
             data[0] = fgetc(fp);
             if (feof(fp) || ferror(fp)) break;
-            data[1] = fgetc( fp );
+            data[1] = fgetc(fp);
             if (feof(fp) || ferror(fp)) break;
 
             if (data[0] == 0xff && data[1] == 0xfe) {
@@ -920,7 +920,7 @@ bool process_line_exclude_comment_ruby(
 	auto isin_sq = false; // 'xxx'
 	auto isin_var = false; // "#{}"
 	char* q = valid_str;
-    for (auto p = (char*)buf; p < buf + bufsize; ++p) {
+    for (auto p = (char*)buf; p < buf + bufsize; ) {
 		if (*p == '\n' || *p == '\0') break; 
 
         if (!isin_multiline_comment
@@ -937,6 +937,7 @@ bool process_line_exclude_comment_ruby(
             else if (file_extension == kCoffee) { p += 3; }
             else if (file_extension == kPython) { p += 3; }
             isin_multiline_comment = true;
+            ++p;
             continue;
         } else if (!isin_dq && !isin_sq && isin_multiline_comment) {
             // in multi-line comment
@@ -991,7 +992,7 @@ bool process_line_exclude_comment_ruby(
 		if (*p == '\r' || *p == '\n' || *p == '\0') break;
 		
 		// valid data
-		*(q++) = *p;
+		*(q++) = *(p++);
 	}
 
 WHILEOUT:
@@ -1007,7 +1008,7 @@ bool process_line_exclude_comment_vb(const char* buf, size_t bufsize, int wordty
 	char valid_str[DATASIZE_OUT+1];
 	auto isin_dq = false; // "xxx"
 	char* q = valid_str;
-    for (auto p = (char*)buf; p < buf + bufsize; ++p) {
+    for (auto p = (char*)buf; p < buf + bufsize; ) {
 		if (*p == '\n' || *p == '\0') break; 
 
         if (!isin_dq && *p == '\'') {
@@ -1021,7 +1022,7 @@ bool process_line_exclude_comment_vb(const char* buf, size_t bufsize, int wordty
 		if (*p == '\r' || *p == '\n' || *p == '\0') break;
 		
 		// valid data
-		*(q++) = *p;
+		*(q++) = *(p++);
 	}
 
     *q = 0x0; // null terminate
@@ -1036,7 +1037,7 @@ bool process_line_exclude_comment_vim(const char* buf, size_t bufsize, int wordt
 	char valid_str[DATASIZE_OUT+1];
 	auto found_anything_but_whitespace = false;
     char* q = valid_str;
-    for (auto p = (char*)buf; p < buf + bufsize; ++p) {
+    for (auto p = (char*)buf; p < buf + bufsize; ) {
 		if (*p == '\n' || *p == '\0' ) break;
 
         if (!found_anything_but_whitespace && *p == '\"') {
@@ -1049,7 +1050,7 @@ bool process_line_exclude_comment_vim(const char* buf, size_t bufsize, int wordt
 		if (!(*p == kSpace || *p == kTab)) found_anything_but_whitespace = true;
 		
 		// valid data
-		*(q++) = *p;
+		*(q++) = *(p++);
 	}
 
     *q = 0x0; // null terminate
@@ -1107,7 +1108,7 @@ bool findword_in_line(char* valid_str, int wordtype, const char* target_word)
 				}
 			}
 			remain_ptr = findptr;
-			findptr = strstr(findptr + target_word_len , target_word);
+			findptr = strstr(findptr + target_word_len, target_word);
 		}
 
 		return false;
