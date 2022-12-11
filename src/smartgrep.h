@@ -55,14 +55,14 @@ typedef struct {
  * @brief	function prototype
  */
 void usage();
-void parse_file(const char* file_name, int wordtype, const char* target_word);
+void parse_file(const char* file_name, const int wordtype, const char* target_word);
 bool process_line_exclude_comment_c(bool& isin_multiline_comment, Prep& prep, const char* buf, size_t bufsize, int wordtype, const char* target_word);
-bool process_line_exclude_comment_ruby(bool& isin_multiline_comment, const char* buf, size_t bufsize, int wordtype, const char* target_word, int file_extension);
-bool process_line_exclude_comment_vb(const char* buf, size_t bufsize, int wordtype, const char* target_word); 
-bool process_line_exclude_comment_vim(const char* buf, size_t bufsize, int wordtype, const char* target_word); 
-bool process_line_include_comment(const char* buf, size_t bufsize, int wordtype, const char* target_word);
+bool process_line_exclude_comment_ruby(bool& isin_multiline_comment, const char* buf, const size_t bufsize, const int wordtype, const char* target_word, const int file_extension);
+bool process_line_exclude_comment_vb(const char* buf, size_t bufsize, const int wordtype, const char* target_word);
+bool process_line_exclude_comment_vim(const char* buf, const size_t bufsize, const int wordtype, const char* target_word);
+bool process_line_include_comment(const char* buf, size_t bufsize, const int wordtype, const char* target_word);
 #ifdef _WIN32
-void parse_directory_win(const std::filesystem::path& path, const FILE_TYPE_INFO& info, int wordtype, const char* target_word);
+void parse_directory_win(const std::filesystem::path& path, const FILE_TYPE_INFO& info, const int wordtype, const char* target_word);
 #else
 void parse_directory_mac(const std::filesystem::path& path, const FILE_TYPE_INFO& info, int wordtype, const char* target_word);
 #endif
@@ -83,10 +83,10 @@ bool is_vim_file(const char* file_name);
 bool is_xcode_resource_file(const char* file_name);
 bool is_ext(const char* file_name, const char* ext_name);
 bool is_last(const char* file_name, const char* last_name);
-bool findword_in_line(char* valid_str, int wordtype, const char* target_word);
+bool findword_in_line(const char* valid_str, const int wordtype, const char* target_word);
 bool is_alnum_or_underscore(int val);
 void print_version();
-int UTF16LEToUTF8(int16_t* pIn, int count, char* pOut);
+int UTF16LEToUTF8(const int16_t* pIn, const int count, char* pOut);
 std::filesystem::path smartgrep_getcwd();
 std::filesystem::path smartgrep_getrepo();
 void test_is_alnum_or_underscore();

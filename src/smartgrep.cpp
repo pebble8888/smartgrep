@@ -324,7 +324,7 @@ void usage()
 void parse_directory_win(
     const std::filesystem::path& path,
     const FILE_TYPE_INFO& info,
-    int wordtype,
+    const int wordtype,
     const char* target_word)
 {
     const auto path_name = path / "*.*";
@@ -385,7 +385,7 @@ void parse_directory_win(
 void parse_directory_mac(
     const std::filesystem::path& path,
     const FILE_TYPE_INFO& info,
-    int wordtype,
+    const int wordtype,
     const char* target_word)
 {
 	DIR* p_dir = opendir(path.string().c_str());
@@ -576,9 +576,9 @@ bool is_last(const char* file_name, const char* last_name) {
 /*
  * @brief	parse one file
  * 			output to standard out
- * @param [in] char* file_name
- * @param [in] int wordtype
- * @param [in] char* target_word
+ * @param [in] const char* file_name
+ * @param [in] const int wordtype
+ * @param [in] const char* target_word
  */
 void parse_file(const char* file_name, int wordtype, const char* target_word)
 {
@@ -719,7 +719,7 @@ void parse_file(const char* file_name, int wordtype, const char* target_word)
                 std::string outstr;
                 // output filename and line number or EOF
                 char buf[512];
-                sprintf(buf, "%s:%d:", file_name, lineno);
+                snprintf(buf, sizeof(buf), "%s:%d:", file_name, lineno);
                 outstr = buf;
                 // output until next newline or EOF
                 for (; q < r_data + r_datasize; ++q) {
@@ -734,7 +734,7 @@ void parse_file(const char* file_name, int wordtype, const char* target_word)
                         q += 2;
                         break;
                     }
-                    sprintf(buf, "%c", *q);
+                    snprintf(buf, sizeof(buf), "%c", *q);
                     outstr += buf;
     			}
 
@@ -744,7 +744,6 @@ void parse_file(const char* file_name, int wordtype, const char* target_word)
                     // almost EOF
                     // TODO:not a completely valid logic
                 }
-                // printf("\n");
                 outstr += "\n";
                 printout(std::move(outstr));
             }
@@ -805,8 +804,8 @@ bool process_line_exclude_comment_c(
     bool& isin_multiline_comment,
     Prep& prep,
     const char* buf,
-    size_t bufsize,
-    int wordtype,
+    const size_t bufsize,
+    const int wordtype,
     const char* target_word)
 {
 	char valid_str[DATASIZE_OUT+1];
@@ -910,10 +909,10 @@ WHILEOUT:
 bool process_line_exclude_comment_ruby(
     bool& isin_multiline_comment,
     const char* buf,
-    size_t bufsize,
-    int wordtype,
+    const size_t bufsize,
+    const int wordtype,
     const char* target_word,
-    int file_extension)
+    const int file_extension)
 {
 	char valid_str[DATASIZE_OUT];
 	auto isin_dq = false; // "xxx"
@@ -1003,7 +1002,7 @@ WHILEOUT:
 /**
  * visual basic 6 and visual basic dot net
  */
-bool process_line_exclude_comment_vb(const char* buf, size_t bufsize, int wordtype, const char* target_word)
+bool process_line_exclude_comment_vb(const char* buf, const size_t bufsize, const int wordtype, const char* target_word)
 {
 	char valid_str[DATASIZE_OUT+1];
 	auto isin_dq = false; // "xxx"
@@ -1032,7 +1031,7 @@ bool process_line_exclude_comment_vb(const char* buf, size_t bufsize, int wordty
 /**
  * vim script
  */
-bool process_line_exclude_comment_vim(const char* buf, size_t bufsize, int wordtype, const char* target_word)
+bool process_line_exclude_comment_vim(const char* buf, const size_t bufsize, const int wordtype, const char* target_word)
 {
 	char valid_str[DATASIZE_OUT+1];
 	auto found_anything_but_whitespace = false;
@@ -1064,11 +1063,11 @@ bool process_line_exclude_comment_vim(const char* buf, size_t bufsize, int wordt
  * @retval	true : found target
  * @retval	false: not found target
  *
- * @param	[in] char* 	valid_str       
- * @param	[in] int 	wordtype
- * @param	[in] char* 	target_word
+ * @param	[in] const char* valid_str
+ * @param	[in] const int wordtype
+ * @param	[in] const char* target_word
  */
-bool findword_in_line(char* valid_str, int wordtype, const char* target_word)
+bool findword_in_line(const char* valid_str, const int wordtype, const char* target_word)
 {
 	if (wordtype & SG_WORDTYPE_NORMAL) {
 		// normal search
@@ -1084,8 +1083,8 @@ bool findword_in_line(char* valid_str, int wordtype, const char* target_word)
 	} else if (wordtype & SG_WORDTYPE_WORD) {
 		// word search
 		const auto target_word_len = (int)strlen(target_word);
-		char* remain_ptr = valid_str;
-		char* findptr = strstr(valid_str, target_word);
+		char* remain_ptr = const_cast<char *>(valid_str);
+		char* findptr = strstr(const_cast<char *>(valid_str), target_word);
 
 		while (findptr != nullptr) {
 			auto head = false;
@@ -1160,9 +1159,9 @@ bool is_alnum_or_underscore(int val)
 /**
  * @return bytelength
  */
-int UTF16LEToUTF8(int16_t* pwIn, int count, char* pOut)
+int UTF16LEToUTF8(const int16_t* pwIn, const int count, char* pOut)
 {
-    int16_t* pw = pwIn;
+    int16_t* pw = const_cast<int16_t*>(pwIn);
     char* q = pOut;
     while (pw <  pwIn + count) {
         if (*pw <= 0x7f) {
