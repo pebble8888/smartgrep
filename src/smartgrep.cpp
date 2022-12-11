@@ -37,10 +37,10 @@
 #include <windows.h>
 #endif
 
-const static int DATASIZE = 64 * 1024; // process unit size
-const static int DATASIZE_OUT = DATASIZE*3/sizeof(wchar_t);
-const static char kTab = 0x9;
-const static char kSpace = 0x20;
+static constexpr int DATASIZE = 64 * 1024; // process unit size
+static constexpr int DATASIZE_OUT = DATASIZE*3/sizeof(wchar_t);
+static constexpr char kTab = 0x9;
+static constexpr char kSpace = 0x20;
 
 static std::queue<std::string> filenames_queue_; // use filenames_mtx_ for access
 static bool done_adding_files_;   // use filenames_mtx_ for access
