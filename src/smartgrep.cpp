@@ -118,10 +118,20 @@ int main(int argc, char* argv[])
 		info.filetype |= (SG_FILETYPE_SOURCE|SG_FILETYPE_HEADER);
 		wordtype |= SG_WORDTYPE_WORD;
 		wordtype |= SG_WORDTYPE_EXCLUDE_COMMENT;
-    } else if (strcmp(argv[1], "-c") == 0) {
-        info.filetype |= (SG_FILETYPE_SOURCE|SG_FILETYPE_HEADER);
-        wordtype |= SG_WORDTYPE_NORMAL;
-        wordtype |= SG_WORDTYPE_INCLUDE_COMMENT;
+    } else if (strcmp(argv[1], "-ic") == 0) {
+		info.filetype |= (SG_FILETYPE_SOURCE|SG_FILETYPE_HEADER);
+		wordtype |= SG_WORDTYPE_NORMAL;
+		wordtype |= SG_WORDTYPE_INCLUDE_COMMENT;
+        wordtype |= SG_WORDTYPE_CASEINSENSITIVE;
+	} else if (strcmp(argv[1], "-hc") == 0) {
+		info.filetype |= SG_FILETYPE_HEADER;
+		wordtype |= SG_WORDTYPE_NORMAL;
+		wordtype |= SG_WORDTYPE_EXCLUDE_COMMENT;
+        wordtype |= SG_WORDTYPE_CASEINSENSITIVE;
+	} else if (strcmp(argv[1], "-ec") == 0) {
+		info.filetype |= (SG_FILETYPE_SOURCE|SG_FILETYPE_HEADER);
+		wordtype |= SG_WORDTYPE_NORMAL;
+		wordtype |= SG_WORDTYPE_EXCLUDE_COMMENT;
         wordtype |= SG_WORDTYPE_CASEINSENSITIVE;
 	} else {
 		usage();
@@ -287,12 +297,11 @@ std::filesystem::path smartgrep_getrepo()
 void usage()
 {
 	printf( 
-		"Usage: smartgrep {-e[w]|-i[w]|-h[w]|-c} [options] word_you_grep\n"
+		"Usage: smartgrep {-e[cw]|-i[cw]|-h[cw]} [options] word_you_grep\n"
         "\n"
-		"  -e[w] : recursive [word] grep for supported file extensions excluding comment\n"
-		"  -i[w] : recursive [word] grep for supported file extensions including comment\n"
-		"  -h[w] : recursive [word] grep for .h excluding comment\n"
-        "  -c : recursive case insensitive grep for supported file extesion including comment\n"
+		"  -e[cw] : recursive [recursive case insensitive,word] grep for supported file extensions excluding comment\n"
+		"  -i[cw] : recursive [recursive case insensitive,word] grep for supported file extensions including comment\n"
+		"  -h[cw] : recursive [recursive case insensitive,word] grep for .h excluding comment\n"
         "\n"
         " [options]\n"
         "  -g : use auto detect git or mercurial repository with the current directory\n"
@@ -529,7 +538,8 @@ bool is_header_file(const char* file_name) {
 }
 
 /*
- @param char: ext_name "c", "cpp", "h", etc
+ @param file_name
+ @param ext_name "c", "cpp", "h", etc
  */
 bool is_ext(const char* file_name, const char* ext_name) {
 	char* period = strrchr((char*)file_name, '.');
@@ -576,9 +586,9 @@ bool is_last(const char* file_name, const char* last_name) {
 /*
  @brief	parse one file
         output to standard out
- @param [in] const char* file_name
- @param [in] const int wordtype
- @param [in] const char* target_word
+ @param [in] file_name
+ @param [in] wordtype
+ @param [in] target_word
  */
 void parse_file(const char* file_name, int wordtype, const char* target_word)
 {
@@ -1059,9 +1069,9 @@ bool process_line_exclude_comment_vim(const char* buf, const size_t bufsize, con
         strstr can be hit twice in one line.
  @retval	true : found target
  @retval	false: not found target
- @param	[in] const char* valid_str
- @param	[in] const int wordtype
- @param	[in] const char* target_word
+ @param	[in] valid_str
+ @param	[in] wordtype
+ @param	[in] target_word
  */
 bool findword_in_line(const char* valid_str, const int wordtype, const char* target_word)
 {

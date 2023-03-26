@@ -16,22 +16,8 @@ if !exists('g:smartgrep_user_option')
   let g:smartgrep_user_option=''
 endif
 
-" exclude comment word
-function! RSmartGrepEWG(word)
-  if exists("g:smartgrep_no_detectrepo")
-    set grepprg=smartgrep\ -ew
-  else
-    set grepprg=smartgrep\ -ew\ -g
-  endif
-  silent! execute "cd " . '.'
-  silent! execute "lgrep " . g:smartgrep_user_option . " " . a:word
-  silent! lopen
-  set grepprg&
-  call RSmartHilight(a:word)
-endfunction
-
 " exclude comment
-function! RSmartGrepEG(word)
+function! RSmartGrepE(word)
   if exists("g:smartgrep_no_detectrepo")
     set grepprg=smartgrep\ -e
   else
@@ -44,8 +30,50 @@ function! RSmartGrepEG(word)
   call RSmartHilight(a:word)
 endfunction
 
+" exclude comment word
+function! RSmartGrepEW(word)
+  if exists("g:smartgrep_no_detectrepo")
+    set grepprg=smartgrep\ -ew
+  else
+    set grepprg=smartgrep\ -ew\ -g
+  endif
+  silent! execute "cd " . '.'
+  silent! execute "lgrep " . g:smartgrep_user_option . " " . a:word
+  silent! lopen
+  set grepprg&
+  call RSmartHilight(a:word)
+endfunction
+
+" exclude comment case insensitive
+function! RSmartGrepEC(word)
+  if exists("g:smartgrep_no_detectrepo")
+    set grepprg=smartgrep\ -ec
+  else
+    set grepprg=smartgrep\ -ec\ -g
+  endif
+  silent! execute "cd " . '.'
+  silent! execute "lgrep " . g:smartgrep_user_option . " " . a:word
+  silent! lopen
+  set grepprg&
+  call RSmartHilight(a:word)
+endfunction
+
+" .h exclude comment
+function! RSmartGrepHW(word)
+  if exists("g:smartgrep_no_detectrepo") 
+    set grepprg=smartgrep\ -h
+  else
+    set grepprg=smartgrep\ -h\ -g
+  endif
+  silent! execute "cd " . '.'
+  silent! execute "lgrep " . g:smartgrep_user_option . " " . a:word
+  silent! lopen
+  set grepprg&
+  call RSmartHilight(a:word)
+endfunction
+
 " .h exclude comment word
-function! RSmartGrepHWG(word)
+function! RSmartGrepHW(word)
   if exists("g:smartgrep_no_detectrepo") 
     set grepprg=smartgrep\ -hw
   else
@@ -58,8 +86,22 @@ function! RSmartGrepHWG(word)
   call RSmartHilight(a:word)
 endfunction
 
+" .h exclude comment word
+function! RSmartGrepHC(word)
+  if exists("g:smartgrep_no_detectrepo") 
+    set grepprg=smartgrep\ -hc
+  else
+    set grepprg=smartgrep\ -hc\ -g
+  endif
+  silent! execute "cd " . '.'
+  silent! execute "lgrep " . g:smartgrep_user_option . " " . a:word
+  silent! lopen
+  set grepprg&
+  call RSmartHilight(a:word)
+endfunction
+
 " including comment
-function! RSmartGrepIG(word)
+function! RSmartGrepI(word)
   if exists("g:smartgrep_no_detectrepo")
     set grepprg=smartgrep\ -i
   else
@@ -72,12 +114,26 @@ function! RSmartGrepIG(word)
   call RSmartHilight(a:word)
 endfunction
 
-" case insensitive
-function! RSmartGrepCG(word)
+" including comment word
+function! RSmartGrepI(word)
   if exists("g:smartgrep_no_detectrepo")
-    set grepprg=smartgrep\ -c
+    set grepprg=smartgrep\ -iw
   else
-    set grepprg=smartgrep\ -c\ -g
+    set grepprg=smartgrep\ -iw\ -g
+  endif
+  silent! execute "cd " . '.'
+  silent! execute "lgrep " . g:smartgrep_user_option . " " . a:word
+  silent! lopen
+  set grepprg&
+  call RSmartHilight(a:word)
+endfunction
+
+" including comment case insensitive
+function! RSmartGrepIC(word)
+  if exists("g:smartgrep_no_detectrepo")
+    set grepprg=smartgrep\ -ic
+  else
+    set grepprg=smartgrep\ -ic\ -g
   endif
   silent! execute "cd " . '.'
   silent! execute "lgrep " . g:smartgrep_user_option . " " . a:word
@@ -128,10 +184,8 @@ endfunction
 if !exists('g:smartgrep_no_default_key_mappings')
   " <Leader>g  : recursive word grep for supported files exclude comment by mouse cursored word 
   " <Leader>h  : recursive word grep for h file exclude comment by mouse cursored word
-  " <Leader>i  : recursive grep for supported files include comment
-  noremap <Leader>g :call RSmartGrepEWG("<C-R><C-W>")<CR>
-  noremap <Leader>h :call RSmartGrepHWG("<C-R><C-W>")<CR>
-  noremap <Leader>i :call RSmartGrepIG("<C-R><C-W>")<CR>
+  noremap <Leader>g :call RSmartGrepEW("<C-R><C-W>")<CR>
+  noremap <Leader>h :call RSmartGrepHW("<C-R><C-W>")<CR>
 endif
 
 if !exists('g:smartgrep_no_default_key_mappings')
@@ -139,8 +193,10 @@ if !exists('g:smartgrep_no_default_key_mappings')
   " :Rh -> recursive word grep for h file exclude comment
   " :Ri -> recursive grep for supported files include comment
   " :Rc -> recursive case insensitive grep for supported files include comment
-  command! -nargs=1 -complete=file R call RSmartGrepEWG("<args>")
-  command! -nargs=1 -complete=file Rh call RSmartGrepHWG("<args>")
-  command! -nargs=1 -complete=file Rc call RSmartGrepCG("<args>")
-  command! -nargs=1 -complete=file Ri call RSmartGrepIG("<args>")
+  " :Rd -> recursive case insensitive grep for supported files exclude comment
+  command! -nargs=1 -complete=file R call RSmartGrepEW("<args>")
+  command! -nargs=1 -complete=file Rh call RSmartGrepHW("<args>")
+  command! -nargs=1 -complete=file Ri call RSmartGrepI("<args>")
+  command! -nargs=1 -complete=file Rc call RSmartGrepIC("<args>")
+  command! -nargs=1 -complete=file Rd call RSmartGrepEC("<args>")
 endif
