@@ -1,25 +1,19 @@
 *smartgrep.txt* 
 
-Version : 4.3.0
+Version : 4.3.2
 Author  : pebble8888@gmail.com
 License : MIT license
 ==============================================================================
 USAGE
 
 :R  -> recursive word grep for supported files exclude comment
-:Rg -> recursive grep for supported files exclude comment
 :Rh -> recursive word grep for h file exclude comment
 :Ri -> recursive grep for supported files include comment
 :Rc -> recursive case insensitive grep for supported files include comment
-:Rs -> ag
-:Rl -> jvgrep
 
 <Leader>g  : recursive word grep for supported files exclude comment by mouse cursored word 
 <Leader>h  : recursive word grep for h file exclude comment by mouse cursored word
 <Leader>i  : recursive grep for supported files include comment
-<Leader>u  : git grep by mouse cursored word
-<Leader>s  : ag by mouse cursored word
-<Leader>l  : jvgrep by ouse cursored word
 
 ==============================================================================
 Support OS

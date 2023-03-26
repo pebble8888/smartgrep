@@ -2,7 +2,7 @@
 " Filename : smartgrep.vim 
 " Brief    : This file is vim plugin
 " Function : grep source file excluding comment and wrapper for major grep command
-" Author   : pebble8888@gmail.com 2009-2015 Copyright
+" Author   : pebble8888@gmail.com 2009-2023 Copyright
 "
 " Implementation below
 
@@ -129,31 +129,18 @@ if !exists('g:smartgrep_no_default_key_mappings')
   " <Leader>g  : recursive word grep for supported files exclude comment by mouse cursored word 
   " <Leader>h  : recursive word grep for h file exclude comment by mouse cursored word
   " <Leader>i  : recursive grep for supported files include comment
-  " <Leader>u  : git grep by mouse cursored word
-  " <Leader>s  : ag by mouse cursored word
-  " <Leader>l  : jvgrep by ouse cursored word
   noremap <Leader>g :call RSmartGrepEWG("<C-R><C-W>")<CR>
   noremap <Leader>h :call RSmartGrepHWG("<C-R><C-W>")<CR>
   noremap <Leader>i :call RSmartGrepIG("<C-R><C-W>")<CR>
-  "noremap <Leader>s :call RSilverSearcherGrep("<C-R><C-W>")<CR>
-  "noremap <Leader>l :call RJvgrep("<C-R><C-W>")<CR>
 endif
 
 if !exists('g:smartgrep_no_default_key_mappings')
   " :R  -> recursive word grep for supported files exclude comment
-  " :Re -> recursive grep for supported files exclude comment
   " :Rh -> recursive word grep for h file exclude comment
   " :Ri -> recursive grep for supported files include comment
   " :Rc -> recursive case insensitive grep for supported files include comment
-  " :Rg -> silver searcher (ag)
-  " :Rj -> jvgrep
-  " :Rf -> grep filename using find command
   command! -nargs=1 -complete=file R call RSmartGrepEWG("<args>")
-  command! -nargs=1 -complete=file Re call RSmartGrepEG("<args>")
   command! -nargs=1 -complete=file Rh call RSmartGrepHWG("<args>")
-  command! -nargs=1 -complete=file Ri call RSmartGrepIG("<args>")
   command! -nargs=1 -complete=file Rc call RSmartGrepCG("<args>")
-  command! -nargs=1 -complete=file Rg call RSilverSearcherGrep("<args>")
-  command! -nargs=1 -complete=file Rj call RJvgrep("<args>")
-  command! -nargs=1 -complete=file Rf call RFind("<args>")
+  command! -nargs=1 -complete=file Ri call RSmartGrepIG("<args>")
 endif
