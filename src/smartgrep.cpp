@@ -309,17 +309,17 @@ void usage()
         "\n"
         "  ignore directory : .git/.hg/.svn/.vs\n"
         "\n"
-        "  Version 4.3.1\n"
+        "  Version 4.3.2\n"
 	);
 }
 
 #ifdef _WIN32
 /*
- * @param path
- * @param filetype	SG_FILETYPE_SOURCE: .c/.cpp/.m/.mm/etc
- * 					SG_FILETYPE_HEADER: .h/.hpp/etc
- * @param wordtype	
- * @param target_word
+ @param path
+ @param filetype    SG_FILETYPE_SOURCE: .c/.cpp/.m/.mm/etc
+                    SG_FILETYPE_HEADER: .h/.hpp/etc
+ @param wordtype	
+ @param target_word
  */
 void parse_directory_win(
     const std::filesystem::path& path,
@@ -376,11 +376,11 @@ void parse_directory_win(
 #else
 
 /*
- * @param path
- * @param filetype	SG_FILETYPE_SOURCE: .c/.cpp/.m/.mm/.cs/.js etc
- * 					SG_FILETYPE_HEADER: .h/.hpp/etc
- * @param wordtype
- * @param target_word
+ @param path
+ @param filetype    SG_FILETYPE_SOURCE: .c/.cpp/.m/.mm/.cs/.js etc
+                    SG_FILETYPE_HEADER: .h/.hpp/etc
+ @param wordtype
+ @param target_word
  */
 void parse_directory_mac(
     const std::filesystem::path& path,
@@ -529,7 +529,7 @@ bool is_header_file(const char* file_name) {
 }
 
 /*
- * @param char: ext_name "c", "cpp", "h", etc
+ @param char: ext_name "c", "cpp", "h", etc
  */
 bool is_ext(const char* file_name, const char* ext_name) {
 	char* period = strrchr((char*)file_name, '.');
@@ -574,11 +574,11 @@ bool is_last(const char* file_name, const char* last_name) {
 }
 
 /*
- * @brief	parse one file
- * 			output to standard out
- * @param [in] const char* file_name
- * @param [in] const int wordtype
- * @param [in] const char* target_word
+ @brief	parse one file
+        output to standard out
+ @param [in] const char* file_name
+ @param [in] const int wordtype
+ @param [in] const char* target_word
  */
 void parse_file(const char* file_name, int wordtype, const char* target_word)
 {
@@ -788,17 +788,15 @@ void parse_file(const char* file_name, int wordtype, const char* target_word)
 }
 
 /**
- * @brief parse one line in file excluding comemnt
- *
- * @retval true : found
- * @retval false: not found
- *
- * @param [in/out] isin_multiline_comment 		whether in C comment
- * @param [in/out] prep
- * @param [in] buf
- * @param [in] bufsize
- * @param [in] wordtype
- * @param [in] target_word
+ @brief parse one line in file excluding comemnt
+ @retval true : found
+ @retval false: not found
+ @param [in/out] isin_multiline_comment 		whether in C comment
+ @param [in/out] prep
+ @param [in] buf
+ @param [in] bufsize
+ @param [in] wordtype
+ @param [in] target_word
  */
 bool process_line_exclude_comment_c(
     bool& isin_multiline_comment,
@@ -904,7 +902,7 @@ WHILEOUT:
 }
 
 /**
- * dynamic languages
+ dynamic languages
  */
 bool process_line_exclude_comment_ruby(
     bool& isin_multiline_comment,
@@ -1000,7 +998,7 @@ WHILEOUT:
 }
 
 /**
- * visual basic 6 and visual basic dot net
+ visual basic 6 and visual basic dot net
  */
 bool process_line_exclude_comment_vb(const char* buf, const size_t bufsize, const int wordtype, const char* target_word)
 {
@@ -1029,7 +1027,7 @@ bool process_line_exclude_comment_vb(const char* buf, const size_t bufsize, cons
 }
 
 /**
- * vim script
+ vim script
  */
 bool process_line_exclude_comment_vim(const char* buf, const size_t bufsize, const int wordtype, const char* target_word)
 {
@@ -1057,15 +1055,13 @@ bool process_line_exclude_comment_vim(const char* buf, const size_t bufsize, con
 }
 
 /**
- * @brief	search string in one line.
- * 			strstr can be hit twice in one line.
- *
- * @retval	true : found target
- * @retval	false: not found target
- *
- * @param	[in] const char* valid_str
- * @param	[in] const int wordtype
- * @param	[in] const char* target_word
+ @brief	search string in one line.
+        strstr can be hit twice in one line.
+ @retval	true : found target
+ @retval	false: not found target
+ @param	[in] const char* valid_str
+ @param	[in] const int wordtype
+ @param	[in] const char* target_word
  */
 bool findword_in_line(const char* valid_str, const int wordtype, const char* target_word)
 {
@@ -1118,13 +1114,13 @@ bool findword_in_line(const char* valid_str, const int wordtype, const char* tar
 }
 
 /**
- * @brief   as is
- * @retval	true: found target
- * @retval	false: not found target
- * @param [in] buf
- * @param [in] bufsize
- * @param [in] worktype
- * @param [in] target_word
+ @brief  as is
+ @retval true: found target
+ @retval false: not found target
+ @param [in] buf
+ @param [in] bufsize
+ @param [in] worktype
+ @param [in] target_word
  */
 bool process_line_include_comment(const char* buf, size_t bufsize, int wordtype, const char* target_word)
 {
@@ -1157,7 +1153,7 @@ bool is_alnum_or_underscore(int val)
 }
 
 /**
- * @return bytelength
+ @return bytelength
  */
 int UTF16LEToUTF8(const int16_t* pwIn, const int count, char* pOut)
 {
@@ -1189,3 +1185,4 @@ void printout(std::string&& str)
     std::lock_guard<std::mutex> lk(print_mtx_);
     output_.push_back(str);
 }
+

@@ -1,6 +1,6 @@
 /**
- *	@file 	smartgrep.h
- *	@author	pebble8888@gmail.com
+ @file   smartgrep.hpp
+ @author pebble8888@gmail.com
  */
 
 #pragma once
@@ -16,7 +16,6 @@
 #define SG_FILETYPE_HEADER	(1<<0)	// .h/.hpp/etc 
 #define SG_FILETYPE_SOURCE	(1<<1)	// .c/.cpp/.m/.mm/.cs/.js etc
 
-/* preprocessor comment */
 #define SG_PREP_IFZERO	"#if 0"
 #define SG_PREP_IF		"#if " // don't hit #ifdef or #ifndef
 #define SG_PREP_IFDEF	"#ifdef"
@@ -25,7 +24,6 @@
 #define SG_PREP_ELSE 	"#else"
 #define SG_PREP_ENDIF	"#endif"
 
-/* file extension */
 enum {
 	kC,
     kShell,
@@ -41,9 +39,6 @@ enum {
 #include "foldernamelist.h"
 #include "prep.h"
 
-/**
- * @brief command option
- */
 typedef struct {
     int filetype;
     bool typejs;
@@ -51,9 +46,6 @@ typedef struct {
     Foldernamelist foldernamelist;
 } FILE_TYPE_INFO;
 
-/**
- * @brief	function prototype
- */
 void usage();
 void parse_file(const char* file_name, const int wordtype, const char* target_word);
 bool process_line_exclude_comment_c(bool& isin_multiline_comment, Prep& prep, const char* buf, size_t bufsize, int wordtype, const char* target_word);

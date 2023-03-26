@@ -1,6 +1,6 @@
 #
 # makefile for Unix / Linux / MacOS / Windows with MinGW
-# Copyright (C) 2011-2015 pebble8888@gmail.com
+# Copyright (C) 2011-2023 pebble8888@gmail.com
 #
 #CXX=g++
 TARGET=smartgrep
