@@ -86,7 +86,7 @@ function! RSmartGrepHW(word)
   call RSmartHilight(a:word)
 endfunction
 
-" .h exclude comment word
+" .h exclude comment word case insensitive
 function! RSmartGrepHC(word)
   if exists("g:smartgrep_no_detectrepo") 
     set grepprg=smartgrep\ -hc
@@ -192,11 +192,11 @@ if !exists('g:smartgrep_no_default_key_mappings')
   " :R  -> recursive word grep for supported files exclude comment
   " :Rh -> recursive word grep for h file exclude comment
   " :Ri -> recursive grep for supported files include comment
-  " :Rc -> recursive case insensitive grep for supported files include comment
-  " :Rd -> recursive case insensitive grep for supported files exclude comment
+  " :Rc -> recursive case insensitive grep for supported files exclude comment
+  " :Rhc -> recursive case insensitive grep for h file exclude comment
   command! -nargs=1 -complete=file R call RSmartGrepEW("<args>")
   command! -nargs=1 -complete=file Rh call RSmartGrepHW("<args>")
   command! -nargs=1 -complete=file Ri call RSmartGrepI("<args>")
-  command! -nargs=1 -complete=file Rc call RSmartGrepIC("<args>")
-  command! -nargs=1 -complete=file Rd call RSmartGrepEC("<args>")
+  command! -nargs=1 -complete=file Rc call RSmartGrepEC("<args>")
+  command! -nargs=1 -complete=file Rhc call RSmartGrepHC("<args>")
 endif
