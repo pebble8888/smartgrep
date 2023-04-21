@@ -115,7 +115,7 @@ function! RSmartGrepI(word)
 endfunction
 
 " including comment word
-function! RSmartGrepI(word)
+function! RSmartGrepIW(word)
   if exists("g:smartgrep_no_detectrepo")
     set grepprg=smartgrep\ -iw
   else
